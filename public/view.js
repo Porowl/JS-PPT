@@ -12,63 +12,6 @@ export default class view {
 		this.offset = PLAYER_OFFSET * player;
 		this.clearLineInfo;
 	}
-	/**
-	 * 무대를 그립니다.
-	 */
-	initGraphics = () => {
-		let ctx = this.boardCtx;
-		ctx.font = "16px 'Press Start 2P'";
-		ctx.fillStyle = COLOR_WHITE;
-		ctx.textBaseline = 'top';
-		ctx.textAlign = 'center';
-		ctx.fillText(
-			NEXT,
-			NEXT_X_OFFSET + NEXT_BLOCK_SIZE_OUTLINE * 3 + this.offset,
-			NEXT_Y_OFFSET + 5
-		);
-		ctx.fillText(
-			HOLD,
-			HOLD_X_OFFSET + HOLD_BLOCK_SIZE_OUTLINE * 3 + this.offset,
-			HOLD_Y_OFFSET + 5
-		);
-		//ctx.fillText(
-		//	LEVEL,
-		//	HOLD_X_OFFSET + HOLD_BLOCK_SIZE_OUTLINE * 3 + this.offset,
-		//	Y_OFFSET + (VISIBLE_HEIGHT - 6) * BLOCK_SIZE_OUTLINE + 5
-		//);
-
-		// BOARD
-		this.callDrawOutline(
-			X_OFFSET,
-			Y_OFFSET,
-			X_OFFSET + BOARD_WIDTH * BLOCK_SIZE_OUTLINE,
-			Y_OFFSET + VISIBLE_HEIGHT * BLOCK_SIZE_OUTLINE
-		);
-
-		// NEXTS
-		this.callDrawOutline(
-			NEXT_X_OFFSET,
-			NEXT_Y_OFFSET,
-			NEXT_X_OFFSET + NEXT_BLOCK_SIZE_OUTLINE * 6,
-			NEXT_Y_OFFSET + DIST_BTW_NEXTS * 6 + NEXT_BLOCK_SIZE_OUTLINE + 30
-		);
-
-		// HOLD
-		this.callDrawOutline(
-			HOLD_X_OFFSET,
-			HOLD_Y_OFFSET,
-			HOLD_X_OFFSET + HOLD_BLOCK_SIZE_OUTLINE * 6,
-			NEXT_Y_OFFSET + HOLD_BLOCK_SIZE_OUTLINE * 5 + 30
-		);
-
-		/*		// LEVEL
-		 *		this.callDrawOutline(
-		 *			HOLD_X_OFFSET,
-		 *			Y_OFFSET + (VISIBLE_HEIGHT - 6) * BLOCK_SIZE_OUTLINE,
-		 *			HOLD_X_OFFSET + HOLD_BLOCK_SIZE_OUTLINE * 6,
-		 *			Y_OFFSET + VISIBLE_HEIGHT * BLOCK_SIZE_OUTLINE
-		 *		);*/
-	};
 
 	callDrawOutline = (L, U, R, D) => {
 		let color = this.player == 0 ? P1_COLORS : P2_COLORS;

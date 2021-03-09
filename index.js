@@ -36,8 +36,8 @@ io.on('connection', (socket) => {
 	io.to(socket.id).emit('connected');
 	console.log('user connected: ', socket.id);
 
-	socket.on('waiting',()=>{
-		lobby.enter(socket);
+	socket.on('waiting',type=>{
+		lobby.enter(socket,type);
     	lobby.getARoomYouTwo();
 	});
 	

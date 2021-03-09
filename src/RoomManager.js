@@ -11,9 +11,8 @@ export default class RoomManager {
 		setInterval(()=>this.update(),1000/60);
 	}
 
-	create = (player0, player1) => {
-		let roomNum = player0.id + player1.id;
-		let room = new Room(roomNum, player0, player1);
+	create = (player0, player1, type0, type1) => {
+		let room = new Room(player0, player1, type0, type1);
 
 		this.rooms.push(room);
 		console.log(`Created room for ${player0.id} & ${player1.id}`);
@@ -46,10 +45,12 @@ export default class RoomManager {
 }
 
 class Room {
-	constructor(id, p0, p1) {
-		this.id = id;
+	constructor(p0, p1, type0, type1) {
+		this.id = p0.id+p1.id;
 		this.player0 = p0.id;
 		this.player1 = p1.id;
+		this.type0 = type0;
+		this.type1 = type1;
 		this.status = STATUS.WAITING;
 		this.obj = {};
 		this.randomseed = Math.random().toString(36).substr(2,11);
@@ -59,6 +60,8 @@ class Room {
 		p0.join(this.id);
 		p1.join(this.id);
 		
+		io.to(this.player0).emit('oppJoined',this.type1);
+		io.to(this.player1).emit('oppJoined',this.type0)
 		
 		p0.on('ready',()=>{
 			this.count++;
@@ -81,6 +84,14 @@ class Room {
 		p1.on('attackFromP'+this.player1, data => {
 			io.to(this.player0).emit('attackToP'+this.player0, data);
 		});
+		
+		p0.on('graphics',data=>{
+			io.to(this.player1).emit('eView',data)
+		})
+		p1.on('graphics',data=>{
+			io.to(this.player0).emit('eView',data)
+		})
+
 	}
 
 	start = () =>{

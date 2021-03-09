@@ -10,7 +10,9 @@ import {
 	PUYO_TYPE,
 	PUYO_SIZE,
 	POP_SPRITE,
-	PLAYER_OFFSET
+	PLAYER_OFFSET,
+	COLOR_WHITE,
+	COLOR_GREY,
 } from '../constants.js';
 
 export default class PuyoView extends view {
@@ -22,6 +24,24 @@ export default class PuyoView extends view {
 		this.popFrame = 0;
 		this.initGraphics();
 	}
+	/**
+	 * 무대를 그립니다.
+	 */
+	initGraphics = () => {
+		let ctx = this.boardCtx;
+		ctx.font = "16px 'Press Start 2P'";
+		ctx.fillStyle = COLOR_WHITE;
+		ctx.textBaseline = 'top';
+		ctx.textAlign = 'center';
+
+		// BOARD
+		this.callDrawOutline(
+			X_OFFSET,
+			Y_OFFSET,
+			X_OFFSET + PUYO_BOARD_WIDTH * PUYO_SIZE,
+			Y_OFFSET + PUYO_VISIBLE_HEIGHT * PUYO_SIZE
+		);
+	};
 
 	addPuyo = (puyo) => {
 		this.puyoArr.push(puyo);

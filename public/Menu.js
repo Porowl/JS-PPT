@@ -1,7 +1,8 @@
 import {socket} from './main.js';
-import {canvas3,ctx0,ctx1,ctx2,ctx3} from './constants.js';
+import {canvas3,ctx0,ctx1,ctx2,ctx3,TETRIS_BUTTON,PUYO_BUTTON} from './constants.js';
 
-export default class Menu {
+/***************Classes****************/
+class Menu {
 	constructor()
 	{
 		window.addEventListener('click',event => {
@@ -11,27 +12,24 @@ export default class Menu {
             let y = (event.clientY - rect.top) / ratio; 
 			this.currScreen.checkButtonClicked(x,y);
 		});
+		
 		this.screens = [];
 		this.currScreen;
-		
-		let temp = new MenuScreen('default');
-		let tempButton = new MenuButton(10,10,60,30,'test');
-		tempButton.setEvent(()=>{});
-		
-		temp.addButton(tempButton);
-		temp.setContext(this);
-		
-		addScreen(temp);
-		this.changeScreenTo('default');
 	}
 	
 	changeScreenTo = name =>{
+		ctx3.clearRect(0,0,1024,768)
 		this.currScreen = this.screens[name]
 		this.currScreen.draw();
 	}
 	
 	addScreen = screen => {
 		this.screens[screen.name] = screen;
+		screen.setContext(this);
+	}
+	
+	init = () => {
+		this.currScreen.draw();
 	}
 }
 
@@ -48,7 +46,7 @@ class MenuScreen {
 	}
 	addButton = (button) => {
 		this.buttons.push(button)
-		button.setContext = this.context;
+		button.setContext(this.context);
 	}
 	
 	addObject = (object) => {
@@ -64,15 +62,14 @@ class MenuScreen {
 	}
 	
 	draw = () => {
-		for(let button of this.buttons){
-			button.draw();
-		}
 		for(let object of this.objects){
 			object.draw();
+			console.log('drawing object')
+		}
+		for(let button of this.buttons){
+			button.draw('drawing button',button.name);
 		}
 	}
-	
-	
 }
 
 class MenuButton {
@@ -85,8 +82,9 @@ class MenuButton {
 		this.event = ()=>{};
 		this.context;
 		
-		this.color = "rgb(100,100,100)";
-		this.textColor = "rgb(0,0,0)";
+		this.color = "rgba(150,150,150,0.3)";
+		this.lineColor = "rgb(0,0,0)"
+		this.textColor = "rgb(255,255,255)";
 	}
 	
 	setContext = context => {
@@ -104,10 +102,12 @@ class MenuButton {
 	
 	draw = () => {
 		let ctx = ctx3;
-
 		ctx.fillStyle = this.color;
 		ctx.fillRect(this.x,this.y,this.w,this.h);
-		ctx.strokeStyle = this.textColor;
+		
+		ctx.lineWidth = 2;
+		
+		ctx.strokeStyle = this.lineColor;
 		ctx.strokeRect(this.x,this.y,this.w,this.h);
 		
 		ctx.textBaseline = 'middle';
@@ -115,9 +115,76 @@ class MenuButton {
 		ctx.font = "15px 'Press Start 2P'";
 		
 		ctx.fillStyle = this.textColor;
-		ctx.strokeStyle = this.color;
+		ctx.strokeStyle = this.lineColor;
 		
 		ctx.strokeText(this.name, this.x+this.w/2, this.y+this.h/2);
 		ctx.fillText(this.name, this.x+this.w/2, this.y+this.h/2);
 	}
 }
+/******************************************/
+let menu = new Menu();
+
+/***************Main Screen****************/
+{
+let titleScreen = new MenuScreen('title')
+menu.addScreen(titleScreen);
+
+let title = {
+	x : 1024/2,
+    y : 768/4,
+    draw : () => {
+		let ctx = ctx3;
+		ctx.fillStyle = "rgb(255,255,255)";
+		ctx.font = "48px 'Press Start 2P'";
+		ctx.strokeStyle = "rgb(0,0,0)";
+		ctx.textBaseline = 'middle';
+		ctx.textAlign = 'center';
+		ctx.lineWidth = 4;	
+		ctx.strokeText("PUYO PUYO",title.x,title.y-25);
+		ctx.fillText("PUYO PUYO",title.x,title.y-25);
+		ctx.font = "75px 'Press Start 2P'";
+		ctx.lineWidth = 6;	
+		ctx.strokeText("TETRIS",title.x,title.y+50);
+		ctx.fillText("TETRIS",title.x,title.y+50);
+	}
+};
+titleScreen.addObject(title);
+
+let ButtonImages = {
+	x : 1024/2-150,
+	y : 768/2,
+	draw : () =>{
+ 		ctx3.drawImage(TETRIS_BUTTON,ButtonImages.x,ButtonImages.y-50);
+ 		ctx3.drawImage(PUYO_BUTTON,ButtonImages.x,ButtonImages.y+55);
+	}
+}
+titleScreen.addObject(ButtonImages);
+
+
+let SelectTetris = new MenuButton(1024/2-150,768/2-50,300,100,'Play As TETRIS');
+titleScreen.addButton(SelectTetris);
+
+SelectTetris.setEvent(()=>{
+	socket.emit('waiting','TETRIS');
+	console.log('Tetris');
+	SelectTetris.context.changeScreenTo('empty');
+});
+
+let SelectPuyo = new MenuButton(1024/2-150,768/2+55,300,100,'Play As PUYO');
+titleScreen.addButton(SelectPuyo);
+
+SelectPuyo.setEvent(()=>{
+	socket.emit('waiting','PUYO');
+	console.log('Puyo');
+	SelectTetris.context.changeScreenTo('empty');
+});
+}
+/***************Empty Screen****************/
+{
+let empty = new MenuScreen('empty');
+menu.addScreen(empty);	
+}
+
+menu.changeScreenTo('title');
+
+export default menu;

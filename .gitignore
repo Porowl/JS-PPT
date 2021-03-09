@@ -2,3 +2,4 @@ node_modules
 .eslintrc.json
 package.json
 package-lock.json
+goorm.menifest

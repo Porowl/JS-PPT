@@ -374,3 +374,9 @@ export const DX_DY = Object.freeze(
 
 export const SPRITE_IMAGE = new Image();
 SPRITE_IMAGE.src ='./PuyoPuyo/puyo.png'
+
+export const PUYO_BUTTON = new Image();
+PUYO_BUTTON.src ='./Images/p.png'
+
+export const TETRIS_BUTTON = new Image();
+TETRIS_BUTTON.src ='./Images/t.jpg'
