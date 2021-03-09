@@ -1,0 +1,19 @@
+<head>
+    <title>Tetris</title>
+    <link href="./main.css" rel="stylesheet" type="text/css" media="all">
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+    </style>
+</head>
+<body onload="init()">
+    <canvas id="board" width="1024" height="768" z-index="0"></canvas>
+    <canvas id="mino" width="1024" height="768" z-index="1"></canvas>
+    <canvas id="animation" width="1024" height="768" z-index="2"></canvas>
+    <canvas id="infos" width="1024" height="768" z-index="3"></canvas>
+</body>
+
+<script src="./seedrandom.min.js"></script>
+<script src="./socket.io.js"></script>
+<script src="./main.js" type="module"></script>
