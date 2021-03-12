@@ -1,4 +1,5 @@
 import view from '../view.js';
+import {socket} from '../main.js';
 
 import {
 	X_OFFSET,
@@ -23,6 +24,7 @@ export default class PuyoView extends view {
 		this.puyoArr = [];
 		this.popFrame = 0;
 		this.initGraphics();
+		this.preview = false;
 	}
 	/**
 	 * 무대를 그립니다.
@@ -41,6 +43,18 @@ export default class PuyoView extends view {
 			X_OFFSET + PUYO_BOARD_WIDTH * PUYO_SIZE,
 			Y_OFFSET + PUYO_VISIBLE_HEIGHT * PUYO_SIZE
 		);
+		
+		ctx = this.infoCtx;
+		
+		ctx.fillText('WAITING',
+					X_OFFSET+this.offset+PUYO_BOARD_WIDTH*PUYO_SIZE/2,
+					 Y_OFFSET+(PUYO_VISIBLE_HEIGHT-1)*PUYO_SIZE/2)
+		ctx.fillText('FOR',
+					X_OFFSET+this.offset+PUYO_BOARD_WIDTH*PUYO_SIZE/2,
+					 Y_OFFSET+PUYO_VISIBLE_HEIGHT*PUYO_SIZE/2)
+		ctx.fillText('OPPONENT',
+					X_OFFSET+this.offset+PUYO_BOARD_WIDTH*PUYO_SIZE/2,
+					 Y_OFFSET+(PUYO_VISIBLE_HEIGHT+1)*PUYO_SIZE/2)
 	};
 
 	addPuyo = (puyo) => {
@@ -70,12 +84,18 @@ export default class PuyoView extends view {
 				if (color != PUYO_TYPE.EMPTY) {
 					let color = board.table[j][i];
 					let state = board.getState(i,j);
-					this.drawPuyoByPointer(x, y, state, color, board, this.boardCtx);
+					this.drawPuyoByPointer(x, y, state, color, board, CTX_NUM.BOARD);
 				}
 				this.boardCtx.lineWidth = 1;
 				this.boardCtx.strokeStyle = "rgb(0,0,0)"
 				this.boardCtx.strokeRect(x, y, PUYO_SIZE, PUYO_SIZE);
 			}
+		}
+		if(!this.preview){
+			socket.emit('graphics',{
+				name:'drawBoard',
+				args:board
+			})			
 		}
 	};
 
@@ -88,8 +108,8 @@ export default class PuyoView extends view {
 		main.move();
 		sub.moveRotate(main.gX, main.gY);
 
-		this.drawPuyo(main, this.pieceCtx);
-		this.drawPuyo(sub, this.pieceCtx);
+		this.drawPuyo(main, CTX_NUM.PIECE);
+		this.drawPuyo(sub, CTX_NUM.PIECE);
 	};
 
 	fallCycle = () => {
@@ -99,7 +119,7 @@ export default class PuyoView extends view {
 			for (let puyo of this.puyoArr[x]) {
 				if (puyo) {
 					if (!puyo.fall()) counter++;
-					this.drawPuyo(puyo, this.pieceCtx);
+					this.drawPuyo(puyo, CTX_NUM.PIECE);
 				}
 			}
 		}
@@ -147,13 +167,13 @@ export default class PuyoView extends view {
 				}
 			}
 
-			this.drawPuyo(puyo, this.pieceCtx);
+			this.drawPuyo(puyo, CTX_NUM.PIECE);
 		}
 
 		return this.popFrame > frame * 5;
 	};
 
-	drawPuyo = (puyo, ctx) => {
+	drawPuyo = (puyo, on) => {
 		let type = puyo.type;
 		let state = puyo.state;
 		if (type == PUYO_TYPE.EMPTY) return;
@@ -161,6 +181,9 @@ export default class PuyoView extends view {
 			state = 6;
 			type = 12;
 		}
+		
+		let ctx = on==CTX_NUM.BOARD?this.boardCtx:this.pieceCtx;
+		
 		ctx.drawImage(
 			SPRITE_IMAGE, //Source
 			state * PUYO_SIZE, //sX
@@ -172,11 +195,18 @@ export default class PuyoView extends view {
 			PUYO_SIZE, //dW
 			PUYO_SIZE //dH
 		);
+		
+		if(!this.preview) {
+			socket.emit('graphics',{
+				name:'drawPuyo',
+				args:[puyo,on]
+			})			
+		}
 	};
 
 	drawNexts = () => {};
 
-	drawPuyoByPointer = (x, y, state, color, board, ctx) => {
+	drawPuyoByPointer = (x, y, state, color, board, on) => {
 		let type = color;
 
 		if (type == PUYO_TYPE.EMPTY) return;
@@ -185,6 +215,8 @@ export default class PuyoView extends view {
 			type = 12;
 		}
 
+		let ctx = on==CTX_NUM.BOARD?this.boardCtx:this.pieceCtx;
+		
 		ctx.drawImage(
 			SPRITE_IMAGE, //Source
 			state * PUYO_SIZE, //sX
@@ -196,5 +228,17 @@ export default class PuyoView extends view {
 			PUYO_SIZE, //dW
 			PUYO_SIZE //dH
 		);
+		
+		if(!this.preview){
+			socket.emit('graphics',{
+				name:'drawPuyoByPointer',
+				args:[x,y,state,color,board,on]
+			})			
+		}
 	};
 }
+
+const CTX_NUM = {
+	BOARD : 0,
+	PIECE : 1
+};

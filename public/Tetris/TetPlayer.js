@@ -13,7 +13,7 @@ export default class Player {
 		this.user = myid;
 		this.enemy;
 		this.board = new Stage();
-		this.view = new TetView(0);
+		this.View = new TetView(0);
 		this.stg = new Storage(myid);
 		this.random;
 		this.gravity = this.stg.getGravity();
@@ -50,39 +50,38 @@ export default class Player {
 					break;
 			}
 		});
-		
-		let eventName = 'garbCountP'+this.user;
-		
-		socket.on(eventName,data=>{
-			let lines = this.board.deductGarbage(data)
-            this.view.showGarbage(this.board.garbage); 
-			if(lines>0) {
-				let eventName = 'attackFromP' + this.user;
-				socket.emit(eventName,lines)
+
+		document.addEventListener(`garbCountP${this.user}`, event=> {
+            let lines = this.board.deductGarbage(event.detail.n)
+            if(lines>0) {
+				console.log(lines);
+				socket.emit(`attackFromP${this.user}`,lines);	
 			}
-		})
-		
-		eventName = 'attackOnP' + this.user;
+		});
 		
 		socket.on(`attackOnP${this.user}`,data=>
         {
             this.board.addGarbage(data);
-            this.view.showGarbage(this.board.garbage); 
+            this.View.showGarbage(this.board.garbage); 
         });
 	}
 
+	setOpponent = type => {
+		this.stg.setOpponent(type);
+	};
+
 	countDown = () => {
 		setTimeout(() => {
-			this.view.countDown(3);
+			this.View.countDown(3);
 		}, 0);
 		setTimeout(() => {
-			this.view.countDown(2);
+			this.View.countDown(2);
 		}, 1000);
 		setTimeout(() => {
-			this.view.countDown(1);
+			this.View.countDown(1);
 		}, 2000);
 		setTimeout(() => {
-			this.view.countDown(0);
+			this.View.countDown(0);
 			this.gameStart();
 		}, 3000);
 	};
@@ -99,9 +98,9 @@ export default class Player {
 					this.phase == PHASE.GAME_OVER;
 					return;
 				};
-				this.view.showGarbage(this.board.garbage); 
+				this.View.showGarbage(this.board.garbage); 
 				let scoreArr = this.stg.updateLines(this.clearedLineArr, this.board.isEmpty());
-				this.view.displayScoreArr(scoreArr);
+				this.View.displayScoreArr(scoreArr);
 				this.updateScore();
 				
 				this.phase = PHASE.NEW_BLOCK;
@@ -109,7 +108,7 @@ export default class Player {
 			}
 				
 			case PHASE.NEW_BLOCK: {
-				this.view.draw(this.board.field);
+				this.View.draw(this.board.field);
 				this.getNewPiece();
 				//this.checkTopOut();
 				this.moveDown();
@@ -147,7 +146,7 @@ export default class Player {
 				if (this.lineClearDelay >= 0) {
 					this.lineClearDelay--;
 					for (var i = 0; i < this.clearedLineArr.length(); i++)
-						this.view.clearAnimation(this.clearedLineArr.get(i), this.lineClearDelay);
+						this.View.clearAnimation(this.clearedLineArr.get(i), this.lineClearDelay);
 				} else {
 					this.phase = PHASE.CLEAR;
 				}
@@ -166,7 +165,7 @@ export default class Player {
 
 	getNewPiece = () => {
 		this.piece = new Mino(this.random.getPiece(this.stg.getIndexInc()));
-		this.view.drawHold(this.stg.hold, DRAWMODE.DRAWPIECE);
+		this.View.drawHold(this.stg.hold, DRAWMODE.DRAWPIECE);
 		this.updatePiece();
 		this.updateNexts();
 		this.gravity = this.stg.getGravity();
@@ -271,7 +270,7 @@ export default class Player {
 			} else {
 				var temp = this.stg.hold;
 				var a = piece.typeId;
-				this.view.drawHold(a, DRAWMODE.DRAWGHOST);
+				this.View.drawHold(a, DRAWMODE.DRAWGHOST);
 				this.stg.hold = a;
 				this.piece = new Mino(temp);
 			}
@@ -284,7 +283,7 @@ export default class Player {
 	hardDrop = () => {
 		if (this.stg.keyMap[KEY.SPACE]) {
 			var result = this.board.hardDrop(this.piece);
-			this.view.hardDropAnimation(this.piece, this.board.garbage);
+			this.View.hardDropAnimation(this.piece, this.board.garbage);
 			this.stg.addDropScore(result * 2);
 			this.piece.hardDropped = true;
 			this.stg.keyMap[KEY.SPACE] = false;
@@ -297,25 +296,25 @@ export default class Player {
 		this.dropRate = 0;
 		this.clearedLineArr = this.board.lock(piece);
 		this.lineClearDelay = this.clearedLineArr.length() == 0 ? 0 : LINE_CLEAR_FRAMES;
-		this.view.lockAnimation(piece, 0, this.board.garbage);
+		this.View.lockAnimation(piece, 0, this.board.garbage);
 	};
 
 	updatePiece = () => {
-		this.view.clearPiece();
-		this.view.drawPiece(this.piece, DRAWMODE.DRAWGHOST, this.board.getGhostIndex(this.piece))
-		this.view.drawPiece(this.piece, DRAWMODE.DRAWPIECE)
+		this.View.clearPiece();
+		this.View.drawPiece(this.piece, DRAWMODE.DRAWGHOST, this.board.getGhostIndex(this.piece))
+		this.View.drawPiece(this.piece, DRAWMODE.DRAWPIECE)
 	}
 	
 	updateNexts = () => {
-		this.view.refreshNexts();
+		this.View.refreshNexts();
 		let arr = this.random.nextPieces(this.stg.getIndex());
 		for (var i = 0; i < Math.max(this.stg.nexts, 6); i++) {
-			this.view.drawNext(arr[i], i);
+			this.View.drawNext(arr[i], i);
 		}
 	};
 
 	updateScore = () => {
-		this.view.displayScore(this.stg.scoreToText());
+		this.View.displayScore(this.stg.scoreToText());
 	};
 }
 

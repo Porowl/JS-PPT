@@ -2,7 +2,9 @@ import {ctx0, ctx1, ctx2, ctx3, NEXT,HOLD, PLAYER_OFFSET, NEXT_X_OFFSET, NEXT_Y_
 		BOARD_HEIGHT,BOARD_WIDTH,VISIBLE_HEIGHT,BOARD_CENTER_X,BOARD_CENTER_Y,BOARD_END_Y,LINE_CLEAR_FRAMES,LOCK_ANIMATION_FRAMES,HARDDROP_ANIMATION_FRAMES 
 	   } from "../constants.js";
 
-import view from '../view.js'
+import view from '../view.js';
+import {socket} from '../main.js';
+
 export default class TetView extends view {
 	constructor(player) {
 		super();
@@ -12,6 +14,7 @@ export default class TetView extends view {
 		this.initGraphics();
 		this.refreshHold();
 		this.refreshNexts();
+		this.preview = false;
 	}
 	/**
 	 * 무대를 그립니다.
@@ -69,6 +72,18 @@ export default class TetView extends view {
 		 *			HOLD_X_OFFSET + HOLD_BLOCK_SIZE_OUTLINE * 6,
 		 *			Y_OFFSET + VISIBLE_HEIGHT * BLOCK_SIZE_OUTLINE
 		 *		);*/
+		
+		ctx = this.infoCtx;
+		
+		ctx.fillText('WAITING',
+					X_OFFSET+this.offset+BOARD_WIDTH*BLOCK_SIZE_OUTLINE/2,
+					 Y_OFFSET+(VISIBLE_HEIGHT-2)*BLOCK_SIZE_OUTLINE/2)
+		ctx.fillText('FOR',
+					X_OFFSET+this.offset+BOARD_WIDTH*BLOCK_SIZE_OUTLINE/2,
+					 Y_OFFSET+VISIBLE_HEIGHT*BLOCK_SIZE_OUTLINE/2)
+		ctx.fillText('OPPONENT',
+					X_OFFSET+this.offset+BOARD_WIDTH*BLOCK_SIZE_OUTLINE/2,
+					 Y_OFFSET+(VISIBLE_HEIGHT+2)*BLOCK_SIZE_OUTLINE/2)
 	};
 	/* BOARD & PIECE GRAPHICS */
 
@@ -96,6 +111,13 @@ export default class TetView extends view {
 					);
 				}
 			}
+		if(!this.preview) {
+			socket.emit('graphics',{
+				name:'draw',
+				args:table
+			})
+		}
+		
 	};
 
 	clearPiece = () => {
@@ -146,6 +168,13 @@ export default class TetView extends view {
 						}
 					}
 				}
+		
+		if(!this.preview) {
+			socket.emit('graphics',{
+				name:'drawPiece',
+				args:[piece, MODE, index]
+			})
+		}
 	};
 
 	drawNext = (typeId, index) => {
@@ -163,6 +192,12 @@ export default class TetView extends view {
 					var h = NEXT_BLOCK_SIZE;
 					this.boardCtx.fillRect(x, y, w, h);
 				}
+		if(!this.preview) {
+			socket.emit('graphics',{
+				name:'drawNext',
+				args:[typeId,index]
+			})
+		}
 	};
 
 	refreshNexts = () => {
@@ -174,6 +209,12 @@ export default class TetView extends view {
 			NEXT_BLOCK_SIZE_OUTLINE * 6, // w
 			DIST_BTW_NEXTS * 6 + NEXT_BLOCK_SIZE_OUTLINE // h
 		);
+		if(!this.preview) {
+			socket.emit('graphics',{
+				name:'refreshNexts',
+				args: null
+			})
+		}
 	};
 
 	drawHold = (typeId = -1, mode) => {
@@ -202,6 +243,13 @@ export default class TetView extends view {
 				}
 			}
 		}
+		
+		if(!this.preview) {
+			socket.emit('graphics',{
+				name:'drawHold',
+				args:[typeId,mode]
+			})
+		}
 	};
 
 	refreshHold = () => {
@@ -213,6 +261,13 @@ export default class TetView extends view {
 			HOLD_BLOCK_SIZE_OUTLINE * 6, // w
 			HOLD_BLOCK_SIZE_OUTLINE * 5 // h
 		);
+		
+		if(!this.preview) {
+			socket.emit('graphics',{
+				name:'refreshHold',
+				args:null
+			})
+		}
 	};
 
 	clearAnimation = (l, i) => {
@@ -227,6 +282,13 @@ export default class TetView extends view {
 		var x = X_OFFSET + 1 + this.offset;
 		ctx.fillRect(x, y, w, h);
 		if(i==0) ctx.clearRect(x,y,w,h);
+		
+		if(!this.preview) {
+			socket.emit('graphics',{
+				name:'clearAnimation',
+				args:[l,i]
+			})
+		}
 	};
 
 	/* UI GRAPHICS*/

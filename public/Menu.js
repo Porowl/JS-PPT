@@ -181,10 +181,8 @@ SelectPuyo.setEvent(()=>{
 }
 /***************Empty Screen****************/
 {
-let empty = new MenuScreen('empty');
-menu.addScreen(empty);	
+	let empty = new MenuScreen('empty');
+	menu.addScreen(empty);	
 }
-
-menu.changeScreenTo('title');
 
 export default menu;

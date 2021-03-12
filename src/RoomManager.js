@@ -63,6 +63,8 @@ class Room {
 		io.to(this.player0).emit('oppJoined',this.type1);
 		io.to(this.player1).emit('oppJoined',this.type0)
 		
+		io.to(this.id).emit('seed',this.randomseed);
+		
 		p0.on('ready',()=>{
 			this.count++;
 			console.log(`${this.id} called ready, current readies are ${this.count}`)
@@ -74,22 +76,23 @@ class Room {
 			if(this.count>=2) this.start();
 		});
 		
-		io.to(this.id).emit('seed',this.randomseed);
 		// io.to(this.player0).emit('seed',this.randomseed)
 		// io.to(this.player1).emit('seed',this.randomseed)
 		
 		p0.on('attackFromP'+this.player0, data => {
-			io.to(this.player1).emit('attackToP'+this.player1, data);
+			console.log(`attack recieved from ${this.player0} and sending ${data} to ${this.player1}`)
+			io.to(this.player1).emit('attackOnP'+this.player1, data);
 		});
 		p1.on('attackFromP'+this.player1, data => {
-			io.to(this.player0).emit('attackToP'+this.player0, data);
+			console.log(`attack recieved from ${this.player1} and sending ${data} to ${this.player0}`)
+			io.to(this.player0).emit('attackOnP'+this.player0, data);
 		});
 		
 		p0.on('graphics',data=>{
-			io.to(this.player1).emit('eView',data)
+			io.to(this.player1).emit('eview',data)
 		})
 		p1.on('graphics',data=>{
-			io.to(this.player0).emit('eView',data)
+			io.to(this.player0).emit('eview',data)
 		})
 
 	}

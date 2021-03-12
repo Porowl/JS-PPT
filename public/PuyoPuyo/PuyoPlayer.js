@@ -5,13 +5,14 @@ import Puyo from './Puyo.js';
 import MultPuyos from './MultPuyos.js';
 
 import {DIRECTION,KICK,PUYO_BOARD_WIDTH} from '../constants.js';
+import {socket} from '../main.js';
 
 export default class PuyoPlayer{
     constructor(user = 0)
     {
-        this.user = 0;
+        this.user = user;
         this.Board = new Board();
-        this.Stats = new Stats(0);
+        this.Stats = new Stats(user);
         this.Puyo = {};
         this.popArr = {arr:[]};
         this.View = new PuyoView(0);
@@ -67,6 +68,21 @@ export default class PuyoPlayer{
         {
             //this.Stats.keyMap[event.keyCode] = false;
         });
+		
+		document.addEventListener(`garbCountP${this.user}`, event=> {
+            let garbs = this.Board.deductGarbage(event.detail.n)
+			console.log(garbs);
+            if(garbs>0) {
+				console.log(garbs);
+				socket.emit(`attackFromP${this.user}`,garbs);	
+			}
+		});
+		
+		socket.on(`attackOnP${this.user}`,data=>
+        {
+            this.Board.addGarbage(data);
+            this.View.showGarbage(this.Board.garbage); 
+        });
     }
 
     update = () =>
@@ -78,7 +94,7 @@ export default class PuyoPlayer{
             {
                 this.View.moveCycle();
                 this.frame++;
-                if(this.frame%8===0)
+                if(this.frame%60===0)
                 {
                     if(this.Board.valid(this.Puyo.getPos(DIRECTION.DOWN)))
                         this.Puyo.move(0,1);
@@ -231,6 +247,8 @@ export default class PuyoPlayer{
         const p2 = ranNum % 0o10;
         return new MultPuyos(new Puyo(p1),new Puyo(p2))
     }
+	
+	setOpponent = () => {};
 }
 
 const PHASE = 

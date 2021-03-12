@@ -15,7 +15,7 @@ export default class Stage {
 		this.garbage = 0;
 	}
 
-	isEmpty = () => this.remaining === 0;
+	isEmpty = () => this.remaining == 0;
 
 	lock = (p) => {
 		let shape = PIECE_MAP[p.typeId][p.rotation];
@@ -165,6 +165,7 @@ export default class Stage {
 			if (chance < 3) empty = parseInt(Math.random() * BOARD_WIDTH);
 			for (let x = 0; x < BOARD_WIDTH; x++) this.field[y][x] = x == empty ? -1 : 7;
 		}
+		this.remaining += this.garbage*9;
 		this.garbage = 0;
 		return true;
 	};

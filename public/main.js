@@ -21,7 +21,7 @@ const init = () => {
 
 	socket.on('connected', () => {
 		GUI = Menu;
-		GUI.init();
+		GUI.changeScreenTo('title');
 	});
 	
 	socket.on('create',type=>{
@@ -32,6 +32,8 @@ const init = () => {
 	socket.on('oppJoined', type =>{
 		console.log('server said your opp is ready and said',type)
 		EnemyView = type==='PUYO'?new PuyoView(1):new TetView(1);
+		EnemyView.preview = true;
+		Player.setOpponent(type);
 		socket.emit('oppRecieved');
 	});
 	
@@ -40,6 +42,12 @@ const init = () => {
 		socket.emit('ready');
 	});
 
+	socket.on('countdown', ()=>{
+		setTimeout(()=>{Player.View.countDown(3);EnemyView.countDown(3)},0);
+		setTimeout(()=>{Player.View.countDown(2);EnemyView.countDown(2)},1000);
+		setTimeout(()=>{Player.View.countDown(1);EnemyView.countDown(1)},2000);
+		setTimeout(()=>{Player.View.countDown(0);EnemyView.countDown(0)},3000);
+	})
 	socket.on('update', dt =>{
 		Player.update(dt);
 	})
@@ -48,10 +56,6 @@ const init = () => {
 		let call = data.name;
 		EnemyView[call](data.args);
 	})
-};
-
-const gameStart = () => {
-	document.getElementById('main').hidden = true;
 };
 
 const resize = () => {

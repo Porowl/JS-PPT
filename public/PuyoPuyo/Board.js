@@ -232,15 +232,15 @@ export default class Board {
 		this.garbage += n;
 	};
 
-	deductGarbage = (n) => {
+	deductGarbage = n => {
 		this.garbage -= n;
 		if (this.garbage < 0) {
 			let a = 0 - this.garbage;
 			this.garbage = 0;
 			return a;
-		}
-		return 0;
+		} else return 0;
 	};
+
 	executeGarbage = () => {
 		let attack = Math.min(this.garbage,50);
 		this.garbage -= attack;

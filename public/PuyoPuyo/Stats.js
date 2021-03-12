@@ -40,13 +40,20 @@ export default class Stats{
         let numPopped = data.arr.length - data.numTrash;
         let chainPower = CHAIN_BONUS[Math.min(this.chain,CHAIN_BONUS.length-1)];
         let colorBonus = COLOR_BONUS[data.colors-1];
-        let groupBonus = GROUP_SIZE_BONUS[data.max];
+        let groupBonus = 0;
+		
+		for(var i in data.groups) {
+			groupBonus += GROUP_SIZE_BONUS[i];
+		}
 
         let multiplier = Math.max(1,(chainPower + colorBonus + groupBonus))
         let score = 10 * numPopped * multiplier;
+		
         this.score += score;
-
+		
         this.chain++;
+		console.log(score);
+		this.sendAttack();
     }
 
     resetChain = () => {
@@ -68,11 +75,17 @@ export default class Stats{
 		this.leftOver = (garbs>1) ? garbs % 1 : 0;
 
 		garbs = garbs | 0;
-		
 		if (garbs == 0) return;
 		
-		let eventName = 'garbCountP'+this.user 
-		socket.emit(eventName,garbs)
+		console.log(garbs);
+		
+        document.dispatchEvent(
+            new CustomEvent(`garbCountP${this.user}`,{
+                detail:{
+                    n:garbs
+                }
+            })
+        );
 	}
 	
 	getMargin = () => {

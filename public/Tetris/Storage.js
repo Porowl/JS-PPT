@@ -1,4 +1,4 @@
-import {GRAVITY, T_SPIN_STATE, SCORE,GAMEMODE,KEYSTATES,KEY,CLEAR_STRINGS,COMBO_GARB
+import {GRAVITY, T_SPIN_STATE, SCORE,GAMEMODE,KEYSTATES,KEY,CLEAR_STRINGS,COMBO_GARB,COMBO_GARB_NERF
 	  } from '../constants.js';
 
 import {socket} from '../main.js';
@@ -26,6 +26,12 @@ export default class Storage{
         this.hold;
     }
 
+	setOpponent = type =>{
+		if(type==='PUYO') {
+			this.vsPuyo = true;
+		}
+	}
+	
     /**
      * 현재 레벨을 반환합니다.
      */
@@ -255,7 +261,6 @@ export default class Storage{
     sendGarbage = (mode) =>
     {
         let lines = 0;
-		let vsPuyo = this.vsPuyo;
         switch(mode)
         {
             case SCORE.SINGLE:
@@ -283,22 +288,30 @@ export default class Storage{
                 lines = 2;
                 break;
             case SCORE.TSD:
-                lines = 4 - (vsPuyo)?1:0;
+                lines = 4 - (this.vsPuyo?1:0);
                 break;
             case SCORE.TST:
-                lines = 6 - (vsPuyo)?2:0;
+                lines = 6 - (this.vsPuyo?2:0);
                 break;
             case SCORE.PERFECT:
-                lines = 10 - (vsPuyo)?4:0; 
+                lines = 10 - (this.vsPuyo?4:0); 
                 break;
             default:
                 lines = 0;
         }
-
-        lines += (this.b2b>1)?1:0;
-        lines += (vsPuyo?COMBO_GARB_NERF:COMBO_GARB)[Math.min(this.combo,(vsPuyo?COMBO_GARB_NERF:COMBO_GARB).length-1)];
+		console.log(lines);
 		
-		let eventName = 'garbCountP'+this.user;
-		socket.emit(eventName,lines)
+        lines += (this.b2b>1)?1:0;
+		let arr = (this.vsPuyo?COMBO_GARB_NERF:COMBO_GARB);
+        lines += arr[Math.min(this.combo,arr.length-1)];
+		
+		console.log(lines);
+        document.dispatchEvent(
+            new CustomEvent(`garbCountP${this.user}`,{
+                detail:{
+                    n:lines
+                }
+            })
+        );
     }
 }
