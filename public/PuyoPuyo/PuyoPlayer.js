@@ -195,7 +195,6 @@ export default class PuyoPlayer{
             case PHASE.GARB_FALL_ANIMATION_END:
             {
 				let arr = this.View.getPuyoArr();
-				console.log(arr);
 
 				for(let x = 0; x<PUYO_BOARD_WIDTH;x++) {
 					for(let puyo of arr[x]) {

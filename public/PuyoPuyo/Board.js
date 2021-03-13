@@ -208,26 +208,6 @@ export default class Board {
 		return puyos;
 	};
 
-	getState = (x, y) => {
-		if (x < 0 || x >= PUYO_BOARD_WIDTH || y >= PUYO_BOARD_HEIGHT || y < 0) return PUYO_STATE.N;
-
-		let order = 'UDLR';
-		let temp = '';
-		let color = this.table[y][x];
-
-		for (let i = 0; i < 4; i++) {
-			let nx = x + DX_DY[i][0];
-			let ny = y + DX_DY[i][1];
-
-			if (nx >= 0 && nx < PUYO_BOARD_WIDTH && ny < PUYO_BOARD_HEIGHT && ny >= 0)
-			if (this.table[ny][nx] == color) temp += order.charAt(i);
-		}
-
-		if (temp.length == 0) temp = 'N';
-
-		return PUYO_STATE[temp];
-	};
-
 	addGarbage = n => {
 		this.garbage += n;
 	};
@@ -247,7 +227,6 @@ export default class Board {
 		
 		let lines = ( attack / 6 ) | 0;
 		let remaining = attack %6;
-		console.log(lines,remaining);
 		
 		let arr = [0,0,0,0,0,0];
 		
@@ -256,7 +235,6 @@ export default class Board {
 			do {
 				temp = Math.random()*6|0
 			} while (arr[temp] == 1)
-			console.log(temp);
 			arr[temp] = 1;
 		}
 		let garb = [];

@@ -14,13 +14,15 @@ import {
 	PLAYER_OFFSET,
 	COLOR_WHITE,
 	COLOR_GREY,
+	PUYO_STATE,
+	DX_DY
 } from '../constants.js';
 
 export default class PuyoView extends view {
 	constructor(player) {
 		super();
 		this.player = player;
-		this.offset = PLAYER_OFFSET*this.player;
+		this.offset = PLAYER_OFFSET * this.player;
 		this.puyoArr = [];
 		this.popFrame = 0;
 		this.initGraphics();
@@ -45,6 +47,10 @@ export default class PuyoView extends view {
 		);
 		
 		ctx = this.infoCtx;
+		ctx.font = "16px 'Press Start 2P'";
+		ctx.fillStyle = COLOR_WHITE;
+		ctx.textBaseline = 'top';
+		ctx.textAlign = 'center';
 		
 		ctx.fillText('WAITING',
 					X_OFFSET+this.offset+PUYO_BOARD_WIDTH*PUYO_SIZE/2,
@@ -57,15 +63,15 @@ export default class PuyoView extends view {
 					 Y_OFFSET+(PUYO_VISIBLE_HEIGHT+1)*PUYO_SIZE/2)
 	};
 
-	addPuyo = (puyo) => {
+	addPuyo = puyo => {
 		this.puyoArr.push(puyo);
 	};
 
-	fallingPuyos = (arr) => {
+	fallingPuyos = arr => {
 		this.puyoArr = arr;
 	};
 
-	addMultPuyo = (multPuyo) => {
+	addMultPuyo = multPuyo => {
 		this.puyoArr = multPuyo;
 	};
 
@@ -73,8 +79,9 @@ export default class PuyoView extends view {
 
 	getPuyoArr = () => this.puyoArr;
 
-	drawBoard = (board) => {
+	drawBoard = board => {
 		this.boardCtx.clearRect(X_OFFSET+this.offset+1, Y_OFFSET+1, PUYO_BOARD_WIDTH * PUYO_SIZE, PUYO_VISIBLE_HEIGHT * PUYO_SIZE);
+
 		for (var i = 0; i < PUYO_BOARD_WIDTH; i++) {
 			for (var j = 1; j < PUYO_BOARD_HEIGHT; j++) {
 				let x = X_OFFSET + i * PUYO_SIZE + 1 + this.offset;
@@ -83,8 +90,8 @@ export default class PuyoView extends view {
 				let color = board.table[j][i];
 				if (color != PUYO_TYPE.EMPTY) {
 					let color = board.table[j][i];
-					let state = board.getState(i,j);
-					this.drawPuyoByPointer(x, y, state, color, board, CTX_NUM.BOARD);
+					let state = this.getState(board.table,i,j);
+					this.drawPuyoByPointer(x, y, state, color, CTX_NUM.BOARD);
 				}
 				this.boardCtx.lineWidth = 1;
 				this.boardCtx.strokeStyle = "rgb(0,0,0)"
@@ -94,13 +101,13 @@ export default class PuyoView extends view {
 		if(!this.preview){
 			socket.emit('graphics',{
 				name:'drawBoard',
-				args:board
+				args:[board]
 			})			
 		}
 	};
 
 	moveCycle = () => {
-		this.pieceCtx.clearRect(X_OFFSET+this.offset+1, 0+1, PUYO_BOARD_WIDTH * PUYO_SIZE, PUYO_VISIBLE_HEIGHT * PUYO_SIZE);
+		this.refreshPiece();
 
 		let main = this.puyoArr.mainPiece;
 		let sub = this.puyoArr.subPiece;
@@ -114,7 +121,7 @@ export default class PuyoView extends view {
 
 	fallCycle = () => {
 		let counter = 0;
-		this.pieceCtx.clearRect(X_OFFSET+this.offset+1, Y_OFFSET+1, PUYO_BOARD_WIDTH * PUYO_SIZE, PUYO_VISIBLE_HEIGHT * PUYO_SIZE);
+		this.refreshPiece();
 		for (let x = 0; x < PUYO_BOARD_WIDTH; x++) {
 			for (let puyo of this.puyoArr[x]) {
 				if (puyo) {
@@ -126,12 +133,12 @@ export default class PuyoView extends view {
 		return counter > 0;
 	};
 
-	popCycle = (arr) => {
+	popCycle = arr => {
 		if (arr.length == 0) return true;
 		this.popFrame++;
 
 		let frame = 4;
-		this.pieceCtx.clearRect(X_OFFSET+this.offset+1, Y_OFFSET+1, PUYO_BOARD_WIDTH * PUYO_SIZE, PUYO_VISIBLE_HEIGHT * PUYO_SIZE);
+		this.refreshPiece();
 		for (let pos of arr) {
 			const x = pos.x;
 			const y = pos.y;
@@ -182,7 +189,7 @@ export default class PuyoView extends view {
 			type = 12;
 		}
 		
-		let ctx = on==CTX_NUM.BOARD?this.boardCtx:this.pieceCtx;
+		let ctx = (on==CTX_NUM.BOARD?this.boardCtx:this.pieceCtx);
 		
 		ctx.drawImage(
 			SPRITE_IMAGE, //Source
@@ -204,9 +211,19 @@ export default class PuyoView extends view {
 		}
 	};
 
+	refreshPiece = () => {
+		this.pieceCtx.clearRect(X_OFFSET+this.offset+1, Y_OFFSET+1, PUYO_BOARD_WIDTH * PUYO_SIZE, PUYO_VISIBLE_HEIGHT * PUYO_SIZE);
+		if(!this.preview) {
+			socket.emit('graphics',{
+				name:'refreshPiece',
+				args:null
+			})			
+		}
+	}
+
 	drawNexts = () => {};
 
-	drawPuyoByPointer = (x, y, state, color, board, on) => {
+	drawPuyoByPointer = (x, y, state, color, on) => {
 		let type = color;
 
 		if (type == PUYO_TYPE.EMPTY) return;
@@ -215,7 +232,7 @@ export default class PuyoView extends view {
 			type = 12;
 		}
 
-		let ctx = on==CTX_NUM.BOARD?this.boardCtx:this.pieceCtx;
+		let ctx = (on==CTX_NUM.BOARD?this.boardCtx:this.pieceCtx);
 		
 		ctx.drawImage(
 			SPRITE_IMAGE, //Source
@@ -228,13 +245,27 @@ export default class PuyoView extends view {
 			PUYO_SIZE, //dW
 			PUYO_SIZE //dH
 		);
-		
-		if(!this.preview){
-			socket.emit('graphics',{
-				name:'drawPuyoByPointer',
-				args:[x,y,state,color,board,on]
-			})			
+	};
+
+	getState = (table, x, y) => {
+		if (x < 0 || x >= PUYO_BOARD_WIDTH || y >= PUYO_BOARD_HEIGHT || y < 0) return PUYO_STATE.N;
+
+		let order = 'UDLR';
+		let temp = '';
+		let color = table[y][x];
+
+		for (let i = 0; i < 4; i++) {
+			let nx = x + DX_DY[i][0];
+			let ny = y + DX_DY[i][1];
+
+			if (nx >= 0 && nx < PUYO_BOARD_WIDTH && ny < PUYO_BOARD_HEIGHT && ny >= 0) {
+				if (table[ny][nx] == color) temp += order.charAt(i);	
+			}
 		}
+
+		if (temp.length == 0) temp = 'N';
+
+		return PUYO_STATE[temp];
 	};
 }
 

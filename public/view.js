@@ -1,4 +1,5 @@
 import {ctx0, ctx1, ctx2, ctx3} from "./constants.js";
+import {socket} from "./main.js"
 
 import {PLAYER_OFFSET, HOLD, HOLD_X_OFFSET, HOLD_Y_OFFSET, NEXT, NEXT_X_OFFSET, NEXT_Y_OFFSET, NEXT_BLOCK_SIZE_OUTLINE, COLOR_WHITE, HOLD_BLOCK_SIZE_OUTLINE, X_OFFSET, Y_OFFSET, BOARD_WIDTH, BLOCK_SIZE_OUTLINE, COLOR_BLACK, COLOR_MAP,VISIBLE_HEIGHT,P2_COLORS,P1_COLORS,DIST_BTW_NEXTS,BOARD_END_Y,COLOR_GREY,BOARD_CENTER_X,BOARD_CENTER_Y} from './constants.js';
 
@@ -11,6 +12,7 @@ export default class view {
 		this.aniCtx = ctx3;
 		this.offset = PLAYER_OFFSET * player;
 		this.clearLineInfo;
+		this.preview = false;
 	}
 
 	callDrawOutline = (L, U, R, D) => {
@@ -71,6 +73,13 @@ export default class view {
 
 		ctx.strokeText(score, BOARD_CENTER_X + this.offset, BOARD_END_Y + 12);
 		ctx.fillText(score, BOARD_CENTER_X + this.offset, BOARD_END_Y + 12);
+		
+		if(!this.preview) {
+			socket.emit('graphics',{
+				name:'displayScore',
+				args:score
+			})
+		}
 	};
 
 	displayScoreArr = (scoreArr) => {
@@ -97,6 +106,13 @@ export default class view {
 				ctx.clearRect(0 + this.offset, BOARD_END_Y + 25, BLOCK_SIZE_OUTLINE * 40 + 5, 100),
 			750
 		);
+		
+		if(!this.preview) {
+			socket.emit('graphics',{
+				name:'displayScoreArr',
+				args:[scoreArr]	
+			})
+		}
 	};
 
 	showGarbage = (n) => {
@@ -134,6 +150,13 @@ export default class view {
 			ctx.strokeRect(x, y, size, size);
 
 			accSize += size + 5;
+		}
+				
+		if(!this.preview) {
+			socket.emit('graphics',{
+				name:'showGarbage',
+				args:n
+			})
 		}
 	};
 }

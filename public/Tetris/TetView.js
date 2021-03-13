@@ -74,6 +74,10 @@ export default class TetView extends view {
 		 *		);*/
 		
 		ctx = this.infoCtx;
+		ctx.font = "16px 'Press Start 2P'";
+		ctx.fillStyle = COLOR_WHITE;
+		ctx.textBaseline = 'top';
+		ctx.textAlign = 'center';
 		
 		ctx.fillText('WAITING',
 					X_OFFSET+this.offset+BOARD_WIDTH*BLOCK_SIZE_OUTLINE/2,
@@ -114,7 +118,7 @@ export default class TetView extends view {
 		if(!this.preview) {
 			socket.emit('graphics',{
 				name:'draw',
-				args:table
+				args:[table]
 			})
 		}
 		
@@ -127,6 +131,12 @@ export default class TetView extends view {
 					  BOARD_WIDTH * BLOCK_SIZE_OUTLINE,
 					  VISIBLE_HEIGHT * BLOCK_SIZE_OUTLINE
 					 );
+		if(!this.preview) {
+			socket.emit('graphics',{
+				name:'clearPiece',
+				args:null
+			})
+		}
 	}
 	
 	drawPiece = (piece, MODE, index = 0) => {

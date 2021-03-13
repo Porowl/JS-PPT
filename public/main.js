@@ -54,7 +54,7 @@ const init = () => {
 	
 	socket.on('eview', data =>{
 		let call = data.name;
-		EnemyView[call](data.args);
+		Array.isArray(data.args)?EnemyView[call](...data.args):EnemyView[call](data.args);
 	})
 };
 

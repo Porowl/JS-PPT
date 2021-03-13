@@ -54,7 +54,6 @@ export default class Player {
 		document.addEventListener(`garbCountP${this.user}`, event=> {
             let lines = this.board.deductGarbage(event.detail.n)
             if(lines>0) {
-				console.log(lines);
 				socket.emit(`attackFromP${this.user}`,lines);	
 			}
 		});
@@ -119,7 +118,6 @@ export default class Player {
 			case PHASE.FALL: {
 				this.moveDownCycle(dt);
 				this.inputCycle();
-				this.updatePiece();
 
 				if (!this.board.canMove(this.piece, 0, 1)) {
 					this.lockDelay += dt;
@@ -198,6 +196,7 @@ export default class Player {
 	moveDown = () => {
 		if (this.board.canMove(this.piece,0,1)) {
 			this.piece.move(0,1);
+			this.updatePiece();
 			return true;
 		}
 		return false;
@@ -215,7 +214,8 @@ export default class Player {
 			
 			if (fc == 0 || (fc >= DAS && (fc - DAS) % ARR == 0)) {
 				if(this.board.canMove(this.piece,dir,0)) {
-					this.piece.move(dir,0);					
+					this.piece.move(dir,0);	
+					this.updatePiece();
 				}
 			}
 			this.LRFrameCounter++;
@@ -255,6 +255,7 @@ export default class Player {
 		if(this.board.canMove(p, dx, dy)) {
 			piece.move(dx,dy);
 			piece.rotate(dir);
+			this.updatePiece();
 			piece.lastMove = LAST_MOVE.SPIN;
 		}
 	};
@@ -274,6 +275,7 @@ export default class Player {
 				this.stg.hold = a;
 				this.piece = new Mino(temp);
 			}
+			this.updatePiece();
 			this.holdUsed = true;
 		}
 		this.stg.keyMap[KEY.SHIFT] = false;
@@ -281,8 +283,9 @@ export default class Player {
 	};
 
 	hardDrop = () => {
-		if (this.stg.keyMap[KEY.SPACE]) {
+		if (this.stg.keyMap[KEY.SPACE]) {			
 			var result = this.board.hardDrop(this.piece);
+			this.updatePiece();
 			this.View.hardDropAnimation(this.piece, this.board.garbage);
 			this.stg.addDropScore(result * 2);
 			this.piece.hardDropped = true;

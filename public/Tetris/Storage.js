@@ -299,13 +299,11 @@ export default class Storage{
             default:
                 lines = 0;
         }
-		console.log(lines);
 		
         lines += (this.b2b>1)?1:0;
 		let arr = (this.vsPuyo?COMBO_GARB_NERF:COMBO_GARB);
         lines += arr[Math.min(this.combo,arr.length-1)];
 		
-		console.log(lines);
         document.dispatchEvent(
             new CustomEvent(`garbCountP${this.user}`,{
                 detail:{

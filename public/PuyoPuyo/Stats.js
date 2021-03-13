@@ -72,13 +72,17 @@ export default class Stats{
 
 		garbs = ds / margin + this.leftOver;
 		
+		console.log(margin);
+		console.log(garbs);
+		
 		this.leftOver = (garbs>1) ? garbs % 1 : 0;
 
 		garbs = garbs | 0;
 		if (garbs == 0) return;
-		
 		console.log(garbs);
 		
+		
+		console.log(`garbCountP${this.user}`);
         document.dispatchEvent(
             new CustomEvent(`garbCountP${this.user}`,{
                 detail:{
@@ -90,7 +94,7 @@ export default class Stats{
 	
 	getMargin = () => {
 		let margin = 60;
-		
+		return margin;
 		let dt = Date.now() - this.gameStartedAt;
 		if(dt>=96000) {
 			dt -= 96000;
