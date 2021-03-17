@@ -1,6 +1,4 @@
-import {ctx0, ctx1, ctx2, ctx3, NEXT,HOLD, PLAYER_OFFSET, NEXT_X_OFFSET, NEXT_Y_OFFSET, NEXT_BLOCK_SIZE_OUTLINE, NEXT_BLOCK_SIZE, HOLD_X_OFFSET, HOLD_Y_OFFSET, HOLD_BLOCK_SIZE_OUTLINE, HOLD_BLOCK_SIZE, Y_OFFSET, X_OFFSET, DIST_BTW_NEXTS, BLOCK_SIZE_OUTLINE, BLOCK_SIZE, COLOR_WHITE, COLOR_GREY, COLOR_BLACK, COLOR_GHOST, P1_COLORS, P2_COLORS, COLOR_MAP, GHOST_COLOR_MAP, LINE_CLEAR_WHITE, LINE_CLEAR_BLACK, PIECE_3D_ADD,LOCK_WHITE,DRAWMODE,PIECE_MAP,
-		BOARD_HEIGHT,BOARD_WIDTH,VISIBLE_HEIGHT,BOARD_CENTER_X,BOARD_CENTER_Y,BOARD_END_Y,LINE_CLEAR_FRAMES,LOCK_ANIMATION_FRAMES,HARDDROP_ANIMATION_FRAMES 
-	   } from "../constants.js";
+import {ctx0, ctx1, ctx2, ctx3, NEXT,HOLD, PLAYER_OFFSET, NEXT_X_OFFSET, NEXT_Y_OFFSET, NEXT_BLOCK_SIZE_OUTLINE, NEXT_BLOCK_SIZE, HOLD_X_OFFSET, HOLD_Y_OFFSET, HOLD_BLOCK_SIZE_OUTLINE, HOLD_BLOCK_SIZE, Y_OFFSET, X_OFFSET, DIST_BTW_NEXTS, BLOCK_SIZE_OUTLINE, BLOCK_SIZE, COLOR_WHITE, COLOR_GREY, COLOR_BLACK, COLOR_GHOST, P1_COLORS, P2_COLORS, COLOR_MAP, GHOST_COLOR_MAP, LINE_CLEAR_WHITE, LINE_CLEAR_BLACK, PIECE_3D_ADD,LOCK_WHITE,DRAWMODE,PIECE_MAP,GAUGE_X_OFFSET,GAUGE_Y_OFFSET,BOARD_HEIGHT,BOARD_WIDTH,VISIBLE_HEIGHT,BOARD_CENTER_X,BOARD_CENTER_Y,BOARD_END_Y,LINE_CLEAR_FRAMES,LOCK_ANIMATION_FRAMES,HARDDROP_ANIMATION_FRAMES } from "../constants.js";
 
 import view from '../view.js';
 import {socket} from '../main.js';
@@ -62,9 +60,16 @@ export default class TetView extends view {
 			HOLD_X_OFFSET,
 			HOLD_Y_OFFSET,
 			HOLD_X_OFFSET + HOLD_BLOCK_SIZE_OUTLINE * 6,
-			NEXT_Y_OFFSET + HOLD_BLOCK_SIZE_OUTLINE * 5 + 30
+			HOLD_Y_OFFSET + HOLD_BLOCK_SIZE_OUTLINE * 7
 		);
 
+		// GUAGE
+		this.callDrawOutline(
+			GAUGE_X_OFFSET,
+			GAUGE_Y_OFFSET,
+			GAUGE_X_OFFSET + NEXT_BLOCK_SIZE_OUTLINE,
+			GAUGE_Y_OFFSET + NEXT_BLOCK_SIZE_OUTLINE*20
+		);
 		/*		// LEVEL
 		 *		this.callDrawOutline(
 		 *			HOLD_X_OFFSET,
@@ -392,4 +397,52 @@ export default class TetView extends view {
 			HARDDROP_ANIMATION_FRAMES * 1000 / 60
 		);
 	};
+
+	displayGauge = n =>{
+		let level = n / 20 | 0;
+		let height = n % 20;
+		let ctx = this.boardCtx;
+		
+		switch (level) {
+			case 0:
+				ctx.fillStyle = COLOR_GREY;
+				break;
+			case 1:
+				ctx.fillStyle = COLOR_MAP[0];
+				break;
+			case 2:
+				ctx.fillStyle = COLOR_MAP[6];
+				break;
+			case 3:
+				ctx.fillStyle = COLOR_MAP[1];
+				break;
+		}
+		ctx.fillRect(GAUGE_X_OFFSET + this.offset,GAUGE_Y_OFFSET,NEXT_BLOCK_SIZE_OUTLINE,NEXT_BLOCK_SIZE_OUTLINE*20);
+		
+		switch (level) {
+			case 0:
+				ctx.fillStyle = COLOR_MAP[0];
+				break;
+			case 1:
+				ctx.fillStyle = COLOR_MAP[6];
+				break;
+			case 2:
+				ctx.fillStyle = COLOR_MAP[1];
+				break;
+		}
+		
+		ctx.fillRect(GAUGE_X_OFFSET + this.offset,GAUGE_Y_OFFSET + NEXT_BLOCK_SIZE_OUTLINE * (20-height),NEXT_BLOCK_SIZE_OUTLINE,NEXT_BLOCK_SIZE_OUTLINE * height);
+		
+		ctx.strokeStyle = COLOR_BLACK;
+		for(let i = 0; i<20; i++) {
+			ctx.strokeRect(GAUGE_X_OFFSET + this.offset,GAUGE_Y_OFFSET+i*NEXT_BLOCK_SIZE_OUTLINE,NEXT_BLOCK_SIZE_OUTLINE,NEXT_BLOCK_SIZE_OUTLINE)
+		}
+				
+		if(!this.preview) {
+			socket.emit('graphics',{
+				name:'displayGauge',
+				args:n
+			})
+		}
+	}
 }

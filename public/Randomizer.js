@@ -70,7 +70,7 @@ export default class Randomizer{
 
     addPuyo = () =>
     {
-        this.puyos.push((this.engine()*5|0)*0o10+this.engine()*5|0) //0o<firstPuyo><SecondPuyo>;
+        this.puyos.push((this.engine()*4|0)*0o10+this.engine()*4|0) //0o<firstPuyo><SecondPuyo>;
     }
 	
 	getNextPuyos = index =>

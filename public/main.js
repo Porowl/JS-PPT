@@ -3,9 +3,9 @@ import TetView from './Tetris/TetView.js';
 import PuyoPlayer from './PuyoPuyo/PuyoPlayer.js';
 import PuyoView from './PuyoPuyo/PuyoView.js';
 import Randomizer from './Randomizer.js'
-import Menu from './Menu.js';
+import menu from './Menu.js';
 
-import {canvas0, canvas1, canvas2, canvas3} from './constants.js';
+import {canvas0, canvas1, canvas2, canvas3,GAME_STATE} from './constants.js';
 
 export let socket = io();
 let requestId;
@@ -20,33 +20,35 @@ const init = () => {
 	window.addEventListener('resize', resize, false);
 
 	socket.on('connected', () => {
-		GUI = Menu;
+		GUI = menu;
 		GUI.changeScreenTo('title');
+		socket.emit('load_complete')
 	});
 	
 	socket.on('create',type=>{
-		console.log('server said hi and said',type)
 		Player = type==='PUYO'?new PuyoPlayer(socket.id):new TetPlayer(socket.id);
+		window.player = Player;
 	});
 
 	socket.on('oppJoined', type =>{
-		console.log('server said your opp is ready and said',type)
 		EnemyView = type==='PUYO'?new PuyoView(1):new TetView(1);
 		EnemyView.preview = true;
 		Player.setOpponent(type);
 		socket.emit('oppRecieved');
+		window.player = Player;
 	});
 	
 	socket.on('seed', seed=>{
 		Player.random = new Randomizer(seed);
-		socket.emit('ready');
+		GUI.changeScreenTo('ready');
 	});
 
 	socket.on('countdown', ()=>{
+		GUI.changeScreenTo('empty');
 		setTimeout(()=>{Player.View.countDown(3);EnemyView.countDown(3)},0);
 		setTimeout(()=>{Player.View.countDown(2);EnemyView.countDown(2)},1000);
 		setTimeout(()=>{Player.View.countDown(1);EnemyView.countDown(1)},2000);
-		setTimeout(()=>{Player.View.countDown(0);EnemyView.countDown(0)},3000);
+		setTimeout(()=>{Player.View.countDown(0);EnemyView.countDown(0);Player.gameStart();},3000);
 	})
 	socket.on('update', dt =>{
 		Player.update(dt);
@@ -56,6 +58,13 @@ const init = () => {
 		let call = data.name;
 		Array.isArray(data.args)?EnemyView[call](...data.args):EnemyView[call](data.args);
 	})
+	
+	socket.on('GAME_OVER',STATE=>{
+		let a = (STATE==GAME_STATE.WIN)?GAME_STATE.WIN:GAME_STATE.LOST;
+		let b = 1-a;
+		Player.View.display(a);
+		EnemyView.display(b);
+	});
 };
 
 const resize = () => {

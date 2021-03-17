@@ -67,15 +67,20 @@ class Room {
 		
 		p0.on('ready',()=>{
 			this.count++;
-			console.log(`${this.id} called ready, current readies are ${this.count}`)
-			if(this.count>=2) this.start();
+			this.start();
 		});
 		p1.on('ready',()=>{
 			this.count++;
-			console.log(`${this.id} called ready, current readies are ${this.count}`)
-			if(this.count>=2) this.start();
+			this.start();
 		});
-		
+		p0.on('cancel',()=>{
+			this.count++;
+			this.start();
+		});
+		p1.on('cancel',()=>{
+			this.count--;
+			this.start();
+		});
 		// io.to(this.player0).emit('seed',this.randomseed)
 		// io.to(this.player1).emit('seed',this.randomseed)
 		
@@ -94,12 +99,25 @@ class Room {
 		p1.on('graphics',data=>{
 			io.to(this.player0).emit('eview',data)
 		})
+		
+		p0.on('gameOver',()=>{
+			io.to(this.player1).emit('GAME_OVER',0);
+			io.to(this.player0).emit('GAME_OVER',1);
+			this.status = STATUS.WAITING;
+		});
+		p1.on('gameOver',()=>{
+			io.to(this.player0).emit('GAME_OVER',0);
+			io.to(this.player1).emit('GAME_OVER',1);
+			this.status = STATUS.WAITING;
+		});
 
 	}
 
 	start = () =>{
-		console.log(`starting game`);
+		if(this.count<2) return;
 		
+		this.count = 0;
+		console.log(`starting game`);
 		io.to(this.id).emit('countdown');
 		
 		setTimeout(()=>{

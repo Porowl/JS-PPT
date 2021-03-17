@@ -13,24 +13,29 @@ export default class Stage {
 
 		this.remaining = 0;
 		this.garbage = 0;
+		this.gauge = 0;
 	}
 
+	
 	isEmpty = () => this.remaining == 0;
 
 	lock = (p) => {
 		let shape = PIECE_MAP[p.typeId][p.rotation];
 
+		let lowest = 0;
 		for (var i = 0; i < 4; i++) {
 			for (var j = 0; j < 4; j++) {
 				if (shape & (0x8000 >> (i * 4 + j))) {
 					var tx = p.x + j;
 					var ty = p.y + i;
+					if(ty>lowest) lowest = ty; 
 					this.field[ty][tx] = p.typeId;
 				}
 			}
 		}
-
+		
 		let data = new lockData();
+		if(lowest<20) data.topOut = true;
 
 		for (var i = p.y; i < Math.min(p.y + 4, BOARD_HEIGHT); i++) {
 			if (this.checkLine(i)) {
@@ -153,12 +158,15 @@ export default class Stage {
 		return counter;
 	};
 
-	executeGarbage = () => {
+	executeGarbage = (vsPuyo) => {
 		if(this.garbage>=40) return false;
 		let n = Math.min(this.garbage, BOARD_HEIGHT - 1);
-		for (let y = 0; y < BOARD_HEIGHT - n; y++)
+		
+		if(vsPuyo && n > 7) n = 7;
+		
+		for (let y = 0; y < BOARD_HEIGHT - n; y++) {
 			for (let x = 0; x < BOARD_WIDTH; x++) this.field[y][x] = this.field[y + n][x];
-
+		}
 		let empty = parseInt(Math.random() * BOARD_WIDTH);
 		for (let y = BOARD_HEIGHT - n; y < BOARD_HEIGHT; y++) {
 			let chance = parseInt(Math.random() * 10);
@@ -166,12 +174,22 @@ export default class Stage {
 			for (let x = 0; x < BOARD_WIDTH; x++) this.field[y][x] = x == empty ? -1 : 7;
 		}
 		this.remaining += this.garbage*9;
-		this.garbage = 0;
+		vsPuyo?this.garbage -= n:this.garbage = 0;
 		return true;
 	};
 
 	addGarbage = (n) => {
-		this.garbage += n;
+		let temp = n;
+		if(this.gauge>0){
+			temp -= this.gauge;
+			if(temp<0){
+				this.gauge = temp;
+			} else {
+				this.garbage -= temp;
+			}
+		} else { 
+			this.garbage += n;		
+		}
 	};
 
 	deductGarbage = (n) => {
@@ -183,12 +201,33 @@ export default class Stage {
 		}
 		return 0;
 	};
+
+	addGauge = (n, m) => {
+		if(this.garbage > 0) {
+			this.garbage -= n;
+			if(this.garbage<0) {
+				let a = 0 - this.garbage;
+				this.garbage = 0;
+				this.gauge += a;
+			}
+		} else {
+			this.gauge += m;
+		}
+		if(this.gauge>60) this.gauge = 60;
+	}
+	
+	resetGauge = () => {
+		let temp = this.gauge;
+		this.gauge = 0;
+		return temp;
+	}
 }
 
 class lockData {
 	constructor() {
 		this.lines = [];
 		this.tSpin = T_SPIN_STATE.NONE;
+		this.topOut = false;
 	}
 
 	add = (i) => this.lines.push(i);

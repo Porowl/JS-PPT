@@ -5,7 +5,7 @@ import Mino from './Mino.js';
 import {socket} from '../main.js';
 
 import {DRAWMODE,MOVES,KEYSTATES,LAST_MOVE,KEY,ENTRY_DELAY,DAS,ARR,OFFSETS,I_OFFSETS,PIECE_MAP,
-	   LINE_CLEAR_FRAMES,CLEAR_STRINGS
+	   LINE_CLEAR_FRAMES,CLEAR_STRINGS,SOUNDS,playSound
 	  } from '../constants.js';
 
 export default class Player {
@@ -63,6 +63,11 @@ export default class Player {
             this.board.addGarbage(data);
             this.View.showGarbage(this.board.garbage); 
         });
+		
+		document.addEventListener(`AddGauge${this.user}`, event=> {
+            let lines = this.board.addGauge(event.detail.n,event.detail.m);
+			this.View.displayGauge(this.board.gauge);
+		});
 	}
 
 	setOpponent = type => {
@@ -92,9 +97,12 @@ export default class Player {
 
 	update = (dt) => {
 		switch (this.phase) {
+			case PHASE.STANDBY:{
+				break;
+			}
 			case PHASE.CLEAR_UPS: {
-				if(!this.board.executeGarbage()) {
-					this.phase == PHASE.GAME_OVER;
+				if(!this.board.executeGarbage(this.stg.vsPuyo)) {
+					this.phase = PHASE.GAME_OVER;
 					return;
 				};
 				this.View.showGarbage(this.board.garbage); 
@@ -107,9 +115,17 @@ export default class Player {
 			}
 				
 			case PHASE.NEW_BLOCK: {
+				//if not on chain send garbage to puyo
+				if(this.stg.vsPuyo && this.stg.isComboBroken()) {
+					this.stg.executeGauge(this.board.resetGauge())
+					this.View.displayGauge(this.board.gauge);
+				}
 				this.View.draw(this.board.field);
 				this.getNewPiece();
-				//this.checkTopOut();
+				if(!this.board.canMove(this.piece,0,0)) {
+					this.phase = PHASE.GAME_OVER;
+					return;
+				}
 				this.moveDown();
 				this.phase = PHASE.FALL;
 				break;
@@ -137,6 +153,7 @@ export default class Player {
 			case PHASE.LOCK: {
 				this.lock(this.piece);
 				this.phase = PHASE.CLEAR_ANI;
+				if(this.clearedLineArr.topOut) this.phase = PHASE.GAME_OVER;
 				break;
 			}
 				
@@ -157,6 +174,13 @@ export default class Player {
 				}
 				
 				this.phase = PHASE.CLEAR_UPS;
+				break;
+			}
+				
+			case PHASE.GAME_OVER:{
+				this.phase = PHASE.STANDBY;
+				socket.emit('gameOver')
+				break;
 			}
 		}
 	};
@@ -196,6 +220,7 @@ export default class Player {
 	moveDown = () => {
 		if (this.board.canMove(this.piece,0,1)) {
 			this.piece.move(0,1);
+			playSound(SOUNDS.MOVE);
 			this.updatePiece();
 			return true;
 		}
@@ -214,7 +239,8 @@ export default class Player {
 			
 			if (fc == 0 || (fc >= DAS && (fc - DAS) % ARR == 0)) {
 				if(this.board.canMove(this.piece,dir,0)) {
-					this.piece.move(dir,0);	
+					this.piece.move(dir,0);
+					playSound(SOUNDS.MOVE);
 					this.updatePiece();
 				}
 			}
@@ -257,6 +283,7 @@ export default class Player {
 			piece.rotate(dir);
 			this.updatePiece();
 			piece.lastMove = LAST_MOVE.SPIN;
+			playSound(SOUNDS.CHANGE);
 		}
 	};
 
@@ -277,6 +304,7 @@ export default class Player {
 			}
 			this.updatePiece();
 			this.holdUsed = true;
+			playSound(SOUNDS.HOLD.play);
 		}
 		this.stg.keyMap[KEY.SHIFT] = false;
 		this.stg.keyMap[KEY.C] = false;
@@ -291,6 +319,7 @@ export default class Player {
 			this.piece.hardDropped = true;
 			this.stg.keyMap[KEY.SPACE] = false;
 			this.stg.keyMap[KEY.H] = false;
+			playSound(SOUNDS.HARDDROP);
 		}
 	};
 

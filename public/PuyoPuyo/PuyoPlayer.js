@@ -70,9 +70,13 @@ export default class PuyoPlayer{
         });
 		
 		document.addEventListener(`garbCountP${this.user}`, event=> {
-            let garbs = this.Board.deductGarbage(event.detail.n)
-			console.log(garbs);
-            if(garbs>0) {
+            let garbs = this.Board.deductGarbage(event.detail.n);
+			if(this.Stats.vsTetris){
+				if(garbs!=0) {
+					console.log(event.detail.m);
+					socket.emit(`attackFromP${this.user}`,event.detail.m);
+				}
+			} else if(garbs>0) {
 				console.log(garbs);
 				socket.emit(`attackFromP${this.user}`,garbs);	
 			}
@@ -85,11 +89,19 @@ export default class PuyoPlayer{
         });
     }
 
+	gameStart = () =>{
+		this.Stats.setGameStarted();
+	}
+	
     update = () =>
     {
         //console.log(`Current Phase is: ${this.phase}`);
         switch(this.phase)
         {
+			case PHASE.STAND_BY:
+			{
+				break;
+			}
             case PHASE.DROP:
             {
                 this.View.moveCycle();
@@ -170,18 +182,16 @@ export default class PuyoPlayer{
             case PHASE.POP_ANIMATION:
             {
                 if(this.View.popCycle(this.popArr.arr)) {
-					if(this.Board.garbage>0){
-						this.phase = PHASE.GARB;
-					} else {
 						this.phase = PHASE.NEW_PUYO;
-					};
 				}
+	            this.View.showGarbage(this.Board.garbage); 
                 break;
             }
 
 			case PHASE.GARB:
 			{
                 let arr = this.Board.executeGarbage();
+				this.View.showGarbage(this.Board.garbage)
                 this.View.fallingPuyos(arr);
 				this.phase++;
 				break;
@@ -224,7 +234,11 @@ export default class PuyoPlayer{
 
                 this.View.emptyArray();
                 this.View.addMultPuyo(this.Puyo);
-				this.View.drawNexts();
+				
+				let i = this.Stats.getIndex()
+				let p1 = this.random.getPuyo(i);
+				let p2 = this.random.getPuyo(i+1);
+				this.View.drawNexts(p1,p2);
 
                 this.phase = PHASE.DROP;
                 break;
@@ -232,8 +246,9 @@ export default class PuyoPlayer{
 
             case PHASE.GAME_OVER:
             {
-                this.gameOver = true;
-                return false;   
+				this.phase = PHASE.STAND_BY;
+				socket.emit('gameOver');
+                break;   
             }
         }
         return true;
@@ -247,7 +262,9 @@ export default class PuyoPlayer{
         return new MultPuyos(new Puyo(p1),new Puyo(p2))
     }
 	
-	setOpponent = () => {};
+	setOpponent = type => {
+		this.Stats.setOpponent(type);
+	};
 }
 
 const PHASE = 

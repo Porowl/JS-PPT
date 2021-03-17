@@ -1,4 +1,4 @@
-import {GRAVITY, T_SPIN_STATE, SCORE,GAMEMODE,KEYSTATES,KEY,CLEAR_STRINGS,COMBO_GARB,COMBO_GARB_NERF
+import {GRAVITY, T_SPIN_STATE, SCORE,GAMEMODE,KEYSTATES,KEY,CLEAR_STRINGS,COMBO_GARB,COMBO_GARB_NERF,SOUNDS,GAUGE_TO_TRASH,playSound
 	  } from '../constants.js';
 
 import {socket} from '../main.js';
@@ -32,11 +32,13 @@ export default class Storage{
 		}
 	}
 	
-    /**
-     * 현재 레벨을 반환합니다.
-     */
     getLevel = () => this.level;
-    
+    getGravity = () => GRAVITY[Math.min(this.getLevel(),GRAVITY.length-1)];
+    getIndex = () => this.index;
+    getIndexInc = () => this.index++;
+
+	isComboBroken = () => this.combo === 0;
+	
     updateLines = (data,perfect) =>
     {
         let lines = data.length();
@@ -109,25 +111,12 @@ export default class Storage{
             this.level++;
         }
 
+		//resetCombo;
         (lines>0)?this.combo++:this.combo=0;
     
         return scoreArr;
     }
-    /**
-     * 현재 중력을 반환합니다.
-     */
-    getGravity = () => GRAVITY[Math.min(this.getLevel(),GRAVITY.length-1)];
 
-    /**
-     * 현재 몇 번째 블럭인지를 표시합니다.
-     */
-    getIndexInc = () => this.index++;
-
-    getIndex = () => this.index;
-
-    /**
-     * 다중 키 입력을 받기 위한 일차 배열을 생성합니다.
-     */
     initKeyMap = () =>{
         this.keyMap = [];
         for(var i = 0;i<101;i++){
@@ -135,14 +124,6 @@ export default class Storage{
         }
     }
 
-    /**
-     * 왼쪽 키와 오른쪽 키 상태를 반환합니다.
-     * @return {int} 
-     * 0: 양쪽 키 다 눌림
-     * 1: 왼쪽 키 눌림
-     * 2: 오른쪽 키 눌림
-     * -1: 안 눌림
-     */
     checkLR = () =>
     {
         if(this.keyMap[KEY.LEFT]&&this.keyMap[KEY.RIGHT])
@@ -152,14 +133,6 @@ export default class Storage{
         return -1;
     }
 
-    /**
-     * 회전 키의 상태를 반환합니다.
-     * @return {int} 
-     * 0: 양쪽 키 다 눌림
-     * 1: 시계방향 회전 키 눌림
-     * 2: 반시계방향 회전 키 눌림
-     * -1: 안 눌림
-     */
     checkRot = () =>
     {
         if((this.keyMap[KEY.UP]||this.keyMap[KEY.X])
@@ -170,10 +143,6 @@ export default class Storage{
         return -1;
     }
     
-    /**
-     * 홀드 키의 상태를 반환합니다.
-     * @return {boolean} 검사 값
-     */
     checkHold = () => this.keyMap[KEY.SHIFT]||this.keyMap[KEY.C];
 
     addScore = mode => 
@@ -188,54 +157,65 @@ export default class Storage{
                 calc = 100;
                 this.b2b = 0;
                 text = CLEAR_STRINGS.SINGLE;
+				playSound(SOUNDS.ERASE);
                 break;
             case SCORE.DOUBLE:
                 calc = 300;
                 this.b2b = 0;
                 text = CLEAR_STRINGS.DOUBLE;
+				playSound(SOUNDS.ERASE);
                 break;
             case SCORE.TRIPLE:
                 calc = 500;
                 this.b2b = 0;
                 text = CLEAR_STRINGS.TRIPLE;
+				playSound(SOUNDS.ERASE);
                 break;
             case SCORE.TETRIS:
                 calc = 800;
                 this.b2b++;
                 text = CLEAR_STRINGS.TETRIS;
+				playSound(SOUNDS.ERASE4);
                 break;
             case SCORE.MTS:
                 calc = 100;
                 text = CLEAR_STRINGS.T_SPIN + CLEAR_STRINGS.MINI;
+				playSound(SOUNDS.TSPIN);
                 break;
             case SCORE.MTSS:
                 calc = 200;
                 this.b2b++;
                 text = CLEAR_STRINGS.T_SPIN + CLEAR_STRINGS.MINI + CLEAR_STRINGS.SINGLE;
+				playSound(SOUNDS.TSPINC);
                 break;
             case SCORE.TS:
                 calc = 400;
                 text = CLEAR_STRINGS.T_SPIN;
+				playSound(SOUNDS.TSPIN);
                 break;
             case SCORE.TSS:
                 calc = 800;
                 this.b2b++;
                 text = CLEAR_STRINGS.T_SPIN + CLEAR_STRINGS.SINGLE;
+				playSound(SOUNDS.TSPINC);
                 break;
             case SCORE.TSD:
                 calc = 1200;
                 this.b2b++;
                 text = CLEAR_STRINGS.T_SPIN + CLEAR_STRINGS.DOUBLE;
+				playSound(SOUNDS.TSPINC);
                 break;
             case SCORE.TST:
                 calc = 1600;
                 this.b2b++;
                 text = CLEAR_STRINGS.T_SPIN + CLEAR_STRINGS.TRIPLE;
+				playSound(SOUNDS.TSPINC);
                 break;
             case SCORE.PERFECT:
                 this.score += 30000;
                 text = CLEAR_STRINGS.PERFECT;
                 return [text, 30000];
+				playSound(SOUNDS.ERASE4);
         }
         if(last&&this.b2b) calc = calc*1.5
         calc = calc*mult;
@@ -288,28 +268,52 @@ export default class Storage{
                 lines = 2;
                 break;
             case SCORE.TSD:
-                lines = 4 - (this.vsPuyo?1:0);
+                lines = 4;
                 break;
             case SCORE.TST:
-                lines = 6 - (this.vsPuyo?2:0);
+                lines = 6;
                 break;
             case SCORE.PERFECT:
-                lines = 10 - (this.vsPuyo?4:0); 
+                lines = 10;
                 break;
             default:
                 lines = 0;
-        }
-		
+        }	
         lines += (this.b2b>1)?1:0;
-		let arr = (this.vsPuyo?COMBO_GARB_NERF:COMBO_GARB);
-        lines += arr[Math.min(this.combo,arr.length-1)];
+		
+		let vsPuyo = lines;
+		if(this.vsPuyo){
+			switch(mode) {
+				case SCORE.TSD:
+					vsPuyo -= 1;
+					break;
+				case SCORE.TST:
+					vsPuyo -= 2;
+					break;
+				case SCORE.PERFECT:
+					vsPuyo -= 4;
+					break;
+			}
+		}	
+
+		vsPuyo += COMBO_GARB_NERF[Math.min(this.combo,COMBO_GARB_NERF.length-1)];
+        lines += COMBO_GARB[Math.min(this.combo,COMBO_GARB.length-1)];
+		
+		let eventName = (this.vsPuyo?`AddGauge${this.user}`:`garbCountP${this.user}`);
 		
         document.dispatchEvent(
-            new CustomEvent(`garbCountP${this.user}`,{
+            new CustomEvent(eventName,{
                 detail:{
-                    n:lines
+                    n: lines,
+					m: vsPuyo
                 }
             })
         );
     }
+	
+	executeGauge = n => {
+		if(n==0) return;
+		let garbPuyo = GAUGE_TO_TRASH[n];
+		socket.emit(`attackFromP${this.user}`,garbPuyo);
+	}
 }

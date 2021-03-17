@@ -15,7 +15,12 @@ import {
 	COLOR_WHITE,
 	COLOR_GREY,
 	PUYO_STATE,
-	DX_DY
+	DX_DY,
+	NEXT_Y_OFFSET,
+	NEXT_X_OFFSET,
+	P1_COLORS,
+	P2_COLORS,
+	
 } from '../constants.js';
 
 export default class PuyoView extends view {
@@ -46,6 +51,9 @@ export default class PuyoView extends view {
 			Y_OFFSET + PUYO_VISIBLE_HEIGHT * PUYO_SIZE
 		);
 		
+		// NEXT
+		this.callNextOutline();
+		
 		ctx = this.infoCtx;
 		ctx.font = "16px 'Press Start 2P'";
 		ctx.fillStyle = COLOR_WHITE;
@@ -62,6 +70,51 @@ export default class PuyoView extends view {
 					X_OFFSET+this.offset+PUYO_BOARD_WIDTH*PUYO_SIZE/2,
 					 Y_OFFSET+(PUYO_VISIBLE_HEIGHT+1)*PUYO_SIZE/2)
 	};
+
+
+	callNextOutline = () => {
+		let color = this.player == 0 ? P1_COLORS : P2_COLORS;
+		let rads = [5,2,10];
+		let sizes = [7,4,5];
+		let colors = [1,0,0];
+		
+		let max = 0;
+		let size = 0;
+		
+		for(let i = 0; i<rads.length;i++)
+		{
+			this.drawNextOutline(rads[i],sizes[i],color[colors[i]]);
+		}
+	};
+
+	drawNextOutline = (rad, size, color) =>{
+		let ctx = this.boardCtx;
+		
+		let L = NEXT_X_OFFSET - rad + this.offset;
+		let ML = NEXT_X_OFFSET + PUYO_SIZE / 2 * 3 - rad + this.offset;
+		let MR = NEXT_X_OFFSET + PUYO_SIZE * 2 + rad + this.offset;
+		let R = NEXT_X_OFFSET + PUYO_SIZE / 2 * 5 + rad + this.offset;
+		let U = NEXT_Y_OFFSET - rad;
+		let MU = NEXT_Y_OFFSET + PUYO_SIZE / 2 * 5 - rad;
+		let MD = NEXT_Y_OFFSET + PUYO_SIZE * 3 + rad; 
+		let D = NEXT_Y_OFFSET + PUYO_SIZE / 2 * 9 + rad;
+		ctx.strokeStyle = color;
+		ctx.beginPath();
+		
+		ctx.moveTo(L,U);
+		ctx.lineTo(MR,U);
+		ctx.lineTo(MR,MU);
+		ctx.lineTo(R,MU);
+		ctx.lineTo(R,D);
+		ctx.lineTo(ML,D);
+		ctx.lineTo(ML,MD);
+		ctx.lineTo(L,MD);
+		
+		ctx.lineWidth = size;
+		ctx.closePath();
+		ctx.stroke();
+	}
+
 
 	addPuyo = puyo => {
 		this.puyoArr.push(puyo);
@@ -137,7 +190,7 @@ export default class PuyoView extends view {
 		if (arr.length == 0) return true;
 		this.popFrame++;
 
-		let frame = 4;
+		let frame = 6;
 		this.refreshPiece();
 		for (let pos of arr) {
 			const x = pos.x;
@@ -212,7 +265,7 @@ export default class PuyoView extends view {
 	};
 
 	refreshPiece = () => {
-		this.pieceCtx.clearRect(X_OFFSET+this.offset+1, Y_OFFSET+1, PUYO_BOARD_WIDTH * PUYO_SIZE, PUYO_VISIBLE_HEIGHT * PUYO_SIZE);
+		this.pieceCtx.clearRect(X_OFFSET+this.offset+1, 0, PUYO_BOARD_WIDTH * PUYO_SIZE, Y_OFFSET + 1 + PUYO_VISIBLE_HEIGHT * PUYO_SIZE);
 		if(!this.preview) {
 			socket.emit('graphics',{
 				name:'refreshPiece',
@@ -267,6 +320,24 @@ export default class PuyoView extends view {
 
 		return PUYO_STATE[temp];
 	};
+
+	drawNexts = (n, m) =>{
+        const p1 = ( n & 0o70 ) / 0o10;
+        const p2 = n % 0o10;
+        const p3 = ( m & 0o70 ) / 0o10;
+        const p4 = m % 0o10;
+		let ctx = this.boardCtx;
+		ctx.drawImage(SPRITE_IMAGE, 0, p2 * PUYO_SIZE, PUYO_SIZE, PUYO_SIZE, NEXT_X_OFFSET+PUYO_SIZE/2 + this.offset, NEXT_Y_OFFSET + PUYO_SIZE/2, PUYO_SIZE, PUYO_SIZE);
+		ctx.drawImage(SPRITE_IMAGE, 0, p1 * PUYO_SIZE, PUYO_SIZE, PUYO_SIZE, NEXT_X_OFFSET+PUYO_SIZE/2 + this.offset, NEXT_Y_OFFSET + PUYO_SIZE*3/2, PUYO_SIZE, PUYO_SIZE);
+		ctx.drawImage(SPRITE_IMAGE, 0, p4 * PUYO_SIZE, PUYO_SIZE, PUYO_SIZE, NEXT_X_OFFSET+PUYO_SIZE/2*3 + this.offset, NEXT_Y_OFFSET + PUYO_SIZE / 2 * 5, PUYO_SIZE, PUYO_SIZE);
+		ctx.drawImage(SPRITE_IMAGE, 0, p3 * PUYO_SIZE, PUYO_SIZE, PUYO_SIZE, NEXT_X_OFFSET+PUYO_SIZE/2*3 + this.offset, NEXT_Y_OFFSET + PUYO_SIZE / 2 * 7, PUYO_SIZE, PUYO_SIZE);
+		if(!this.preview) {
+			socket.emit('graphics',{
+				name:'drawNexts',
+				args: [n,m]
+			})			
+		}
+	}
 }
 
 const CTX_NUM = {

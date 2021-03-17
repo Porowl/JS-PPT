@@ -8,12 +8,6 @@ export const ctx1 = canvas1.getContext("2d");
 export const ctx2 = canvas2.getContext("2d");
 export const ctx3 = canvas3.getContext("2d");
 
-/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~SETTINGS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-export const settings = [
-    0,  // 0: GAME MODE
-    0   // 1: Player Num (+1 when loaded);
-];
-
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~STRINGS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 export const NEXT = "NEXT";
@@ -77,6 +71,10 @@ export const DIST_BTW_NEXTS = 3*NEXT_BLOCK_SIZE_OUTLINE;
 export const HOLD_X_OFFSET = X_OFFSET - 126;
 export const HOLD_Y_OFFSET = Y_OFFSET;
 
+export const GAUGE_X_OFFSET = X_OFFSET - 42;
+export const GAUGE_Y_OFFSET = Y_OFFSET + VISIBLE_HEIGHT * BLOCK_SIZE_OUTLINE - NEXT_BLOCK_SIZE_OUTLINE*20;
+
+
 export const PLAYER_OFFSET = 500;
 
 export const DAS = 12;
@@ -113,6 +111,7 @@ export const COMBO_GARB = Object.freeze(
 export const COMBO_GARB_NERF = Object.freeze(
     [0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5]
 );
+
 export const KEY = {
     SHIFT:  16,     //hold
     CTRL:   17,     //rotate counterclockwise
@@ -221,8 +220,7 @@ export const PUYO_STATE = Object.freeze({
 	UDLR : 15  
 });
 
-export const KICK = Object.freeze(
-{
+export const KICK = Object.freeze({
     NO_ROTATION: -1,
     DONT_PUSH: 0,
     PUSH_LEFT: 1,
@@ -230,6 +228,18 @@ export const KICK = Object.freeze(
     PUSH_UP: 3,
     DOUBLE_ROTATION:4
 });
+
+export const GAME_STATE = Object.freeze({
+	WIN:0,
+	LOST:1
+});
+
+export const GROUP_SIZE_BONUS = Object.freeze([0,0,0,0,0,2,3,4,5,6,7,10]);
+export const CHAIN_BONUS = Object.freeze([   0,   8,  16,  32,  64,  96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 480, 512]);
+export const COLOR_BONUS = Object.freeze([0,3,6,12,24]);
+export const VS_TETRIS_SCORE = Object.freeze([0,210,630,1050,1710,3500,7000,14000,28000,56000]);
+export const GAUGE_TO_TRASH = Object.freeze([0,4,5,6,8,10,13,16,20,24,28,33,38,43,49,55,61,68,75,83,92,102,113,125,138,152,167,183,200,218,237,257,278,300,323,347,372,398,425,453,482,512,543,575,608,642,677,713,750,788,827,867,908,950,993,1037,1082,1128,1175,1223,1272
+]);
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~COLORS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 export const COLOR_BLACK =         "rgb(000,000,000)";
@@ -327,11 +337,6 @@ export const I_OFFSETS = Object.freeze(
     [[0,0],[-2,0],[ 1,0],[-2,-1],[ 1, 2]],  // 7: 3 -> 2
 ]);
 
-
-export const GROUP_SIZE_BONUS = Object.freeze([0,0,0,0,0,2,3,4,5,6,7,10]);
-export const CHAIN_BONUS = Object.freeze([   0,   8,  16,  32,  64,  96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 480, 512]);
-export const COLOR_BONUS = Object.freeze([0,3,6,12,24]);
-
 export const XY_OFFSETS = Object.freeze(
 [
 	[ 0,-1],
@@ -352,23 +357,6 @@ export const DIRECTION = Object.freeze({
 	DOUBLE: 2
 });
 
-export const POP_SPRITE = Object.freeze(
-[
-    [9,11],     //R
-    [9,13],     //G
-    [10,0],     //B
-    [10,2],     //Y
-    [10,4],     //P
-	[12,6]		//T
-]);
-
-export const DX_DY = Object.freeze(
-[
-	[ 0,-1],
-	[ 0, 1],
-	[-1, 0],
-	[ 1, 0]
-]);
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~IMAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
@@ -380,3 +368,75 @@ PUYO_BUTTON.src ='./Images/p.png'
 
 export const TETRIS_BUTTON = new Image();
 TETRIS_BUTTON.src ='./Images/t.jpg'
+
+export const POP_SPRITE = Object.freeze(
+[
+    [9,11],     //R
+    [9,13],     //G
+    [10,0],     //B
+    [10,2],     //Y
+    [10,4],     //P
+	[12,6]		//T
+]);
+
+export const NUISANCE_QUEUE = {
+	VALUE : {
+		CROWN: 720,
+		STAR: 360,
+		COMET: 180,
+		ROCK: 30,
+		BIG: 6,
+		SMALL: 1
+	},
+	SPRITES : {
+		CROWN: [10,11],
+		STAR: [11,11],
+		COMET: [12,11],
+		ROCK: [12,12],
+		BIG: [13,12],
+		SMALL: [14,12],
+	}
+}
+
+export const DX_DY = Object.freeze(
+[
+	[ 0,-1],
+	[ 0, 1],
+	[-1, 0],
+	[ 1, 0]
+]);
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~SOUNDS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+export const SOUNDS = {
+	COMBO1: './sounds/soundEffects/combo1.wav',
+	COMBO2: './sounds/soundEffects/combo2.wav',
+	COMBO3: './sounds/soundEffects/combo3.wav',
+	COMBO4: './sounds/soundEffects/combo4.wav',
+	COMBO5: './sounds/soundEffects/combo5.wav',
+	COMBO6: './sounds/soundEffects/combo6.wav',
+	COMBO7: './sounds/soundEffects/combo7.wav',
+	CHANGE: './sounds/soundEffects/change.wav',
+	ERASE: './sounds/soundEffects/erase1.wav',
+	ERASE4: './sounds/soundEffects/erase4.wav',
+	HARDDROP: './sounds/soundEffects/harddrop.wav',
+	HOLD: './sounds/soundEffects/hold.wav',
+	MOVE: './sounds/soundEffects/move.wav',
+	TSPIN: './sounds/soundEffects/tspin0.wav',
+	TSPINC: './sounds/soundEffects/tspin1.wav',
+}
+
+export const VOICES = {
+	ARLE: {
+		COMBO: n =>{
+			n = Math.min(n,6);
+			let url = './sounds/character/Arle/Arle_chain_' + n + '.wav'
+			return url;
+		}
+	},
+}
+
+export const playSound = url => {
+	let aud = new Audio(url);
+	aud.volume = 0.2;
+	aud.play();
+	return;
+}

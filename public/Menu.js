@@ -1,5 +1,5 @@
 import {socket} from './main.js';
-import {canvas3,ctx0,ctx1,ctx2,ctx3,TETRIS_BUTTON,PUYO_BUTTON} from './constants.js';
+import {canvas3,ctx0,ctx1,ctx2,ctx3,TETRIS_BUTTON,PUYO_BUTTON,X_OFFSET,Y_OFFSET,BOARD_CENTER_X,BOARD_CENTER_Y} from './constants.js';
 
 /***************Classes****************/
 class Menu {
@@ -124,7 +124,13 @@ class MenuButton {
 /******************************************/
 let menu = new Menu();
 
-/***************Main Screen****************/
+/***************EMPTY SCREEN****************/
+{
+	let empty = new MenuScreen('empty');
+	menu.addScreen(empty);	
+}
+
+/***************MAIN  SCREEN****************/
 {
 let titleScreen = new MenuScreen('title')
 menu.addScreen(titleScreen);
@@ -160,13 +166,11 @@ let ButtonImages = {
 }
 titleScreen.addObject(ButtonImages);
 
-
 let SelectTetris = new MenuButton(1024/2-150,768/2-50,300,100,'Play As TETRIS');
 titleScreen.addButton(SelectTetris);
 
 SelectTetris.setEvent(()=>{
 	socket.emit('waiting','TETRIS');
-	console.log('Tetris');
 	SelectTetris.context.changeScreenTo('empty');
 });
 
@@ -175,14 +179,20 @@ titleScreen.addButton(SelectPuyo);
 
 SelectPuyo.setEvent(()=>{
 	socket.emit('waiting','PUYO');
-	console.log('Puyo');
 	SelectTetris.context.changeScreenTo('empty');
 });
 }
-/***************Empty Screen****************/
+/***************READY SCREEN****************/
 {
-	let empty = new MenuScreen('empty');
-	menu.addScreen(empty);	
+let readyScreen = new MenuScreen('ready');
+menu.addScreen(readyScreen);
+
+let ready = new MenuButton(X_OFFSET,Y_OFFSET+400,200,75,'READY');
+	ready.status = false;
+ready.setEvent(()=>{
+	socket.emit(ready.status?'cancel':'ready');
+});
+readyScreen.addButton(ready);
 }
 
 export default menu;

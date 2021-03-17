@@ -1,4 +1,4 @@
-import {CHAIN_BONUS,COLOR_BONUS,GROUP_SIZE_BONUS} from '../constants.js';
+import {CHAIN_BONUS,COLOR_BONUS,GROUP_SIZE_BONUS,VS_TETRIS_SCORE,playSound,VOICES,SOUNDS} from '../constants.js';
 
 import {socket} from '../main.js';
 
@@ -11,8 +11,11 @@ export default class Stats{
         this.chain = 0;
 		this.last = 0;
 		this.leftOver = 0;
+		this.leftOverVsTetris = 0;
 		
 		this.remaining = 0;
+		
+		this.vsTetris = false;
 		
 		this.gameStartedAt = Date.now();
 		
@@ -21,6 +24,12 @@ export default class Stats{
 
 	setGameStarted = () => {
 		this.gameStatedAt = Date.now();
+	}
+	
+	setOpponent = type =>{
+		if(type==='TETRIS') {
+			this.vsTetris = true;
+		}
 	}
 	
     getIndexInc = () => this.index++;
@@ -51,8 +60,8 @@ export default class Stats{
 		
         this.score += score;
 		
-        this.chain++;
-		console.log(score);
+		playSound(playSound(VOICES.ARLE.COMBO(this.chain++)));
+
 		this.sendAttack();
     }
 
@@ -67,40 +76,59 @@ export default class Stats{
 		
 		let ds = this.score-this.last;
 		this.last = this.score;
+		let multiplier = this.getMargin();
+		let vsTetris = 0;
+		let sc = ds;
+		let threshold = 0;
+		let nextThreshold;
+		let index = 0;
 		
-		let margin = this.getMargin();
-
-		garbs = ds / margin + this.leftOver;
-		
-		console.log(margin);
-		console.log(garbs);
-		
-		this.leftOver = (garbs>1) ? garbs % 1 : 0;
-
+		console.log(sc);
+		// vs PUYO calculation
+		garbs = ds / (60/multiplier|0) + this.leftOver;
+		this.leftOver = garbs % 1;		
 		garbs = garbs | 0;
-		if (garbs == 0) return;
-		console.log(garbs);
 		
+		// vs TET calculation
+		while(index < VS_TETRIS_SCORE.length){
+			nextThreshold = ( VS_TETRIS_SCORE[index] /multiplier | 0);
+			console.log(nextThreshold);
+			if(sc<nextThreshold) break;
+			threshold = nextThreshold;
+			index++;
+		}
 		
-		console.log(`garbCountP${this.user}`);
+		vsTetris = Math.min(index,VS_TETRIS_SCORE.length);
+
+		this.leftOverVsTetris += (sc-threshold)/nextThreshold;
+
+		if(this.chain>=8 && (this.chain-8%3 == 0)){
+			if(this.leftOverVsTetris>1){
+				vsTetris++;
+				this.leftOverVsTetris -= 1;
+			}
+		}
+		
+		console.log(vsTetris);
         document.dispatchEvent(
             new CustomEvent(`garbCountP${this.user}`,{
                 detail:{
-                    n:garbs
+                    n:garbs,
+					m:vsTetris
                 }
             })
         );
 	}
 	
 	getMargin = () => {
-		let margin = 60;
-		return margin;
 		let dt = Date.now() - this.gameStartedAt;
-		if(dt>=96000) {
+		let exp = 1;
+		let multiplier = 1;
+		if(dt >= 96000) {
 			dt -= 96000;
 			let exp = Math.max((1 + dt/14000 ) | 0,14);
-			margin = Math.pow(margin,exp)|0;
+			multiplier = Math.pow(0.75, exp);
 		}
-		return margin;
+		return multiplier;
 	}
 }

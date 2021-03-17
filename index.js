@@ -33,7 +33,11 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {	
-	io.to(socket.id).emit('connected');
+	let cycle = setInterval(()=>{
+		io.to(socket.id).emit('connected')
+	},1000);
+	socket.on('load_complete',()=>{clearInterval(cycle);});
+	
 	console.log('user connected: ', socket.id);
 
 	socket.on('waiting',type=>{
