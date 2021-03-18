@@ -5,7 +5,7 @@ import Mino from './Mino.js';
 import {socket} from '../main.js';
 
 import {DRAWMODE,MOVES,KEYSTATES,LAST_MOVE,KEY,ENTRY_DELAY,DAS,ARR,OFFSETS,I_OFFSETS,PIECE_MAP,
-	   LINE_CLEAR_FRAMES,CLEAR_STRINGS,SOUNDS,playSound
+	   LINE_CLEAR_FRAMES,CLEAR_STRINGS,SOUNDS,playSound,ACTION_LOCKDELAY_REFRESH_MAX
 	  } from '../constants.js';
 
 export default class Player {
@@ -31,6 +31,8 @@ export default class Player {
 		this.LRFrameCounter = 0;
 		this.RotateFrameCounter = 0;
 		this.dropRate = 0;
+		this.lockDelayRefreshed = 0;
+		this.lockDelayRefreshedCount = 0;
 		
 		this.phase = PHASE.NEW_BLOCK;
 		this.gameOver = false;
@@ -133,9 +135,14 @@ export default class Player {
 				
 			case PHASE.FALL: {
 				this.moveDownCycle(dt);
-				this.inputCycle();
+				this.inputCycle(); 
 
-				if (!this.board.canMove(this.piece, 0, 1)) {
+				if (!this.board.canMove(this.piece, 0, 1) && this.lockDelayRefreshed == 1 && this.lockDelayRefreshedCount < ACTION_LOCKDELAY_REFRESH_MAX) {
+					this.lockDelay = 0;
+					this.lockDelayRefreshed = 0;
+					this.lockDelayRefreshedCount += 1;
+				}
+				else if (!this.board.canMove(this.piece, 0, 1)) {
 					this.lockDelay += dt;
 				} else {
 					this.lockDelay = 0;
@@ -240,6 +247,7 @@ export default class Player {
 			if (fc == 0 || (fc >= DAS && (fc - DAS) % ARR == 0)) {
 				if(this.board.canMove(this.piece,dir,0)) {
 					this.piece.move(dir,0);
+					this.lockDelayRefreshed = 1;
 					playSound(SOUNDS.MOVE);
 					this.updatePiece();
 				}
@@ -283,6 +291,7 @@ export default class Player {
 			piece.rotate(dir);
 			this.updatePiece();
 			piece.lastMove = LAST_MOVE.SPIN;
+			this.lockDelayRefreshed = 1;
 			playSound(SOUNDS.CHANGE);
 		}
 	};
@@ -325,6 +334,7 @@ export default class Player {
 
 	lock = (piece) => {
 		this.lockDelay = 0;
+		this.lockDelayRefreshedCount = 0;
 		this.dropRate = 0;
 		this.clearedLineArr = this.board.lock(piece);
 		this.lineClearDelay = this.clearedLineArr.length() == 0 ? 0 : LINE_CLEAR_FRAMES;

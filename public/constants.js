@@ -84,6 +84,7 @@ export const ENTRY_DELAY = 6;
 export const LINE_CLEAR_FRAMES = 20;
 export const LOCK_ANIMATION_FRAMES = 15;
 export const HARDDROP_ANIMATION_FRAMES = 2;
+export const ACTION_LOCKDELAY_REFRESH_MAX = 16;
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ENUMS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
