@@ -172,7 +172,7 @@ export const MOVES =
 {
     [KEY.LEFT]:  p=>({...p, x: p.x-1, lastMove: LAST_MOVE.MOVE}),
     [KEY.RIGHT]: p=>({...p, x: p.x+1, lastMove: LAST_MOVE.MOVE}),
-    [KEY.DOWN]:  p=>({...p, y: p.y+1, lastMove: LAST_MOVE.DOWN}),
+    [KEY.DOWN]:  p=>({...p, y: p.y+1, lastMove: LAST_MOVE.MOVE}),
 };
 
 export const LAST_MOVE = Object.freeze(
@@ -180,7 +180,6 @@ export const LAST_MOVE = Object.freeze(
     NONE: 0,
     MOVE: 1,
     SPIN: 2,
-    DOWN: 3
 });
 
 export const T_SPIN_STATE =

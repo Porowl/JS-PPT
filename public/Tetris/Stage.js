@@ -153,7 +153,7 @@ export default class Stage {
 			piece.move(0, 1);
 			counter++;
 		}
-		piece.lastMove = LAST_MOVE.DOWN;
+		if(counter!=0) piece.lastMove = LAST_MOVE.MOVE;
 
 		return counter;
 	};

@@ -4,7 +4,7 @@ import PuyoView from './PuyoView.js';
 import Puyo from './Puyo.js';
 import MultPuyos from './MultPuyos.js';
 
-import {DIRECTION,KICK,PUYO_BOARD_WIDTH} from '../constants.js';
+import {DIRECTION,KICK,PUYO_BOARD_WIDTH,KEY} from '../constants.js';
 import {socket} from '../main.js';
 
 export default class PuyoPlayer{
@@ -27,24 +27,23 @@ export default class PuyoPlayer{
         {
             if(this.phase == PHASE.DROP)
             {
-                if(event.keyCode == 37) setTimeout(()=>
+                if(event.keyCode == KEY.LEFT) setTimeout(()=>
                 {
                     if(this.Board.valid(this.Puyo.getPos(DIRECTION.LEFT)))
                     {
                         this.Puyo.move(-1,0);
                     }
                 },0)
-                else if(event.keyCode == 39) setTimeout(()=>
+                else if(event.keyCode == KEY.RIGHT) setTimeout(()=>
                 {
                     if(this.Board.valid(this.Puyo.getPos(DIRECTION.RIGHT)))
                     {
                         this.Puyo.move(1,0);
                     }
                 },0)
-
-                else if(event.keyCode == 38||event.keyCode == 90) setTimeout(()=>
+                else if(event.keyCode == KEY.Z||event.keyCode == KEY.X) setTimeout(()=>
                 {
-                    let dir = event.keyCode==38?DIRECTION.CW:DIRECTION.ACW
+                    let dir = event.keyCode==KEY.Z?DIRECTION.CW:DIRECTION.ACW
                     let result = this.Board.validRotation(this.Puyo.getPos(),dir)
                     if(result==KICK.NO_ROTATION)
                     {
@@ -53,7 +52,7 @@ export default class PuyoPlayer{
                     else this.Puyo.rotate(dir, result);
                 },0)
 
-                else if(event.keyCode == 40) setTimeout(()=>
+                else if(event.keyCode == KEY.DOWN) setTimeout(()=>
                 {
                     if(this.Board.valid(this.Puyo.getPos(DIRECTION.DOWN)))
                     {
@@ -257,8 +256,8 @@ export default class PuyoPlayer{
     getPuyo = () =>
     {
         const ranNum = this.random.getPuyo(this.Stats.getIndexInc());
-        const p1 = ( ranNum & 0o70 ) / 0o10;
-        const p2 = ranNum % 0o10;
+        const p1 = ( ranNum & 0xc ) / 0x4;
+        const p2 = ranNum % 0x4;
         return new MultPuyos(new Puyo(p1),new Puyo(p2))
     }
 	

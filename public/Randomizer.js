@@ -1,9 +1,12 @@
 export default class Randomizer{
     constructor(seed){
 		this.engine = new Math.seedrandom(seed);
-        this.bag = 0x00;
-        this.pieces = this.initPieces();
+        this.bag = [];
+        this.pieces = [];
 		this.puyos = [];
+		
+		this.initPuyoBag();
+		this.initPieces();
     }
 
     getPiece = (index) =>
@@ -22,59 +25,52 @@ export default class Randomizer{
      * 첫 7개 블럭을 생성합니다.
      */
     initPieces = () => {
-        var tempArr =[]
         for(var i = 0; i<7;i++){
-            tempArr.push(this.pullTet());
+            this.addPiece;
         }
         return tempArr;
     }
 
-    /**
-     * 다음 블럭을 추가합니다.
-     */
     addPiece = () => {
-        this.pieces.push(this.pullTet());
+        let rand = this.engine.random()*this.bag.length|0;
+		let pulled = this.bag.splice(rand,1);
+		this.pieces.push(pulled);
+		
+		this.refillBag();
     }
 
-    /**
-     * 다음 블럭을 난수로 가져옵니다.
-     * 가이드라인에 따라 7개의 블럭이 다 나오고 난 뒤에
-     * 난수가 초기화됩니다.
-     */
-    pullTet = () =>
+    refillBag = () =>
     {
-        do{
-            var temp = parseInt(this.engine()*7);
-        } while ((0x40>>temp ) & this.bag)
-
-        this.bag = (this.bag | (0x40>>temp));
-
-        this.checkBagFull();
-        return temp;
-    }
-
-    /**
-     * 현재 7개의 블럭이 다 나왔는지 확인합니다.
-     */
-    checkBagFull = () =>
-    {
-        if(this.bag == 0x7f) // 0111 1111
-            this.bag = 0x00
+        if(this.bag.length == 0) {
+			for(var i = 0; i<7; i++){
+				this.bag.push(i);
+			}
+		}
     }
 	
 	getPuyo = (index = 0) =>
     {
-        while(this.puyos.length<index+3){this.addPuyo()};
+		index = index % this.puyos.length;
         return this.puyos[index];
-    }
-
-    addPuyo = () =>
-    {
-        this.puyos.push((this.engine()*4|0)*0o10+this.engine()*4|0) //0o<firstPuyo><SecondPuyo>;
     }
 	
 	getNextPuyos = index =>
 	{
 		this.puyos.slice(index,index+3);
+	}
+	
+	initPuyoBag = () => {
+		let arr = [];
+		
+		for(let i = 0; i<16; i++) {	
+			for(let j = 0; j<16; j++) {
+				arr.push(j);	
+			}
+			while(arr.length>0){
+				let rand = this.engine.random()*arr.length|0;
+				let pulled = arr.splice(rand,1);
+				this.puyos.push(pulled);				
+			}
+		}
 	}
 }
