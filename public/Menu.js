@@ -145,13 +145,10 @@ let title = {
 		ctx.strokeStyle = "rgb(0,0,0)";
 		ctx.textBaseline = 'middle';
 		ctx.textAlign = 'center';
-		ctx.lineWidth = 4;	
-		ctx.strokeText("PUYO PUYO",title.x,title.y-25);
-		ctx.fillText("PUYO PUYO",title.x,title.y-25);
 		ctx.font = "75px 'Press Start 2P'";
 		ctx.lineWidth = 6;	
-		ctx.strokeText("TETRIS",title.x,title.y+50);
-		ctx.fillText("TETRIS",title.x,title.y+50);
+		ctx.strokeText("JSPPT",title.x,title.y+50);
+		ctx.fillText("JSPPT",title.x,title.y+50);
 	}
 };
 titleScreen.addObject(title);

@@ -32,7 +32,7 @@ export default class Randomizer{
     }
 
     addPiece = () => {
-        let rand = this.engine.random()*this.bag.length|0;
+        let rand = this.engine()*this.bag.length|0;
 		let pulled = this.bag.splice(rand,1);
 		this.pieces.push(pulled);
 		
@@ -67,7 +67,7 @@ export default class Randomizer{
 				arr.push(j);	
 			}
 			while(arr.length>0){
-				let rand = this.engine.random()*arr.length|0;
+				let rand = this.engine()*arr.length|0;
 				let pulled = arr.splice(rand,1);
 				this.puyos.push(pulled);				
 			}
