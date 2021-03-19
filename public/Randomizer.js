@@ -28,7 +28,6 @@ export default class Randomizer{
         for(var i = 0; i<7;i++){
             this.addPiece;
         }
-        return tempArr;
     }
 
     addPiece = () => {
