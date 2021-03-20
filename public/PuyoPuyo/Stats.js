@@ -119,7 +119,7 @@ export default class Stats{
 		}
 		
         document.dispatchEvent(
-            new CustomEvent(`garbCountP${this.user}`,{
+            new CustomEvent('garbCount',{
                 detail:{
                     n:garbs,
 					m:vsTetris
