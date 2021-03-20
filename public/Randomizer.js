@@ -25,14 +25,15 @@ export default class Randomizer{
      * 첫 7개 블럭을 생성합니다.
      */
     initPieces = () => {
+		this.refillBag();
         for(var i = 0; i<7;i++){
-            this.addPiece;
+            this.addPiece();
         }
     }
 
     addPiece = () => {
         let rand = this.engine()*this.bag.length|0;
-		let pulled = this.bag.splice(rand,1);
+		let pulled = this.bag.splice(rand,1)[0];
 		this.pieces.push(pulled);
 		
 		this.refillBag();

@@ -23,64 +23,65 @@ export default class PuyoPlayer{
 
         this.gameOver = false;
 
-        document.addEventListener(`keydown`,event =>
-        {
-            if(this.phase == PHASE.DROP)
-            {
-                if(event.keyCode == KEY.LEFT) setTimeout(()=>
-                {
-                    if(this.Board.valid(this.Puyo.getPos(DIRECTION.LEFT)))
-                    {
-                        this.Puyo.move(-1,0);
-                    }
-                },0)
-                else if(event.keyCode == KEY.RIGHT) setTimeout(()=>
-                {
-                    if(this.Board.valid(this.Puyo.getPos(DIRECTION.RIGHT)))
-                    {
-                        this.Puyo.move(1,0);
-                    }
-                },0)
-                else if(event.keyCode == KEY.Z||event.keyCode == KEY.X) setTimeout(()=>
-                {
-                    let dir = event.keyCode==KEY.Z?DIRECTION.CW:DIRECTION.ACW
-                    let result = this.Board.validRotation(this.Puyo.getPos(),dir)
-                    if(result==KICK.NO_ROTATION)
-                    {
-                        if(this.Puyo.rotation%2==0) this.Puyo.tempRotation = 1;
-                    }
-                    else this.Puyo.rotate(dir, result);
-                },0)
+		this.eventTriggerNames = [ 
+			'keydown',
+			'garbCount'
+		];
+		this.events =[
+			(event) => {
+				if(this.phase == PHASE.DROP)
+				{
+					if(event.keyCode == KEY.LEFT) setTimeout(()=>
+					{
+						if(this.Board.valid(this.Puyo.getPos(DIRECTION.LEFT)))
+						{
+							this.Puyo.move(-1,0);
+						}
+					},0)
+					else if(event.keyCode == KEY.RIGHT) setTimeout(()=>
+					{
+						if(this.Board.valid(this.Puyo.getPos(DIRECTION.RIGHT)))
+						{
+							this.Puyo.move(1,0);
+						}
+					},0)
+					else if(event.keyCode == KEY.Z||event.keyCode == KEY.X) setTimeout(()=>
+					{
+						let dir = event.keyCode==KEY.Z?DIRECTION.CW:DIRECTION.ACW
+						let result = this.Board.validRotation(this.Puyo.getPos(),dir)
+						if(result==KICK.NO_ROTATION)
+						{
+							if(this.Puyo.rotation%2==0) this.Puyo.tempRotation = 1;
+						}
+						else this.Puyo.rotate(dir, result);
+					},0)
 
-                else if(event.keyCode == KEY.DOWN) setTimeout(()=>
-                {
-                    if(this.Board.valid(this.Puyo.getPos(DIRECTION.DOWN)))
-                    {
-                        this.Puyo.move(0,1);
-                    }
-                },0)
-            }
-            //this.Stats.keyMap[event.keyCode] = true;
-        });
-
-        document.addEventListener(`up`,event =>
-        {
-            //this.Stats.keyMap[event.keyCode] = false;
-        });
-		
-		document.addEventListener(`garbCountP${this.user}`, event=> {
-            let garbs = this.Board.deductGarbage(event.detail.n);
-			if(this.Stats.vsTetris){
-				if(garbs!=0) {
-					console.log(event.detail.m);
-					socket.emit(`attackFromP${this.user}`,event.detail.m);
+					else if(event.keyCode == KEY.DOWN) setTimeout(()=>
+					{
+						if(this.Board.valid(this.Puyo.getPos(DIRECTION.DOWN)))
+						{
+							this.Puyo.move(0,1);
+						}
+					},0)
 				}
-			} else if(garbs>0) {
-				console.log(garbs);
-				socket.emit(`attackFromP${this.user}`,garbs);	
+				//this.Stats.keyMap[event.keyCode] = true;
+			},
+			(event) => {
+				let garbs = this.Board.deductGarbage(event.detail.n);
+				if(this.Stats.vsTetris){
+					if(garbs!=0) {
+						socket.emit(`attackFromP${this.user}`,event.detail.m);
+					}
+				} else if(garbs>0) {
+					socket.emit(`attackFromP${this.user}`,garbs);	
+				}
 			}
-		});
-		
+		];
+		for(let i = 0; i<this.eventTriggerNames.length;i++){
+			document.addEventListener(this.eventTriggerNames[i],this.events[i]);
+		}
+
+		socket.off(`attackOnP${this.user}`)
 		socket.on(`attackOnP${this.user}`,data=>
         {
             this.Board.addGarbage(data);
@@ -94,7 +95,6 @@ export default class PuyoPlayer{
 	
     update = () =>
     {
-        //console.log(`Current Phase is: ${this.phase}`);
         switch(this.phase)
         {
 			case PHASE.STAND_BY:
@@ -168,7 +168,8 @@ export default class PuyoPlayer{
                 this.View.popFrame = 0;
                 if(this.popArr.arr.length>0)
                 {
-                    this.Stats.calcScore(this.popArr);
+					let data = this.Stats.calcScore(this.popArr);
+					this.View.displayScore(data)
                     this.Board.pop(this.popArr.arr);
                     this.View.drawBoard(this.Board);
                     this.phase++;
@@ -190,6 +191,7 @@ export default class PuyoPlayer{
 			case PHASE.GARB:
 			{
                 let arr = this.Board.executeGarbage();
+				this.garbDropped = true;
 				this.View.showGarbage(this.Board.garbage)
                 this.View.fallingPuyos(arr);
 				this.phase++;
@@ -219,11 +221,13 @@ export default class PuyoPlayer{
             case PHASE.NEW_PUYO:
             {
                 if(this.popArr.arr.length>0){this.phase = PHASE.FALL; break;}
-                if(this.Board.garbage>0){this.phase = PHASE.GARB; break;}
-				
+                if(this.Board.garbage>0 && !this.garbDropped){this.phase = PHASE.GARB; break;}
 				this.popArr.arr.length = 0;
+				this.garbDropped = false;
 				
-                if(this.Board.blocked()) {
+				this.View.displayScore(this.Stats.scoreToText());
+
+				if(this.Board.blocked()) {
 					this.phase = PHASE.GAME_OVER;
 					break;
 				}

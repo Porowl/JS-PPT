@@ -20,7 +20,7 @@ class Menu {
 	changeScreenTo = name =>{
 		ctx3.clearRect(0,0,1024,768)
 		this.currScreen = this.screens[name]
-		this.currScreen.draw();
+		this.currScreen.onActive();
 	}
 	
 	addScreen = screen => {
@@ -38,7 +38,20 @@ class MenuScreen {
 		this.name = name;
 		this.buttons = [];
 		this.objects = [];
+		this.events = [];
 		this.context;
+		
+		this.events.push(()=>{this.draw();});
+	}
+	
+	onActive = () => {
+		for(let func of this.events){
+			func();
+		}
+	}
+	
+	addEvent = func => {
+		this.events.push(func);
 	}
 	
 	setContext = context => {
@@ -64,10 +77,9 @@ class MenuScreen {
 	draw = () => {
 		for(let object of this.objects){
 			object.draw();
-			console.log('drawing object')
 		}
 		for(let button of this.buttons){
-			button.draw('drawing button',button.name);
+			button.draw();
 		}
 	}
 }
@@ -112,7 +124,7 @@ class MenuButton {
 		
 		ctx.textBaseline = 'middle';
 		ctx.textAlign = 'center';
-		ctx.font = "15px 'Press Start 2P'";
+		ctx.font = "15px Kongtext";
 		
 		ctx.fillStyle = this.textColor;
 		ctx.strokeStyle = this.lineColor;
@@ -125,13 +137,13 @@ class MenuButton {
 let menu = new Menu();
 
 /***************EMPTY SCREEN****************/
-{
+
 	let empty = new MenuScreen('empty');
 	menu.addScreen(empty);	
-}
+
 
 /***************MAIN  SCREEN****************/
-{
+
 let titleScreen = new MenuScreen('title')
 menu.addScreen(titleScreen);
 
@@ -141,11 +153,11 @@ let title = {
     draw : () => {
 		let ctx = ctx3;
 		ctx.fillStyle = "rgb(255,255,255)";
-		ctx.font = "48px 'Press Start 2P'";
+		ctx.font = "48px Kongtext";
 		ctx.strokeStyle = "rgb(0,0,0)";
 		ctx.textBaseline = 'middle';
 		ctx.textAlign = 'center';
-		ctx.font = "75px 'Press Start 2P'";
+		ctx.font = "75px Kongtext";
 		ctx.lineWidth = 6;	
 		ctx.strokeText("JSPPT",title.x,title.y+50);
 		ctx.fillText("JSPPT",title.x,title.y+50);
@@ -178,18 +190,48 @@ SelectPuyo.setEvent(()=>{
 	socket.emit('waiting','PUYO');
 	SelectTetris.context.changeScreenTo('empty');
 });
-}
 /***************READY SCREEN****************/
-{
 let readyScreen = new MenuScreen('ready');
 menu.addScreen(readyScreen);
 
-let ready = new MenuButton(X_OFFSET,Y_OFFSET+400,200,75,'READY');
+let ready = new MenuButton(X_OFFSET,Y_OFFSET+425,200,75,'READY');
 	ready.status = false;
 ready.setEvent(()=>{
-	socket.emit(ready.status?'cancel':'ready');
+	ready.status = ready.status ^ true;
+	let eventName = ready.status?'ready':'cancel' 
+	socket.emit(eventName);
 });
+
 readyScreen.addButton(ready);
-}
+readyScreen.addEvent(()=>{ready.status = false});
+
+/***************RETURN SCREEN****************/
+let returnToMain = new MenuScreen('returnToMain');
+menu.addScreen(returnToMain);
+
+let returnButton = new MenuButton(X_OFFSET,Y_OFFSET+500,200,75,'RETURN TO TITLE');
+returnButton.setEvent(()=>{
+	ctx0.clearRect(0,0,1024,768);
+	ctx1.clearRect(0,0,1024,768);
+	ctx2.clearRect(0,0,1024,768);
+	ctx3.clearRect(0,0,1024,768);
+	returnToMain.context.changeScreenTo('title')
+	socket.emit('leaveRoom');
+});
+returnToMain.addButton(returnButton);
+
+/***************REPLAY SCREEN****************/
+
+let replayScreen = new MenuScreen('replay');
+menu.addScreen(replayScreen);
+
+let playAgain = new MenuButton(X_OFFSET,Y_OFFSET+425,200,75,'PLAY AGAIN');
+playAgain.setEvent(()=>{
+	socket.emit('playAgain');
+	returnToMain.context.changeScreenTo('returnToMain')
+});
+
+replayScreen.addButton(playAgain);
+replayScreen.addButton(returnButton);
 
 export default menu;

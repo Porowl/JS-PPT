@@ -13,6 +13,14 @@ let keySettings = () => {};
 let Player;
 let EnemyView;
 let GUI;
+let myType;
+let enemyType;
+
+export let Singleton = {
+	state: false,
+	getState: ()=> Singleton.state,
+	setState: state => Singleton.state = state
+};
 
 const init = () => {
 	resize();
@@ -26,16 +34,21 @@ const init = () => {
 	});
 	
 	socket.on('create',type=>{
-		Player = type==='PUYO'?new PuyoPlayer(socket.id):new TetPlayer(socket.id);
-		window.player = Player;
+		resetPlayer(Player);
+		
+		myType = type;
+		Player = myType==='PUYO'?new PuyoPlayer(socket.id):new TetPlayer(socket.id);
 	});
 
 	socket.on('oppJoined', type =>{
-		EnemyView = type==='PUYO'?new PuyoView(1):new TetView(1);
+		enemyType = type;
+		EnemyView = enemyType === 'PUYO'?new PuyoView(1):new TetView(1);
 		EnemyView.preview = true;
-		Player.setOpponent(type);
+		Player.setOpponent(enemyType);
+		Player.View.display();
+		EnemyView.display();
+		
 		socket.emit('oppRecieved');
-		window.player = Player;
 	});
 	
 	socket.on('seed', seed=>{
@@ -59,12 +72,56 @@ const init = () => {
 		Array.isArray(data.args)?EnemyView[call](...data.args):EnemyView[call](data.args);
 	})
 	
+	socket.on('readyStatus', data=>{
+		if(data==socket.id){
+			Player.View.display(GAME_STATE.READY);
+		} else {
+			EnemyView.display(GAME_STATE.READY);
+		}
+	});
+	
+	socket.on('cancelStatus', data=>{
+		if(data==socket.id){
+			Player.View.display();
+		} else {
+			EnemyView.display();
+		}
+	});
+	
+	socket.on('playAgainStatus', data=>{
+		if(data==socket.id){
+			Player.View.display(GAME_STATE.PLAY_AGAIN);
+		} else {
+			EnemyView.display(GAME_STATE.PLAY_AGAIN);
+		}
+	});
+	
+	socket.on('oppDisconnected',()=>{
+		console.log('enemy disconnected');
+		EnemyView.display(GAME_STATE.DISCONNECTED);
+		GUI.changeScreenTo('returnToMain');
+	});
+	
 	socket.on('GAME_OVER',STATE=>{
 		let a = (STATE==GAME_STATE.WIN)?GAME_STATE.WIN:GAME_STATE.LOST;
 		let b = 1-a;
 		Player.View.display(a);
 		EnemyView.display(b);
+		GUI.changeScreenTo('replay');
 	});
+	
+	socket.on('reset',seed=>{
+		resetPlayer(Player);
+		
+		Player = myType==='PUYO'?new PuyoPlayer(socket.id):new TetPlayer(socket.id);
+		EnemyView = enemyType === 'PUYO'?new PuyoView(1):new TetView(1);
+		Player.random = new Randomizer(seed);
+		EnemyView.preview = true;
+		Player.setOpponent(enemyType);
+		Player.View.display();
+		EnemyView.display();
+		GUI.changeScreenTo('ready');
+	})
 };
 
 const resize = () => {
@@ -88,5 +145,17 @@ const resize = () => {
 	canvas3.style.width = cw;
 	canvas3.style.height = ch;
 };
+
+const resetPlayer = (user) =>{
+	if(user){
+		let eventNames = user.eventTriggerNames;
+		let events = user.events;
+		
+		for(let i = 0; i<eventNames.length;i++){
+			document.removeEventListener(eventNames[i],events[i]);
+		}
+		user = null;
+	}
+}
 
 window.init = init;

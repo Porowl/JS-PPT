@@ -63,6 +63,17 @@ export default class Stats{
 		playSound(playSound(VOICES.ARLE.COMBO(this.chain++)));
 
 		this.sendAttack();
+		
+		let temp = ""+ numPopped*10;
+        if(temp.length==2) temp += ' ';
+		temp += 'x';
+		
+		let mult = "" + multiplier;
+		while(temp.length<3)
+        {
+            mult = "0" + mult;
+        }
+        return temp + mult;
     }
 
     resetChain = () => {
@@ -83,7 +94,6 @@ export default class Stats{
 		let nextThreshold;
 		let index = 0;
 		
-		console.log(sc);
 		// vs PUYO calculation
 		garbs = ds / (60/multiplier|0) + this.leftOver;
 		this.leftOver = garbs % 1;		
@@ -92,7 +102,6 @@ export default class Stats{
 		// vs TET calculation
 		while(index < VS_TETRIS_SCORE.length){
 			nextThreshold = ( VS_TETRIS_SCORE[index] /multiplier | 0);
-			console.log(nextThreshold);
 			if(sc<nextThreshold) break;
 			threshold = nextThreshold;
 			index++;
@@ -109,7 +118,6 @@ export default class Stats{
 			}
 		}
 		
-		console.log(vsTetris);
         document.dispatchEvent(
             new CustomEvent(`garbCountP${this.user}`,{
                 detail:{
@@ -131,4 +139,13 @@ export default class Stats{
 		}
 		return multiplier;
 	}
+	
+	scoreToText = () => {
+        let temp = "" + this.score;
+        while(temp.length<7)
+        {
+            temp = "0" + temp;
+        }
+        return temp;
+    }
 }

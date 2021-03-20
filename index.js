@@ -46,9 +46,20 @@ io.on('connection', (socket) => {
 	});
 	
 	socket.on('disconnect', () => {
-    	lobby.leave(socket);
+		onDisconnection(socket);
 		console.log('user disconnected: ', socket.id);
 	});
+	
+	socket.on('leaveRoom', () =>{
+		onDisconnection(socket)
+		io.to(socket.id).emit('connected')
+	})
 });
+
+const onDisconnection = socket => {
+	lobby.leave(socket);
+	let other = Rmgr.leave(socket);
+	if(other) io.to(other.id).emit('oppDisconnected');
+}
 
 //git test

@@ -19,6 +19,8 @@ export default class Player {
 		this.gravity = this.stg.getGravity();
 		this.piece = {};
 		
+		this.View.draw(this.board.field);
+		
 		this.clearedLineArr = {};
 		
 		this.ghostSwitch = true;
@@ -38,37 +40,52 @@ export default class Player {
 		this.gameOver = false;
 		this.cycle = undefined;
 		
-		document.addEventListener('keydown', (event) => {
+		this.eventTriggerNames = [
+			'keydown',
+			'keyup',
+			'garbCount',
+			'AddGauge'
+		];
+		this.events = [
+			//0
+			(event) => {
 			this.stg.keyMap[event.keyCode] = true;
-		});
-		document.addEventListener('keyup', (event) => {
-			switch(event.keyCode) {
-				case 16:
-				case 32:
-				case 67:
-					break;
-				default:
-					delete this.stg.keyMap[event.keyCode];
-					break;
+			},
+			//1
+			(event) => {
+				switch(event.keyCode) {
+					case 16:
+					case 32:
+					case 67:
+						break;
+					default:
+						delete this.stg.keyMap[event.keyCode];
+						break;
+				}
+			},
+			//2
+			(event) => {
+				let lines = this.board.deductGarbage(event.detail.n)
+				if(lines>0) {
+					socket.emit(`attackFromP${this.user}`,lines);	
+				}
+			},
+			//3
+			(event) => {
+				let lines = this.board.addGauge(event.detail.n,event.detail.m);
+				this.View.displayGauge(this.board.gauge);
 			}
-		});
-
-		document.addEventListener(`garbCountP${this.user}`, event=> {
-            let lines = this.board.deductGarbage(event.detail.n)
-            if(lines>0) {
-				socket.emit(`attackFromP${this.user}`,lines);	
-			}
-		});
+		];
 		
+		for(let i = 0; i<this.eventTriggerNames.length;i++){
+			document.addEventListener(this.eventTriggerNames[i],this.events[i]);
+		}
+		
+		socket.off(`attackOnP${this.user}`);
 		socket.on(`attackOnP${this.user}`,data=>
-        {
-            this.board.addGarbage(data);
-            this.View.showGarbage(this.board.garbage); 
-        });
-		
-		document.addEventListener(`AddGauge${this.user}`, event=> {
-            let lines = this.board.addGauge(event.detail.n,event.detail.m);
-			this.View.displayGauge(this.board.gauge);
+		{
+			this.board.addGarbage(data);
+			this.View.showGarbage(this.board.garbage); 
 		});
 	}
 
@@ -193,7 +210,8 @@ export default class Player {
 	};
 
 	getNewPiece = () => {
-		this.piece = new Mino(this.random.getPiece(this.stg.getIndexInc()));
+		let index = this.stg.getIndexInc();
+		this.piece = new Mino(this.random.getPiece(index));
 		this.View.drawHold(this.stg.hold, DRAWMODE.DRAWPIECE);
 		this.updatePiece();
 		this.updateNexts();
@@ -348,7 +366,6 @@ export default class Player {
 	}
 	
 	updateNexts = () => {
-		this.View.refreshNexts();
 		let arr = this.random.nextPieces(this.stg.getIndex());
 		for (var i = 0; i < Math.max(this.stg.nexts, 6); i++) {
 			this.View.drawNext(arr[i], i);

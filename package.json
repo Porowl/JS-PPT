@@ -1,6 +1,6 @@
 {
   "name": "js-ppt",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "description": "JS Korean-ripoff of Puyo Puyo Tetris series",
   "main": "index.js",
   "type": "module",

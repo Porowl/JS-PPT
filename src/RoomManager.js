@@ -3,7 +3,7 @@ import {io} from '../index.js';
 export default class RoomManager {
 	constructor() {
 		this.rooms = [];
-		this.playingRooms = [];
+//		this.playingRooms = [];
 		
 		this.now = 0;
 		this.last = 0;
@@ -18,21 +18,30 @@ export default class RoomManager {
 		console.log(`Created room for ${player0.id} & ${player1.id}`);
 	};
 
+	leave = socket => {
+		let roomIndex = this.findRoomIndex(socket);
+		let other;
+
+		if (roomIndex >= 0) {
+			other = this.rooms[roomIndex].other(socket)
+			this.rooms.splice(roomIndex, 1);
+		}
+		
+		return other;
+	}
+
 	findRoomIndex = (socket) => {
-		let roomIndex = null;
+		let roomIndex = -1;
 		this.rooms.some((room, index) => {
-			for (let object in room.objects) {
-				let obj = room.objects[object];
-				if (obj.id == socket.id) {
-					roomIndex = index;
-					return true;
-				}
+			if(room.contains(socket)){
+				roomIndex = index;
+				return true;
 			}
 		});
 		return roomIndex;
 	};
 
-	update = ( ) => {
+	update = () => {
 		this.now = Date.now();
 		let dt = (this.now - this.last)/1000;
 		this.last = this.now;
@@ -47,12 +56,11 @@ export default class RoomManager {
 class Room {
 	constructor(p0, p1, type0, type1) {
 		this.id = p0.id+p1.id;
-		this.player0 = p0.id;
-		this.player1 = p1.id;
+		this.player0 = p0;
+		this.player1 = p1;
 		this.type0 = type0;
 		this.type1 = type1;
 		this.status = STATUS.WAITING;
-		this.obj = {};
 		this.randomseed = Math.random().toString(36).substr(2,11);
 		
 		this.count = 0;
@@ -60,60 +68,84 @@ class Room {
 		p0.join(this.id);
 		p1.join(this.id);
 		
-		io.to(this.player0).emit('oppJoined',this.type1);
-		io.to(this.player1).emit('oppJoined',this.type0)
+		io.to(this.player0.id).emit('oppJoined',this.type1);
+		io.to(this.player1.id).emit('oppJoined',this.type0)
 		
 		io.to(this.id).emit('seed',this.randomseed);
 		
 		p0.on('ready',()=>{
 			this.count++;
 			this.start();
+			io.to(this.id).emit('readyStatus',this.player0.id);
 		});
 		p1.on('ready',()=>{
 			this.count++;
 			this.start();
+			io.to(this.id).emit('readyStatus',this.player1.id);
 		});
 		p0.on('cancel',()=>{
-			this.count++;
-			this.start();
+			this.count--;
+			io.to(this.id).emit('cancelStatus',this.player0.id);
 		});
 		p1.on('cancel',()=>{
 			this.count--;
-			this.start();
+			io.to(this.id).emit('cancelStatus',this.player1.id);
 		});
 		// io.to(this.player0).emit('seed',this.randomseed)
 		// io.to(this.player1).emit('seed',this.randomseed)
 		
-		p0.on('attackFromP'+this.player0, data => {
-			console.log(`attack recieved from ${this.player0} and sending ${data} to ${this.player1}`)
-			io.to(this.player1).emit('attackOnP'+this.player1, data);
+		p0.on('attackFromP'+this.player0.id, data => {
+			console.log(`attack recieved from ${this.player0.id} and sending ${data} to ${this.player1.id}`)
+			io.to(this.player1.id).emit('attackOnP'+this.player1.id, data);
 		});
-		p1.on('attackFromP'+this.player1, data => {
-			console.log(`attack recieved from ${this.player1} and sending ${data} to ${this.player0}`)
-			io.to(this.player0).emit('attackOnP'+this.player0, data);
+		p1.on('attackFromP'+this.player1.id, data => {
+			console.log(`attack recieved from ${this.player1.id} and sending ${data} to ${this.player0.id}`)
+			io.to(this.player0.id).emit('attackOnP'+this.player0.id, data);
 		});
 		
 		p0.on('graphics',data=>{
-			io.to(this.player1).emit('eview',data)
+			io.to(this.player1.id).emit('eview',data)
 		})
 		p1.on('graphics',data=>{
-			io.to(this.player0).emit('eview',data)
+			io.to(this.player0.id).emit('eview',data)
 		})
 		
 		p0.on('gameOver',()=>{
-			io.to(this.player1).emit('GAME_OVER',0);
-			io.to(this.player0).emit('GAME_OVER',1);
+			io.to(this.player1.id).emit('GAME_OVER',0);
+			io.to(this.player0.id).emit('GAME_OVER',1);
 			this.status = STATUS.WAITING;
 		});
 		p1.on('gameOver',()=>{
-			io.to(this.player0).emit('GAME_OVER',0);
-			io.to(this.player1).emit('GAME_OVER',1);
+			io.to(this.player0.id).emit('GAME_OVER',0);
+			io.to(this.player1.id).emit('GAME_OVER',1);
 			this.status = STATUS.WAITING;
 		});
+		
+		p0.on('playAgain',()=>{
+			io.to(this.id).emit('playAgainStatus', this.player0.id);
+			this.count++;
+			this.reset();
+		});
+		p1.on('playAgain',()=>{
+			io.to(this.id).emit('playAgainStatus', this.player1.id);
+			this.count++;
+			this.reset();
+		});
+	}
 
+	other = socket =>(this.player0.id == socket.id)?this.player1:this.player0;
+	
+	contains = socket => this.player0.id == socket.id || this.player1.id == socket.id;
+	
+	reset = () =>{
+		if(this.count!=2) return;
+		this.randomseed = Math.random().toString(36).substr(2,11);
+		io.to(this.id).emit('reset',this.randomseed);
+		this.count = 0;
 	}
 
 	start = () =>{
+		console.log(this.id, this.count);
 		if(this.count<2) return;
 		
 		this.count = 0;

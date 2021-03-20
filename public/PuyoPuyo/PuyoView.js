@@ -38,7 +38,7 @@ export default class PuyoView extends view {
 	 */
 	initGraphics = () => {
 		let ctx = this.boardCtx;
-		ctx.font = "16px 'Press Start 2P'";
+		ctx.font = "16px Kongtext";
 		ctx.fillStyle = COLOR_WHITE;
 		ctx.textBaseline = 'top';
 		ctx.textAlign = 'center';
@@ -55,7 +55,7 @@ export default class PuyoView extends view {
 		this.callNextOutline();
 		
 		ctx = this.infoCtx;
-		ctx.font = "16px 'Press Start 2P'";
+		ctx.font = "16px Kongtext";
 		ctx.fillStyle = COLOR_WHITE;
 		ctx.textBaseline = 'top';
 		ctx.textAlign = 'center';
@@ -274,8 +274,6 @@ export default class PuyoView extends view {
 		}
 	}
 
-	drawNexts = () => {};
-
 	drawPuyoByPointer = (x, y, state, color, on) => {
 		let type = color;
 
@@ -322,11 +320,13 @@ export default class PuyoView extends view {
 	};
 
 	drawNexts = (n, m) =>{
-        const p1 = ( n & 0o70 ) / 0o10;
-        const p2 = n % 0o10;
-        const p3 = ( m & 0o70 ) / 0o10;
-        const p4 = m % 0o10;
+        const p1 = ( n & 0xc ) / 0x4;
+        const p2 = n % 0x4;
+        const p3 = ( m & 0xc ) / 0x4;
+        const p4 = m % 0x4;
 		let ctx = this.boardCtx;
+		ctx.clearRect(NEXT_X_OFFSET+PUYO_SIZE/2 + this.offset,NEXT_Y_OFFSET+PUYO_SIZE/2,PUYO_SIZE,PUYO_SIZE*2);
+		ctx.clearRect(NEXT_X_OFFSET+PUYO_SIZE/2*3 + this.offset,NEXT_Y_OFFSET+PUYO_SIZE/2*5,PUYO_SIZE,PUYO_SIZE*2);
 		ctx.drawImage(SPRITE_IMAGE, 0, p2 * PUYO_SIZE, PUYO_SIZE, PUYO_SIZE, NEXT_X_OFFSET+PUYO_SIZE/2 + this.offset, NEXT_Y_OFFSET + PUYO_SIZE/2, PUYO_SIZE, PUYO_SIZE);
 		ctx.drawImage(SPRITE_IMAGE, 0, p1 * PUYO_SIZE, PUYO_SIZE, PUYO_SIZE, NEXT_X_OFFSET+PUYO_SIZE/2 + this.offset, NEXT_Y_OFFSET + PUYO_SIZE*3/2, PUYO_SIZE, PUYO_SIZE);
 		ctx.drawImage(SPRITE_IMAGE, 0, p4 * PUYO_SIZE, PUYO_SIZE, PUYO_SIZE, NEXT_X_OFFSET+PUYO_SIZE/2*3 + this.offset, NEXT_Y_OFFSET + PUYO_SIZE / 2 * 5, PUYO_SIZE, PUYO_SIZE);

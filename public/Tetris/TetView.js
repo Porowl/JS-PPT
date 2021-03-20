@@ -9,17 +9,17 @@ export default class TetView extends view {
 		
 		this.player = player;
 		this.offset = PLAYER_OFFSET*this.player;
+		this.preview = false;
 		this.initGraphics();
 		this.refreshHold();
 		this.refreshNexts();
-		this.preview = false;
 	}
 	/**
 	 * 무대를 그립니다.
 	 */
 	initGraphics = () => {
 		let ctx = this.boardCtx;
-		ctx.font = "16px 'Press Start 2P'";
+		ctx.font = "16px Kongtext";
 		ctx.fillStyle = COLOR_WHITE;
 		ctx.textBaseline = 'top';
 		ctx.textAlign = 'center';
@@ -79,7 +79,7 @@ export default class TetView extends view {
 		 *		);*/
 		
 		ctx = this.infoCtx;
-		ctx.font = "16px 'Press Start 2P'";
+		ctx.font = "16px Kongtext";
 		ctx.fillStyle = COLOR_WHITE;
 		ctx.textBaseline = 'top';
 		ctx.textAlign = 'center';
@@ -193,6 +193,7 @@ export default class TetView extends view {
 	};
 
 	drawNext = (typeId, index) => {
+		if(index==0)this.refreshNexts();
 		for (let i = 0; i < 4; i++)
 			for (let j = 0; j < 4; j++)
 				if (PIECE_MAP[typeId][0] & (0x8000 >> (i * 4 + j))) {
@@ -224,12 +225,6 @@ export default class TetView extends view {
 			NEXT_BLOCK_SIZE_OUTLINE * 6, // w
 			DIST_BTW_NEXTS * 6 + NEXT_BLOCK_SIZE_OUTLINE // h
 		);
-		if(!this.preview) {
-			socket.emit('graphics',{
-				name:'refreshNexts',
-				args: null
-			})
-		}
 	};
 
 	drawHold = (typeId = -1, mode) => {
@@ -276,13 +271,6 @@ export default class TetView extends view {
 			HOLD_BLOCK_SIZE_OUTLINE * 6, // w
 			HOLD_BLOCK_SIZE_OUTLINE * 5 // h
 		);
-		
-		if(!this.preview) {
-			socket.emit('graphics',{
-				name:'refreshHold',
-				args:null
-			})
-		}
 	};
 
 	clearAnimation = (l, i) => {
@@ -324,9 +312,9 @@ export default class TetView extends view {
 		ctx.textBaseline = 'middle';
 		ctx.textAlign = 'center';
 		ctx.fillStyle = COLOR_WHITE;
-		ctx.font = "24px 'Press Start 2P'";
+		ctx.font = "24px Kongtext";
 		ctx.fillText(level + 1, x, y);
-		ctx.font = "12px 'Press Start 2P'";
+		ctx.font = "12px Kongtext";
 		ctx.fillText(`${lines}/${goal}`, x, y + BLOCK_SIZE_OUTLINE * 2.25);
 
 		ctx.lineWidth = 5;

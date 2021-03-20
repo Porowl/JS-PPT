@@ -231,7 +231,11 @@ export const KICK = Object.freeze({
 
 export const GAME_STATE = Object.freeze({
 	WIN:0,
-	LOST:1
+	LOST:1,
+	READY:2,
+	
+	PLAY_AGAIN: 98,
+	DISCONNECTED: 99
 });
 
 export const GROUP_SIZE_BONUS = Object.freeze([0,0,0,0,0,2,3,4,5,6,7,10]);
@@ -361,7 +365,7 @@ export const DIRECTION = Object.freeze({
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~IMAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 export const SPRITE_IMAGE = new Image();
-SPRITE_IMAGE.src ='./PuyoPuyo/puyo.png'
+SPRITE_IMAGE.src ='./Images/puyo.png'
 
 export const PUYO_BUTTON = new Image();
 PUYO_BUTTON.src ='./Images/p.png'

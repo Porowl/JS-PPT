@@ -299,7 +299,7 @@ export default class Storage{
 		vsPuyo += COMBO_GARB_NERF[Math.min(this.combo,COMBO_GARB_NERF.length-1)];
         lines += COMBO_GARB[Math.min(this.combo,COMBO_GARB.length-1)];
 		
-		let eventName = (this.vsPuyo?`AddGauge${this.user}`:`garbCountP${this.user}`);
+		let eventName = (this.vsPuyo?'AddGauge':'garbCount');
 		
         document.dispatchEvent(
             new CustomEvent(eventName,{

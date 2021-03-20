@@ -48,7 +48,7 @@ export default class view {
 
 	countDown = (i) => {
 		let ctx = this.infoCtx;
-		ctx.font = "100px 'Press Start 2P'";
+		ctx.font = "100px Kongtext";
 		ctx.textBaseline = 'middle';
 		ctx.textAlign = 'center';
 		switch (i) {
@@ -72,7 +72,7 @@ export default class view {
 		ctx.clearRect(X_OFFSET + this.offset - 5, BOARD_END_Y - 5, BLOCK_SIZE_OUTLINE * 20 + 5, 35);
 		ctx.textBaseline = 'middle';
 		ctx.textAlign = 'center';
-		ctx.font = "24px 'Press Start 2P'";
+		ctx.font = "24px Kongtext";
 		ctx.strokeStyle = COLOR_GREY;
 		ctx.lineWidth = 5;
 		ctx.fillStyle = COLOR_WHITE;
@@ -97,7 +97,7 @@ export default class view {
 
 		ctx.textBaseline = 'middle';
 		ctx.textAlign = 'center';
-		ctx.font = "15px 'Press Start 2P'";
+		ctx.font = "15px Kongtext";
 		ctx.strokeStyle = COLOR_GREY;
 		ctx.lineWidth = 4;
 		ctx.fillStyle = COLOR_WHITE;
@@ -160,14 +160,46 @@ export default class view {
 		
 	};
 
-	display = STATE => {
-		let string = (STATE==GAME_STATE.WIN)?"WIN":"LOSE"
-		
+	display = (STATE = -1) => {
+		let string;		
 		let ctx = this.infoCtx;
-		ctx.font = "64px 'Press Start 2P'";
+		
+		ctx.font = "64px Kongtext";
 		ctx.textBaseline = 'middle';
 		ctx.textAlign = 'center';
-		ctx.fillStyle = COLOR_MAP[(STATE==GAME_STATE.WIN)?6:1]
+		
+		switch(STATE) {
+			case GAME_STATE.WIN:
+				string = "WIN";
+				ctx.fillStyle = COLOR_MAP[6];
+				break;
+			case GAME_STATE.LOST:
+				string = "LOSE";
+				ctx.fillStyle = COLOR_MAP[1];
+				break;
+			case GAME_STATE.READY:
+				string = "READY";
+				ctx.fillStyle = COLOR_MAP[0];
+				break;
+			case GAME_STATE.PLAY_AGAIN:
+				string = "PLAY AGAIN";
+				ctx.fillStyle = COLOR_WHITE;
+				ctx.font = "24px Kongtext";
+				break;
+			case GAME_STATE.DISCONNECTED:
+				ctx.font = "24px Kongtext";
+				string = "DISCONNECTED";
+				ctx.fillStyle = COLOR_MAP[1];
+				break;
+			default:
+				string = "";
+				break;
+		}
+		
+		ctx.clearRect(X_OFFSET+this.offset,Y_OFFSET,BLOCK_SIZE_OUTLINE*10,BLOCK_SIZE_OUTLINE*20)
 		ctx.fillText(string, BOARD_CENTER_X + this.offset, BOARD_CENTER_Y, BLOCK_SIZE_OUTLINE * 10);
+		ctx.strokeStyle = COLOR_BLACK;
+		ctx.lineWidth = 1;
+		ctx.strokeText(string, BOARD_CENTER_X + this.offset, BOARD_CENTER_Y, BLOCK_SIZE_OUTLINE * 10);
 	}
 }
