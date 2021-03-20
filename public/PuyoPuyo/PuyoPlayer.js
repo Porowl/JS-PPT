@@ -68,8 +68,9 @@ export default class PuyoPlayer{
 			},
 			(event) => {
 				let garbs = this.Board.deductGarbage(event.detail.n);
+				let remaining = this.Board.garbage;
 				if(this.Stats.vsTetris){
-					if(garbs!=0) {
+					if(garbs!=0&&remaining==0) {
 						socket.emit(`attackFromP${this.user}`,event.detail.m);
 					}
 				} else if(garbs>0) {

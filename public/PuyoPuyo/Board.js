@@ -13,7 +13,6 @@ export default class Board {
 	constructor() {
 		this.table = this.initTable();
 		this.garbage = 0;
-		this.gauge = 0;
 	}
 
 	initTable = () => {
@@ -234,14 +233,6 @@ export default class Board {
 			return a;
 		} else return 0;
 	};
-
-	addGauge = n =>{
-		this.gauge += n;
-	}
-	
-	deductGuage = n => {
-		this.gauge -= n;
-	}
 
 	executeGarbage = () => {
 		let attack = Math.min(this.garbage,30);

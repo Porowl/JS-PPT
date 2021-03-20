@@ -85,7 +85,8 @@ export default class Player {
 		socket.on(`attackOnP${this.user}`,data=>
 		{
 			this.board.addGarbage(data);
-			this.View.showGarbage(this.board.garbage); 
+			this.View.showGarbage(this.board.garbage);
+			this.View.displayGauge(this.board.gauge);
 		});
 	}
 
