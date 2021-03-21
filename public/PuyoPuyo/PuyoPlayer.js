@@ -47,7 +47,7 @@ export default class PuyoPlayer{
 					},0)
 					else if(event.keyCode == KEY.Z||event.keyCode == KEY.X) setTimeout(()=>
 					{
-						let dir = event.keyCode==KEY.Z?DIRECTION.CW:DIRECTION.ACW
+						let dir = event.keyCode==KEY.Z?DIRECTION.ACW:DIRECTION.CW
 						let result = this.Board.validRotation(this.Puyo.getPos(),dir)
 						if(result==KICK.NO_ROTATION)
 						{
