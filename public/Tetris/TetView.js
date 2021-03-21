@@ -63,13 +63,6 @@ export default class TetView extends view {
 			HOLD_Y_OFFSET + HOLD_BLOCK_SIZE_OUTLINE * 7
 		);
 
-		// GUAGE
-		this.callDrawOutline(
-			GAUGE_X_OFFSET,
-			GAUGE_Y_OFFSET,
-			GAUGE_X_OFFSET + NEXT_BLOCK_SIZE_OUTLINE,
-			GAUGE_Y_OFFSET + NEXT_BLOCK_SIZE_OUTLINE*20
-		);
 		/*		// LEVEL
 		 *		this.callDrawOutline(
 		 *			HOLD_X_OFFSET,
@@ -422,10 +415,16 @@ export default class TetView extends view {
 		ctx.fillRect(GAUGE_X_OFFSET + this.offset,GAUGE_Y_OFFSET + NEXT_BLOCK_SIZE_OUTLINE * (20-height),NEXT_BLOCK_SIZE_OUTLINE,NEXT_BLOCK_SIZE_OUTLINE * height);
 		
 		ctx.strokeStyle = COLOR_BLACK;
+		ctx.lineWidth = 1;
 		for(let i = 0; i<20; i++) {
-			ctx.strokeRect(GAUGE_X_OFFSET + this.offset,GAUGE_Y_OFFSET+i*NEXT_BLOCK_SIZE_OUTLINE,NEXT_BLOCK_SIZE_OUTLINE,NEXT_BLOCK_SIZE_OUTLINE)
+		ctx.strokeRect(GAUGE_X_OFFSET + this.offset,GAUGE_Y_OFFSET+i*NEXT_BLOCK_SIZE_OUTLINE,NEXT_BLOCK_SIZE_OUTLINE,NEXT_BLOCK_SIZE_OUTLINE)
 		}
-				
+		this.callDrawOutline(
+			GAUGE_X_OFFSET,
+			GAUGE_Y_OFFSET,
+			GAUGE_X_OFFSET + NEXT_BLOCK_SIZE_OUTLINE,
+			GAUGE_Y_OFFSET + NEXT_BLOCK_SIZE_OUTLINE*20
+		);		
 		if(!this.preview) {
 			socket.emit('graphics',{
 				name:'displayGauge',

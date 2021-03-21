@@ -74,7 +74,7 @@ export default class Player {
 			//3
 			(event) => {
 				let lines = this.board.addGauge(event.detail.n,event.detail.m);
-				this.View.displayGauge(this.board.gauge);
+				this.updateGauge();
 			}
 		];
 		
@@ -87,12 +87,13 @@ export default class Player {
 		{
 			this.board.addGarbage(data);
 			this.View.showGarbage(this.board.garbage);
-			this.View.displayGauge(this.board.gauge);
+			if(this.stg.vsPuyo) this.updateGauge();
 		});
 	}
 
 	setOpponent = type => {
 		this.stg.setOpponent(type);
+		if(this.stg.vsPuyo) this.updateGauge();
 	};
 
 	countDown = () => {
@@ -139,7 +140,7 @@ export default class Player {
 				//if not on chain send garbage to puyo
 				if(this.stg.vsPuyo && this.stg.isComboBroken()) {
 					this.stg.executeGauge(this.board.resetGauge())
-					this.View.displayGauge(this.board.gauge);
+					this.updateGauge();
 				}
 				this.View.draw(this.board.field);
 				this.getNewPiece();
@@ -377,6 +378,10 @@ export default class Player {
 	updateScore = () => {
 		this.View.displayScore(this.stg.scoreToText());
 	};
+
+	updateGauge = () => {		
+		this.View.displayGauge(this.board.gauge);
+	}
 }
 
 const PHASE = {
