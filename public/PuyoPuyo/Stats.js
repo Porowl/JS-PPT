@@ -1,4 +1,4 @@
-import {CHAIN_BONUS,COLOR_BONUS,GROUP_SIZE_BONUS,VS_TETRIS_SCORE,playSound,VOICES,SOUNDS} from '../constants.js';
+import {CHAIN_BONUS,COLOR_BONUS,GROUP_SIZE_BONUS,VS_TETRIS_SCORE,playSound,VOICES,SOUNDS,KEY,KEYSTATES} from '../constants.js';
 
 import {socket} from '../main.js';
 
@@ -35,12 +35,29 @@ export default class Stats{
     getIndexInc = () => this.index++;
     getIndex = () => this.index;
 
-    initKeyMap = () =>
-    {
+    initKeyMap = () => {
         let arr = [];
         for(let i = 0; i<101; i++)
             arr.push(false);
+		return arr;
     } 
+	
+	checkLR = () => {
+        if(this.keyMap[KEY.LEFT]&&this.keyMap[KEY.RIGHT])
+            return 0;
+        else if(this.keyMap[KEY.LEFT]) return KEYSTATES.L;
+        else if(this.keyMap[KEY.RIGHT]) return KEYSTATES.R;
+        return -1;
+    }
+
+    checkRot = () => {
+        if((this.keyMap[KEY.UP]||this.keyMap[KEY.X])
+            &&(this.keyMap[KEY.Z]||this.keyMap[KEY.CTRL]))
+            return KEYSTATES.UZ;
+        else if(this.keyMap[KEY.UP]||this.keyMap[KEY.X]) return KEYSTATES.U;
+        else if(this.keyMap[KEY.Z]||this.keyMap[KEY.CTRL]) return KEYSTATES.Z;
+        return -1;
+    }
 
     calcScore = (data) =>
     {

@@ -47,7 +47,7 @@ export const BOARD_WIDTH   = 10;
 
 export const VISIBLE_HEIGHT = 20;
 
-export const BLOCK_SIZE = 19;
+export const BLOCK_SIZE = 18;
 export const NEXT_BLOCK_SIZE = 10;
 export const HOLD_BLOCK_SIZE = 15;
 
@@ -78,6 +78,7 @@ export const GAUGE_Y_OFFSET = Y_OFFSET + VISIBLE_HEIGHT * BLOCK_SIZE_OUTLINE - N
 export const PLAYER_OFFSET = 500;
 
 export const DAS = 12;
+export const PUYO_DAS = 8;
 export const ARR = 2;
 export const ENTRY_DELAY = 6;
 

@@ -4,68 +4,54 @@ import PuyoView from './PuyoView.js';
 import Puyo from './Puyo.js';
 import MultPuyos from './MultPuyos.js';
 
-import {DIRECTION,KICK,PUYO_BOARD_WIDTH,KEY} from '../constants.js';
+import {DIRECTION,KICK,PUYO_BOARD_WIDTH,KEY,PUYO_DAS,ARR,KEYSTATES} from '../constants.js';
 import {socket} from '../main.js';
 
 export default class PuyoPlayer{
-    constructor(user = 0)
-    {
-        this.user = user;
-        this.Board = new Board();
-        this.Stats = new Stats(user);
-        this.Puyo = {};
-        this.popArr = {arr:[]};
-        this.View = new PuyoView(0);
+    constructor(user = 0) {
+		this.user = user;
+		this.Board = new Board();
+		this.Stats = new Stats(user);
+		this.Puyo = {};
+		this.popArr = {arr:[]};
+		this.View = new PuyoView(0);
 		this.random = {};
-
-        this.phase = PHASE.NEW_PUYO;
-        this.frame = 0;
-
-        this.gameOver = false;
-
+		
+		this.phase = PHASE.NEW_PUYO;
+		this.LRFrameCounter = 0;
+		this.DFrameCounter = 0;
+		this.RotateFrameCounter = 0;
+		this.dropRate = 0;
+		this.lockDelay = 0;
+		this.gravity = 16/60
+		
+		this.View.drawBoard(this.Board);
+		
+		this.gameOver = false;
+		
 		this.eventTriggerNames = [ 
 			'keydown',
+			'keyup',
 			'garbCount'
 		];
 		this.events =[
+			//0
 			(event) => {
-				if(this.phase == PHASE.DROP)
-				{
-					if(event.keyCode == KEY.LEFT) setTimeout(()=>
-					{
-						if(this.Board.valid(this.Puyo.getPos(DIRECTION.LEFT)))
-						{
-							this.Puyo.move(-1,0);
-						}
-					},0)
-					else if(event.keyCode == KEY.RIGHT) setTimeout(()=>
-					{
-						if(this.Board.valid(this.Puyo.getPos(DIRECTION.RIGHT)))
-						{
-							this.Puyo.move(1,0);
-						}
-					},0)
-					else if(event.keyCode == KEY.Z||event.keyCode == KEY.X) setTimeout(()=>
-					{
-						let dir = event.keyCode==KEY.Z?DIRECTION.ACW:DIRECTION.CW
-						let result = this.Board.validRotation(this.Puyo.getPos(),dir)
-						if(result==KICK.NO_ROTATION)
-						{
-							if(this.Puyo.rotation%2==0) this.Puyo.tempRotation = 1;
-						}
-						else this.Puyo.rotate(dir, result);
-					},0)
-
-					else if(event.keyCode == KEY.DOWN) setTimeout(()=>
-					{
-						if(this.Board.valid(this.Puyo.getPos(DIRECTION.DOWN)))
-						{
-							this.Puyo.move(0,1);
-						}
-					},0)
-				}
-				//this.Stats.keyMap[event.keyCode] = true;
+				this.Stats.keyMap[event.keyCode] = true;
 			},
+			//1
+			(event) => {
+				switch(event.keyCode) {
+					case 16:
+					case 32:
+					case 67:
+						break;
+					default:
+						delete this.Stats.keyMap[event.keyCode];
+						break;
+				}
+			},
+			//2
 			(event) => {
 				let garbs = this.Board.deductGarbage(event.detail.n);
 				let remaining = this.Board.garbage;
@@ -78,76 +64,71 @@ export default class PuyoPlayer{
 				}
 			}
 		];
+				
 		for(let i = 0; i<this.eventTriggerNames.length;i++){
 			document.addEventListener(this.eventTriggerNames[i],this.events[i]);
 		}
-
+		
 		socket.off(`attackOnP${this.user}`)
-		socket.on(`attackOnP${this.user}`,data=>
-        {
-            this.Board.addGarbage(data);
-            this.View.showGarbage(this.Board.garbage); 
-        });
-    }
+		socket.on(`attackOnP${this.user}`,data=> {
+			this.Board.addGarbage(data);
+			this.View.showGarbage(this.Board.garbage); 
+		});
+	}
 
-	gameStart = () =>{
+	gameStart = () => {
 		this.Stats.setGameStarted();
 	}
 	
-    update = () =>
-    {
-        switch(this.phase)
-        {
-			case PHASE.STAND_BY:
-			{
+    update = (dt) => {
+        switch(this.phase) {
+			case PHASE.STAND_BY: {
 				break;
 			}
-            case PHASE.DROP:
-            {
+            case PHASE.DROP: {
                 this.View.moveCycle();
-                this.frame++;
-                if(this.frame%60===0)
-                {
-                    if(this.Board.valid(this.Puyo.getPos(DIRECTION.DOWN)))
-                        this.Puyo.move(0,1);
-                    else{
-                        this.phase++;
-                    }
-                }
+				this.moveDownCycle(dt);
+				this.inputCycle(); 
+
+				if(!this.Board.valid(this.Puyo.getPos(DIRECTION.DOWN))){
+					if(this.Stats.keyMap[KEY.DOWN]){
+						this.phase++;
+					} else {
+						this.lockDelay += dt;
+					}
+				} else {
+					this.lockDlay = 0;
+				}
+				
+				if(this.lockDelay >= 0.533 && !this.Board.valid(this.Puyo.getPos(DIRECTION.DOWN))) {
+					this.phase++;
+				}
                 break;
             }
-
-            case PHASE.LOCK:
-            {
+            case PHASE.LOCK: {
+				this.lockDelay = 0;
                 this.Board.lockMult(this.Puyo)
-                    this.phase++;
+				this.phase++;
 				this.View.drawBoard(this.Board);
                 break;
             }
-
-            case PHASE.FALL:
-            {
+            case PHASE.FALL: {
                 let array = this.Board.fall();
                 this.View.drawBoard(this.Board);
                 this.View.fallingPuyos(array);
                 this.phase++;
                 break;
             }
-
-            case PHASE.FALL_ANIMATION:
-            {
+			case PHASE.FALL_ANIMATION:{
                 if(!this.View.fallCycle()) this.phase++;
                 break;
             }
 
-            case PHASE.FALL_ANIMATION_END:
-            {
+            case PHASE.FALL_ANIMATION_END: {
                 let arr = this.View.getPuyoArr();
 
-                for(let x = 0; x<PUYO_BOARD_WIDTH;x++)
-                {
-                    for(let puyo of arr[x])
-                    {
+                for(let x = 0; x<PUYO_BOARD_WIDTH;x++) {
+                    for(let puyo of arr[x]) {
                         this.Board.lockSingle(puyo);
                     }
                 }
@@ -156,19 +137,14 @@ export default class PuyoPlayer{
                 this.phase++;
                 break;
             }
-
-            case PHASE.CALC:
-            {
+            case PHASE.CALC: {
                 this.phase++;
                 this.popArr = this.Board.calc();
                 break;
             }
-
-            case PHASE.POP:
-            {
+            case PHASE.POP: {
                 this.View.popFrame = 0;
-                if(this.popArr.arr.length>0)
-                {
+                if(this.popArr.arr.length>0) {
 					let data = this.Stats.calcScore(this.popArr);
 					this.View.displayScore(data)
                     this.Board.pop(this.popArr.arr);
@@ -179,18 +155,14 @@ export default class PuyoPlayer{
 				}
                 break;
             }
-
-            case PHASE.POP_ANIMATION:
-            {
+            case PHASE.POP_ANIMATION: {
                 if(this.View.popCycle(this.popArr.arr)) {
 						this.phase = PHASE.NEW_PUYO;
 				}
 	            this.View.showGarbage(this.Board.garbage); 
                 break;
             }
-
-			case PHASE.GARB:
-			{
+			case PHASE.GARB: {
                 let arr = this.Board.executeGarbage();
 				this.garbDropped = true;
 				this.View.showGarbage(this.Board.garbage)
@@ -198,14 +170,11 @@ export default class PuyoPlayer{
 				this.phase++;
 				break;
 			}
-			
-			case PHASE.GARB_FALL:
-			{
+			case PHASE.GARB_FALL: {
                 if(!this.View.fallCycle()) this.phase++;
 				break;
 			}
-            case PHASE.GARB_FALL_ANIMATION_END:
-            {
+            case PHASE.GARB_FALL_ANIMATION_END: {
 				let arr = this.View.getPuyoArr();
 
 				for(let x = 0; x<PUYO_BOARD_WIDTH;x++) {
@@ -218,9 +187,7 @@ export default class PuyoPlayer{
 				this.phase++;
                 break;
             }
-
-            case PHASE.NEW_PUYO:
-            {
+            case PHASE.NEW_PUYO: {
                 if(this.popArr.arr.length>0){this.phase = PHASE.FALL; break;}
                 if(this.Board.garbage>0 && !this.garbDropped){this.phase = PHASE.GARB; break;}
 				this.popArr.arr.length = 0;
@@ -247,9 +214,7 @@ export default class PuyoPlayer{
                 this.phase = PHASE.DROP;
                 break;
             }
-
-            case PHASE.GAME_OVER:
-            {
+            case PHASE.GAME_OVER: {
 				this.phase = PHASE.STAND_BY;
 				socket.emit('gameOver');
                 break;   
@@ -257,6 +222,71 @@ export default class PuyoPlayer{
         }
         return true;
     }
+
+	inputCycle = () => {
+		this.moveLR();
+		this.rotate();
+	};
+
+	moveLR = () =>{
+		let state = this.Stats.checkLR();
+		if (state == KEYSTATES.LR || state == -1) {
+			this.LRFrameCounter = 0;
+		} else {
+			let dir = state==KEYSTATES.L?DIRECTION.LEFT:DIRECTION.RIGHT;
+			let offset = state==KEYSTATES.L?-1:1
+			let fc = this.LRFrameCounter;
+			if (fc == 0 || (fc >= PUYO_DAS && (fc - PUYO_DAS) % ARR == 0)) {
+				if(this.Board.valid(this.Puyo.getPos(dir))){
+					this.Puyo.move(offset,0);
+				}
+			}
+			this.LRFrameCounter++;
+		}
+	}
+	
+	rotate = () => {
+		let state = this.Stats.checkRot();
+		if (state == KEYSTATES.UZ || state == -1) {
+			this.RotateFrameCounter = 0;
+		} else {
+			if (this.RotateFrameCounter == 0) {
+				let dir = state == KEYSTATES.U ? DIRECTION.ACW : DIRECTION.CW;
+				let result = this.Board.validRotation(this.Puyo.getPos(),dir)
+				if(result==KICK.NO_ROTATION) {
+					if(this.Puyo.rotation%2==0) this.Puyo.tempRotation = 1;
+				}
+				else this.Puyo.rotate(dir, result);
+			}
+			this.RotateFrameCounter++;
+		}
+	};
+
+	moveDownCycle = (dt) => {
+		if(this.Stats.keyMap[KEY.DOWN]) {
+			if(this.DFrameCounter%ARR==0){
+				if (this.moveDown()) {
+					this.Stats.score += 1;
+					this.View.displayScore(this.Stats.scoreToText());
+				}				
+			}
+			this.DFrameCounter++;
+			return;
+		}
+		this.dropRate += dt;
+		while (this.dropRate > this.gravity) {
+			this.dropRate -= this.gravity;
+			this.moveDown();
+		}
+	};
+
+	moveDown = () => {
+		if(this.Board.valid(this.Puyo.getPos(DIRECTION.DOWN))){
+			this.Puyo.move(0,1);
+			return true;
+		}
+		return false;
+	}
 
     getPuyo = () =>
     {

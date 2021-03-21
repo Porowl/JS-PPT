@@ -26,7 +26,12 @@ const init = () => {
 	resize();
 
 	window.addEventListener('resize', resize, false);
-
+	window.addEventListener('focus',()=>{
+		document.title = 'JS-PPT';
+		PageTitleNotification.off();
+	});
+	
+	
 	socket.on('connected', () => {
 		GUI = menu;
 		GUI.changeScreenTo('title');
@@ -43,6 +48,9 @@ const init = () => {
 	socket.on('oppJoined', type =>{
 		enemyType = type;
 		EnemyView = enemyType === 'PUYO'?new PuyoView(1):new TetView(1);
+		
+		if(!document.hasFocus()) PageTitleNotification.on("Opponent has joined!", 1000);
+		
 		EnemyView.preview = true;
 		Player.setOpponent(enemyType);
 		Player.View.display();
@@ -156,6 +164,25 @@ const resetPlayer = (user) =>{
 		}
 		user = null;
 	}
+}
+
+const PageTitleNotification = {
+    vars:{
+        OriginalTitle: document.title,
+        Interval: null
+    },    
+    on: function(notification, intervalSpeed){
+        var _this = this;
+        _this.vars.Interval = setInterval(function(){
+             document.title = (_this.vars.OriginalTitle == document.title)
+                                 ? notification
+                                 : _this.vars.OriginalTitle;
+        }, (intervalSpeed) ? intervalSpeed : 1000);
+    },
+    off: function(){
+        clearInterval(this.vars.Interval);
+        document.title = this.vars.OriginalTitle;   
+    }
 }
 
 window.init = init;

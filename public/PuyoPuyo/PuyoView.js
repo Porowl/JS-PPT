@@ -265,7 +265,7 @@ export default class PuyoView extends view {
 	};
 
 	refreshPiece = () => {
-		this.pieceCtx.clearRect(X_OFFSET+this.offset+1, 0, PUYO_BOARD_WIDTH * PUYO_SIZE, Y_OFFSET + 1 + PUYO_VISIBLE_HEIGHT * PUYO_SIZE);
+		this.pieceCtx.clearRect(X_OFFSET+this.offset-PUYO_SIZE, 0, (PUYO_BOARD_WIDTH+2) * PUYO_SIZE, Y_OFFSET + 1 + PUYO_VISIBLE_HEIGHT * PUYO_SIZE);
 		if(!this.preview) {
 			socket.emit('graphics',{
 				name:'refreshPiece',

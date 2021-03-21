@@ -59,10 +59,9 @@ export default class Puyo{
         return false;
     }
 
-    move()
-    {
-        let dx = (this.x * PUYO_SIZE - this.gX) * 0.25 | 0;
-        let dy = (this.y * PUYO_SIZE - this.gY) * 0.25 | 0;
+    move = () => {
+        let dx = (this.x * PUYO_SIZE - this.gX) * 0.4 | 0;
+        let dy = (this.y * PUYO_SIZE - this.gY) * 0.4 | 0;
 
         if(dx == 0)
             this.gX = this.x * PUYO_SIZE;
@@ -73,11 +72,10 @@ export default class Puyo{
         this.gY += dy;
     }
 
-    moveRotate(x,y)
-    {
+    moveRotate = (x,y) => {
         if(this.onRotate)
         {
-            this.angle += Math.PI/2/5 * this.direction;
+            this.angle += Math.PI/2/7 * this.direction;
             this.angle = (this.angle+Math.PI*2) % (Math.PI*2);
             this.gX = x+Math.sin(this.angle)*PUYO_SIZE
             this.gY = y-Math.cos(this.angle)*PUYO_SIZE 

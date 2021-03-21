@@ -33,6 +33,7 @@ export default class Player {
 		this.LRFrameCounter = 0;
 		this.RotateFrameCounter = 0;
 		this.dropRate = 0;
+		this.lockDelay = 0;
 		this.lockDelayRefreshed = 0;
 		this.lockDelayRefreshedCount = 0;
 		
@@ -49,7 +50,7 @@ export default class Player {
 		this.events = [
 			//0
 			(event) => {
-			this.stg.keyMap[event.keyCode] = true;
+				this.stg.keyMap[event.keyCode] = true;
 			},
 			//1
 			(event) => {

@@ -39,18 +39,15 @@ export default class Storage{
 
 	isComboBroken = () => this.combo === 0;
 	
-    updateLines = (data,perfect) =>
-    {
+    updateLines = (data,perfect) => {
         let lines = data.length();
         let tspin = data.tSpin;
         let mini = tspin===T_SPIN_STATE.MINI;
         let scoreArr = [];
 
         let mode;
-        if(tspin!==T_SPIN_STATE.NONE)
-        {
-            switch(lines)
-            {
+        if(tspin!==T_SPIN_STATE.NONE) {
+            switch(lines) {
                 case 0:
                     mode = mini?SCORE.MTS:SCORE.TS;
                     break;
@@ -64,11 +61,8 @@ export default class Storage{
                     mode = SCORE.TST;
                     break;
             }
-        }
-        else 
-        {
-            switch(lines)
-            {
+        } else {
+            switch(lines) {
                 case 0:
                     break;
                 case 1:
@@ -85,8 +79,7 @@ export default class Storage{
                     break;
             }
         }
-        if(mode)
-        {
+        if(mode) {
             scoreArr.push(this.addScore(mode));
         }
         if(perfect) scoreArr.push(this.addScore(SCORE.PERFECT));
@@ -94,8 +87,7 @@ export default class Storage{
         if(this.gameMode == GAMEMODE.VARIABLE)
             lines = this.calculateVariableGoal(mode);
  
-        if(this.gameMode == GAMEMODE.VERSUS)
-        {
+        if(this.gameMode == GAMEMODE.VERSUS) {
             if(perfect)
                 this.sendGarbage(SCORE.PERFECT);
             else if(mode)
@@ -105,8 +97,7 @@ export default class Storage{
         this.clearedLines += lines;
         
         let goal = this.getGoal();
-        if(this.clearedLines>=goal)
-        {
+        if(this.clearedLines>=goal) {
             this.clearedLines -=goal;
             this.level++;
         }
@@ -117,15 +108,14 @@ export default class Storage{
         return scoreArr;
     }
 
-    initKeyMap = () =>{
+    initKeyMap = () => {
         this.keyMap = [];
         for(var i = 0;i<101;i++){
             this.keyMap.push(false);
         }
     }
 
-    checkLR = () =>
-    {
+    checkLR = () => {
         if(this.keyMap[KEY.LEFT]&&this.keyMap[KEY.RIGHT])
             return 0;
         else if(this.keyMap[KEY.LEFT]) return KEYSTATES.L;
@@ -133,8 +123,7 @@ export default class Storage{
         return -1;
     }
 
-    checkRot = () =>
-    {
+    checkRot = () => {
         if((this.keyMap[KEY.UP]||this.keyMap[KEY.X])
             &&(this.keyMap[KEY.Z]||this.keyMap[KEY.CTRL]))
             return KEYSTATES.UZ;
@@ -145,8 +134,7 @@ export default class Storage{
     
     checkHold = () => this.keyMap[KEY.SHIFT]||this.keyMap[KEY.C];
 
-    addScore = mode => 
-    {
+    addScore = mode => {
         let last = this.b2b;
         let mult = this.level+1
         let calc = 0;
@@ -226,11 +214,9 @@ export default class Storage{
 
     addDropScore = n => this.score+=n;
     
-    scoreToText = () =>
-    {
+    scoreToText = () => {
         let temp = ""+ this.score;
-        while(temp.length<7)
-        {
+        while(temp.length<7) {
             temp = "0" + temp;
         }
         return temp;
@@ -238,8 +224,7 @@ export default class Storage{
 
     getGoal = () => (this.gameMode == GAMEMODE.STATIC)?10:(this.level+1)*5;
 
-    sendGarbage = (mode) =>
-    {
+    sendGarbage = (mode) => {
         let lines = 0;
         switch(mode)
         {
