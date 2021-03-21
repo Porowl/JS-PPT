@@ -251,7 +251,7 @@ export default class PuyoPlayer{
 			this.RotateFrameCounter = 0;
 		} else {
 			if (this.RotateFrameCounter == 0) {
-				let dir = state == KEYSTATES.U ? DIRECTION.ACW : DIRECTION.CW;
+				let dir = state == KEYSTATES.U ? DIRECTION.CW : DIRECTION.ACW;
 				let result = this.Board.validRotation(this.Puyo.getPos(),dir)
 				if(result==KICK.NO_ROTATION) {
 					if(this.Puyo.rotation%2==0) this.Puyo.tempRotation = 1;
