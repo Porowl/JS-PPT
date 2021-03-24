@@ -411,37 +411,38 @@ export const DX_DY = Object.freeze(
 	[ 1, 0]
 ]);
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~SOUNDS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+//sounds are from https://onlinesequencer.net/#t0
 export const SOUNDS = {
-	COMBO1: './sounds/soundEffects/combo1.wav',
-	COMBO2: './sounds/soundEffects/combo2.wav',
-	COMBO3: './sounds/soundEffects/combo3.wav',
-	COMBO4: './sounds/soundEffects/combo4.wav',
-	COMBO5: './sounds/soundEffects/combo5.wav',
-	COMBO6: './sounds/soundEffects/combo6.wav',
-	COMBO7: './sounds/soundEffects/combo7.wav',
-	CHANGE: './sounds/soundEffects/change.wav',
-	ERASE: './sounds/soundEffects/erase1.wav',
-	ERASE4: './sounds/soundEffects/erase4.wav',
-	HARDDROP: './sounds/soundEffects/harddrop.wav',
-	HOLD: './sounds/soundEffects/hold.wav',
-	MOVE: './sounds/soundEffects/move.wav',
-	TSPIN: './sounds/soundEffects/tspin0.wav',
-	TSPINC: './sounds/soundEffects/tspin1.wav',
+	COMBO1: './sounds/soundEffects/combo_1.mp3',
+	COMBO2: './sounds/soundEffects/combo_2.mp3',
+	COMBO3: './sounds/soundEffects/combo_3.mp3',
+	COMBO4: './sounds/soundEffects/combo_4.mp3',
+	COMBO5: './sounds/soundEffects/combo_5.mp3',
+	COMBO6: './sounds/soundEffects/combo_6.mp3',
+	COMBO7: './sounds/soundEffects/combo_7.mp3',
+	COMBO8: './sounds/soundEffects/combo_8.mp3',
+	COMBO9: './sounds/soundEffects/combo_9.mp3',
+	CHANGE: './sounds/soundEffects/lock.mp3',
+	ERASE: './sounds/soundEffects/lock.mp3',
+	ERASE4: './sounds/soundEffects/lock.mp3',
+	HARDDROP: './sounds/soundEffects/lock.mp3',
+	HOLD: './sounds/soundEffects/lock.mp3',
+	MOVE: './sounds/soundEffects/lock.mp3',
+	TSPIN: './sounds/soundEffects/lock.mp3',
+	TSPINC: './sounds/soundEffects/lock.mp3',
 }
 
 export const VOICES = {
 	ARLE: {
 		COMBO: n =>{
-			n = Math.min(n,6);
-			let url = './sounds/character/Arle/Arle_chain_' + n + '.wav'
-			return url;
+			return SOUNDS['COMBO'+Math.min(n,9)];
 		}
 	},
 }
 
 export const playSound = url => {
-	// let aud = new Audio(url);
-	// aud.volume = 0.2;
-	// aud.play();
+	let aud = new Audio(url);
+	aud.volume = 0.35;
+	aud.play();
 	return;
 }

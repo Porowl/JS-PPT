@@ -104,6 +104,9 @@ export default class Storage{
 
 		//resetCombo;
         (lines>0)?this.combo++:this.combo=0;
+		if(this.combo!=0){
+			playSound(playSound(SOUNDS['COMBO'+Math.min(this.combo,9)]));
+		}
     
         return scoreArr;
     }

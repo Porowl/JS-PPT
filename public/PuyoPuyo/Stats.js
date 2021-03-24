@@ -76,8 +76,9 @@ export default class Stats{
         let score = 10 * numPopped * multiplier;
 		
         this.score += score;
-		
-		playSound(playSound(VOICES.ARLE.COMBO(this.chain++)));
+		this.chain++;
+
+		playSound(playSound(VOICES.ARLE.COMBO(this.chain)));
 
 		this.sendAttack();
 		

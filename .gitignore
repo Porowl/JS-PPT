@@ -2,4 +2,3 @@ node_modules
 .eslintrc.json
 package-lock.json
 goorm.manifest
-**/sounds

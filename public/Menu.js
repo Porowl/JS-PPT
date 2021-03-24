@@ -137,13 +137,10 @@ class MenuButton {
 let menu = new Menu();
 
 /***************EMPTY SCREEN****************/
-
-	let empty = new MenuScreen('empty');
-	menu.addScreen(empty);	
-
+let empty = new MenuScreen('empty');
+menu.addScreen(empty);	
 
 /***************MAIN  SCREEN****************/
-
 let titleScreen = new MenuScreen('title')
 menu.addScreen(titleScreen);
 
@@ -209,7 +206,7 @@ readyScreen.addEvent(()=>{ready.status = false});
 let returnToMain = new MenuScreen('returnToMain');
 menu.addScreen(returnToMain);
 
-let returnButton = new MenuButton(X_OFFSET,Y_OFFSET+500,200,75,'RETURN TO TITLE');
+let returnButton = new MenuButton(X_OFFSET,Y_OFFSET+500,200,75,'RET. 2 TITLE');
 returnButton.setEvent(()=>{
 	ctx0.clearRect(0,0,1024,768);
 	ctx1.clearRect(0,0,1024,768);
