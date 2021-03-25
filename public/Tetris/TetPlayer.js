@@ -207,6 +207,7 @@ export default class Player {
 			case PHASE.GAME_OVER:{
 				this.phase = PHASE.STANDBY;
 				socket.emit('gameOver')
+				playSound(SOUNDS.GAMEOVER);
 				break;
 			}
 		}

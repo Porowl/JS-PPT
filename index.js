@@ -15,6 +15,7 @@ let ee = new EventEmitter();
 
 export {io, ee};
 
+let numUser = 0;
 let Rmgr = new RoomManager();
 let lobby = new WaitingQueue(Rmgr);
 let __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -35,11 +36,17 @@ app.get('/', (req, res) => {
 io.on('connection', (socket) => {	
 	let cycle = setInterval(()=>{
 		io.to(socket.id).emit('connected')
-	},1000);
-	socket.on('load_complete',()=>{clearInterval(cycle);});
+	},500);
+	socket.on('load_complete',()=>{
+		clearInterval(cycle);
+	});
 	
 	console.log('user connected: ', socket.id);
 
+	socket.on('askCurrPlayers',()=>{
+		socket.emit('currPlayers',io.engine.clientsCount);	
+	});
+	
 	socket.on('waiting',type=>{
 		lobby.enter(socket,type);
     	lobby.getARoomYouTwo();

@@ -1,3 +1,4 @@
+export let socket = io();
 import TetPlayer from './Tetris/TetPlayer.js';
 import TetView from './Tetris/TetView.js';
 import PuyoPlayer from './PuyoPuyo/PuyoPlayer.js';
@@ -5,9 +6,9 @@ import PuyoView from './PuyoPuyo/PuyoView.js';
 import Randomizer from './Randomizer.js'
 import menu from './Menu.js';
 
-import {canvas0, canvas1, canvas2, canvas3,GAME_STATE} from './constants.js';
+import {canvas0, canvas1, canvas2, canvas3,GAME_STATE,playSound,SOUNDS} from './constants.js';
 
-export let socket = io();
+let established = false;
 let requestId;
 let keySettings = () => {};
 let Player;
@@ -15,12 +16,6 @@ let EnemyView;
 let GUI;
 let myType;
 let enemyType;
-
-export let Singleton = {
-	state: false,
-	getState: ()=> Singleton.state,
-	setState: state => Singleton.state = state
-};
 
 const init = () => {
 	resize();
@@ -31,8 +26,9 @@ const init = () => {
 		PageTitleNotification.off();
 	});
 	
-	
 	socket.on('connected', () => {
+		if(established) return;
+		established = true;
 		GUI = menu;
 		GUI.changeScreenTo('title');
 		socket.emit('load_complete')
@@ -50,6 +46,7 @@ const init = () => {
 		EnemyView = enemyType === 'PUYO'?new PuyoView(1):new TetView(1);
 		
 		if(!document.hasFocus()) PageTitleNotification.on("Opponent has joined!", 1000);
+		playSound(SOUNDS.PLAYER_JOIN)
 		
 		EnemyView.preview = true;
 		Player.setOpponent(enemyType);
@@ -177,7 +174,7 @@ const PageTitleNotification = {
              document.title = (_this.vars.OriginalTitle == document.title)
                                  ? notification
                                  : _this.vars.OriginalTitle;
-        }, (intervalSpeed) ? intervalSpeed : 1000);
+        }, (intervalSpeed) ? intervalSpeed : 500);
     },
     off: function(){
         clearInterval(this.vars.Interval);

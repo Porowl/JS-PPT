@@ -423,13 +423,15 @@ export const SOUNDS = {
 	COMBO8: './sounds/soundEffects/combo_8.mp3',
 	COMBO9: './sounds/soundEffects/combo_9.mp3',
 	CHANGE: './sounds/soundEffects/lock.mp3',
-	ERASE: './sounds/soundEffects/lock.mp3',
-	ERASE4: './sounds/soundEffects/lock.mp3',
+	ERASE: './sounds/soundEffects/clear1.mp3',
+	ERASE4: './sounds/soundEffects/clear4.mp3',
 	HARDDROP: './sounds/soundEffects/lock.mp3',
 	HOLD: './sounds/soundEffects/lock.mp3',
 	MOVE: './sounds/soundEffects/lock.mp3',
 	TSPIN: './sounds/soundEffects/lock.mp3',
 	TSPINC: './sounds/soundEffects/lock.mp3',
+	PLAYER_JOIN: './sounds/soundEffects/player_join.mp3',
+	GAMEOVER: './sounds/soundEffects/gameover.mp3'
 }
 
 export const VOICES = {

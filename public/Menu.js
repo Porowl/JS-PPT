@@ -1,5 +1,5 @@
 import {socket} from './main.js';
-import {canvas3,ctx0,ctx1,ctx2,ctx3,TETRIS_BUTTON,PUYO_BUTTON,X_OFFSET,Y_OFFSET,BOARD_CENTER_X,BOARD_CENTER_Y} from './constants.js';
+import {canvas3,ctx0,ctx1,ctx2,ctx3,TETRIS_BUTTON,PUYO_BUTTON,X_OFFSET,Y_OFFSET,BOARD_CENTER_X,BOARD_CENTER_Y,SOUNDS} from './constants.js';
 
 /***************Classes****************/
 class Menu {
@@ -147,10 +147,10 @@ menu.addScreen(titleScreen);
 let title = {
 	x : 1024/2,
     y : 768/4,
-    draw : () => {
+	num: 0,
+    draw : function(){
 		let ctx = ctx3;
 		ctx.fillStyle = "rgb(255,255,255)";
-		ctx.font = "48px Kongtext";
 		ctx.strokeStyle = "rgb(0,0,0)";
 		ctx.textBaseline = 'middle';
 		ctx.textAlign = 'center';
@@ -158,8 +158,32 @@ let title = {
 		ctx.lineWidth = 6;	
 		ctx.strokeText("JSPPT",title.x,title.y+50);
 		ctx.fillText("JSPPT",title.x,title.y+50);
+	},
+	displayNum: function(){
+		let ctx = ctx3;
+		ctx.fillStyle = "rgb(255,255,255)";
+		ctx.strokeStyle = "rgb(0,0,0)";
+		ctx.textBaseline = 'middle';
+		ctx.textAlign = 'center';
+		ctx.font = "10px Kongtext";
+		ctx.lineWidth = 2;
+		let text = this.num + ' player' + (this.num>1?'s are':' is') + ' currently online';
+		ctx.strokeText(text,title.x,title.y+100);
+		ctx.fillText(text,title.x,title.y+100);
 	}
 };
+
+titleScreen.addEvent(()=>{
+	socket.emit('askCurrPlayers');
+	socket.off('currPlayers');
+	socket.on('currPlayers',data=>{
+		title.num = data;
+		title.displayNum();
+	});
+});
+
+
+
 titleScreen.addObject(title);
 
 let ButtonImages = {
@@ -187,6 +211,7 @@ SelectPuyo.setEvent(()=>{
 	socket.emit('waiting','PUYO');
 	SelectTetris.context.changeScreenTo('empty');
 });
+
 /***************READY SCREEN****************/
 let readyScreen = new MenuScreen('ready');
 menu.addScreen(readyScreen);
@@ -199,8 +224,8 @@ ready.setEvent(()=>{
 	socket.emit(eventName);
 });
 
-readyScreen.addButton(ready);
 readyScreen.addEvent(()=>{ready.status = false});
+readyScreen.addButton(ready);
 
 /***************RETURN SCREEN****************/
 let returnToMain = new MenuScreen('returnToMain');
