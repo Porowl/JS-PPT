@@ -23,7 +23,14 @@ export default class RoomManager {
 		let other;
 
 		if (roomIndex >= 0) {
-			other = this.rooms[roomIndex].other(socket)
+			let room = this.rooms[roomIndex];
+			
+			other = room.other(socket);
+			socket.leave(room.id);
+			other.leave(room.id);
+			room.turnOff();
+			
+			delete this.rooms[roomIndex];
 			this.rooms.splice(roomIndex, 1);
 		}
 		
@@ -162,6 +169,21 @@ class Room {
 			io.to(this.id).emit('update',dt);
 		}
 	};
+
+	turnOff = () =>{
+		p0.off('ready');
+		p0.off('cancel');
+		p0.off('attackFromP'+this.player0.id);
+		p0.off('graphics');
+		p0.off('gameOver');
+		p0.off('playAgain');
+		p1.off('ready');
+		p1.off('cancel');
+		p1.off('attackFromP'+this.player1.id);
+		p1.off('graphics');
+		p1.off('gameOver');
+		p1.off('playAgain');
+	}
 }
 
 const STATUS = {
