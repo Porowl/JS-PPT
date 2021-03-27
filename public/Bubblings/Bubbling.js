@@ -1,4 +1,4 @@
-import {PUYO_SIZE,DIRECTION,PUYO_STATE,PUYO_BOARD_HEIGHT} from '../constants.js';
+import {BUBBLING_SIZE,DIRECTION,BUBBLING_STATE,BUBBLING_BOARD_HEIGHT} from '../constants.js';
 
 export default class Puyo{
     constructor(type)
@@ -10,16 +10,16 @@ export default class Puyo{
         this.rotation = 0;
         this.onRotate = false;
         this.angle = 0;
-        this.state = PUYO_STATE.N;
+        this.state = BUBBLING_STATE.N;
     }
 
     initPos = () =>
     {
         this.x = 2;
         this.y = 0;
-        this.gX = this.x*PUYO_SIZE //Graphic X
-        this.gY = this.y*PUYO_SIZE
-        this.limit = PUYO_BOARD_HEIGHT;
+        this.gX = this.x*BUBBLING_SIZE //Graphic X
+        this.gY = this.y*BUBBLING_SIZE
+        this.limit = BUBBLING_BOARD_HEIGHT;
     }
 
     movePos = (x,y) =>
@@ -32,8 +32,8 @@ export default class Puyo{
     {
         this.x = x;
         this.y = y;
-        this.gX = x*PUYO_SIZE;
-        this.gY = y*PUYO_SIZE;
+        this.gX = x*BUBBLING_SIZE;
+        this.gY = y*BUBBLING_SIZE;
     }
 
     setLimit = y =>
@@ -49,7 +49,7 @@ export default class Puyo{
         this.velocity += 0.25;
         this.gY += this.velocity;
 
-        if(this.gY>this.limit*PUYO_SIZE)
+        if(this.gY>this.limit*BUBBLING_SIZE)
         {
             this.velocity = 0;
             this.setPos(this.x, this.limit);
@@ -60,13 +60,13 @@ export default class Puyo{
     }
 
     move = () => {
-        let dx = (this.x * PUYO_SIZE - this.gX) * 0.4 | 0;
-        let dy = (this.y * PUYO_SIZE - this.gY) * 0.4 | 0;
+        let dx = (this.x * BUBBLING_SIZE - this.gX) * 0.4 | 0;
+        let dy = (this.y * BUBBLING_SIZE - this.gY) * 0.4 | 0;
 
         if(dx == 0)
-            this.gX = this.x * PUYO_SIZE;
+            this.gX = this.x * BUBBLING_SIZE;
         if(dy == 0)
-            this.gY = this.y * PUYO_SIZE;
+            this.gY = this.y * BUBBLING_SIZE;
 
         this.gX += dx;
         this.gY += dy;
@@ -77,8 +77,8 @@ export default class Puyo{
         {
             this.angle += Math.PI/2/7 * this.direction;
             this.angle = (this.angle+Math.PI*2) % (Math.PI*2);
-            this.gX = x+Math.sin(this.angle)*PUYO_SIZE
-            this.gY = y-Math.cos(this.angle)*PUYO_SIZE 
+            this.gX = x+Math.sin(this.angle)*BUBBLING_SIZE
+            this.gY = y-Math.cos(this.angle)*BUBBLING_SIZE 
             let targetAngle = Math.PI/2 * this.rotation;
             if(Math.abs(this.angle-targetAngle)<0.001) this.onRotate = false;
         } else {

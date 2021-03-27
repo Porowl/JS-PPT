@@ -1,13 +1,13 @@
 import {
-	PUYO_BOARD_HEIGHT,
-	PUYO_BOARD_WIDTH,
-	PUYO_TYPE,
+	BUBBLING_BOARD_HEIGHT,
+	BUBBLING_BOARD_WIDTH,
+	BUBBLING_TYPE,
 	XY_OFFSETS,
 	KICK,
-	PUYO_STATE,
+	BUBBLING_STATE,
 	DX_DY,
 } from '../constants.js';
-import Puyo from './Puyo.js';
+import Bubbling from './Bubbling.js';
 
 export default class Board {
 	constructor() {
@@ -17,28 +17,28 @@ export default class Board {
 
 	initTable = () => {
 		const temp = [];
-		for (let y = 0; y < PUYO_BOARD_HEIGHT; y++) {
+		for (let y = 0; y < BUBBLING_BOARD_HEIGHT; y++) {
 			temp.push([]);
-			for (let x = 0; x < PUYO_BOARD_WIDTH; x++) {
-				temp[y].push(PUYO_TYPE.EMPTY);
+			for (let x = 0; x < BUBBLING_BOARD_WIDTH; x++) {
+				temp[y].push(BUBBLING_TYPE.EMPTY);
 			}
 		}
-		temp[-1] = [PUYO_TYPE.EMPTY,PUYO_TYPE.EMPTY,PUYO_TYPE.EMPTY,PUYO_TYPE.EMPTY,PUYO_TYPE.EMPTY,PUYO_TYPE.EMPTY];
-		temp[-2] = [PUYO_TYPE.EMPTY,PUYO_TYPE.EMPTY,PUYO_TYPE.EMPTY,PUYO_TYPE.EMPTY,PUYO_TYPE.EMPTY,PUYO_TYPE.EMPTY];
+		temp[-1] = [BUBBLING_TYPE.EMPTY,BUBBLING_TYPE.EMPTY,BUBBLING_TYPE.EMPTY,BUBBLING_TYPE.EMPTY,BUBBLING_TYPE.EMPTY,BUBBLING_TYPE.EMPTY];
+		temp[-2] = [BUBBLING_TYPE.EMPTY,BUBBLING_TYPE.EMPTY,BUBBLING_TYPE.EMPTY,BUBBLING_TYPE.EMPTY,BUBBLING_TYPE.EMPTY,BUBBLING_TYPE.EMPTY];
 		return temp;
 	};
 
-	valid = (data, color = PUYO_TYPE.EMPTY) => {
+	valid = (data, color = BUBBLING_TYPE.EMPTY) => {
 		let x = data.x;
 		let y = data.y;
 
-		if (x < 0 || x > PUYO_BOARD_WIDTH || y >= PUYO_BOARD_HEIGHT) return false;
+		if (x < 0 || x > BUBBLING_BOARD_WIDTH || y >= BUBBLING_BOARD_HEIGHT) return false;
 		if (this.table[y][x] != color) return false;
 
 		x += data.dx;
 		y += data.dy;
 
-		if (x < 0 || x > PUYO_BOARD_WIDTH || y >= PUYO_BOARD_HEIGHT) return false;
+		if (x < 0 || x > BUBBLING_BOARD_WIDTH || y >= BUBBLING_BOARD_HEIGHT) return false;
 		if (this.table[y][x] != color) return false;
 
 		return true;
@@ -77,15 +77,14 @@ export default class Board {
 		} else return KICK.NO_ROTATION;
 	};
 
-	lockMult = (multPuyo) => {
-		this.lockSingle(multPuyo.mainPiece);
-		this.lockSingle(multPuyo.subPiece);
+	lockMult = (multBubbling) => {
+		this.lockSingle(multBubbling.mainPiece);
+		this.lockSingle(multBubbling.subPiece);
 	};
 
-	lockSingle = (puyo) => {
-		//console.log(`locking ${puyo.type} at (${puyo.x},${puyo.y})`)
-		if(puyo.y>=0&&puyo.y<PUYO_BOARD_HEIGHT && puyo.x>=0 && puyo.x<PUYO_BOARD_WIDTH){
-			this.table[puyo.y][puyo.x] = puyo.type;		
+	lockSingle = (bubbling) => {
+		if(bubbling.y>=0&&bubbling.y<BUBBLING_BOARD_HEIGHT && bubbling.x>=0 && bubbling.x<BUBBLING_BOARD_WIDTH){
+			this.table[bubbling.y][bubbling.x] = bubbling.type;		
 		}
 	};
 
@@ -96,16 +95,16 @@ export default class Board {
 		let groups = [];
 		let numTrash = 0;
 
-		for (let i = 1; i < PUYO_BOARD_HEIGHT; i++) {
+		for (let i = 1; i < BUBBLING_BOARD_HEIGHT; i++) {
 			visited.push([]);
-			for (let j = 0; j < PUYO_BOARD_WIDTH; j++) {
+			for (let j = 0; j < BUBBLING_BOARD_WIDTH; j++) {
 				visited[i].push(false);
 			}
 		}
 
-		for (let i = 1; i < PUYO_BOARD_HEIGHT; i++) {
-			for (let j = 0; j < PUYO_BOARD_WIDTH; j++) {
-				if (!visited[i][j] && this.table[i][j] != PUYO_TYPE.EMPTY && this.table[i][j] != PUYO_TYPE.TRASH) {
+		for (let i = 1; i < BUBBLING_BOARD_HEIGHT; i++) {
+			for (let j = 0; j < BUBBLING_BOARD_WIDTH; j++) {
+				if (!visited[i][j] && this.table[i][j] != BUBBLING_TYPE.EMPTY && this.table[i][j] != BUBBLING_TYPE.TRASH) {
 					let temp = this.bfs(j, i, visited);
 					if (temp.length >= 4) {
 						groups.push(temp.length);
@@ -121,9 +120,9 @@ export default class Board {
 
 		let trash = [];
 		visited = [[]];
-		for (let i = 1; i < PUYO_BOARD_HEIGHT; i++) {
+		for (let i = 1; i < BUBBLING_BOARD_HEIGHT; i++) {
 			visited.push([]);
-			for (let j = 0; j < PUYO_BOARD_WIDTH; j++) {
+			for (let j = 0; j < BUBBLING_BOARD_WIDTH; j++) {
 				visited[i].push(false);
 			}
 		}
@@ -131,9 +130,9 @@ export default class Board {
 			for (let i = 0; i < 4; i++) {
 				let nx = point.x + DX_DY[i][0];
 				let ny = point.y + DX_DY[i][1];
-				if (nx >= 0 && nx < PUYO_BOARD_WIDTH && ny < PUYO_BOARD_HEIGHT && ny >= 0 && !visited[ny][nx]) {
-					if (this.table[ny][nx] == PUYO_TYPE.TRASH) {
-						trash.push({x:nx,y:ny,color:PUYO_TYPE.TRASH})
+				if (nx >= 0 && nx < BUBBLING_BOARD_WIDTH && ny < BUBBLING_BOARD_HEIGHT && ny >= 0 && !visited[ny][nx]) {
+					if (this.table[ny][nx] == BUBBLING_TYPE.TRASH) {
+						trash.push({x:nx,y:ny,color:BUBBLING_TYPE.TRASH})
 					}
 					visited[ny][nx] == true;
 				}
@@ -168,7 +167,7 @@ export default class Board {
 				let ty = point.y + XY_OFFSETS[i][1];
 				let tx = point.x + XY_OFFSETS[i][0];
 				if (
-					ty < 1 || ty >= PUYO_BOARD_HEIGHT || tx < 0 || tx >= PUYO_BOARD_WIDTH ||
+					ty < 1 || ty >= BUBBLING_BOARD_HEIGHT || tx < 0 || tx >= BUBBLING_BOARD_WIDTH ||
 					visited[ty][tx]
 				) {
 					continue;
@@ -184,41 +183,40 @@ export default class Board {
 	};
 
 	pop = (arr) => {
-		for (let puyo of arr) {
-			this.table[puyo.y][puyo.x] = PUYO_TYPE.EMPTY;
+		for (let bubbling of arr) {
+			this.table[bubbling.y][bubbling.x] = BUBBLING_TYPE.EMPTY;
 		}
 	};
 
 	fall = () => {
-		let puyos = [];
-		for (let x = 0; x < PUYO_BOARD_WIDTH; x++) {
+		let bubblings = [];
+		for (let x = 0; x < BUBBLING_BOARD_WIDTH; x++) {
 			let xArr = [];
 			let lowest = 0;
-			for (let y = PUYO_BOARD_HEIGHT - 1; y >= 0; y--) {
-				if (this.table[y][x] == PUYO_TYPE.EMPTY) {
+			for (let y = BUBBLING_BOARD_HEIGHT - 1; y >= 0; y--) {
+				if (this.table[y][x] == BUBBLING_TYPE.EMPTY) {
 					lowest = y;
 					break;
 				}
 			}
 
-			for (let y = PUYO_BOARD_HEIGHT - 2; y > 0; y--) {
-				if (this.table[y][x] != PUYO_TYPE.EMPTY) {
-					if (this.table[y + 1][x] == PUYO_TYPE.EMPTY) {
+			for (let y = BUBBLING_BOARD_HEIGHT - 2; y > 0; y--) {
+				if (this.table[y][x] != BUBBLING_TYPE.EMPTY) {
+					if (this.table[y + 1][x] == BUBBLING_TYPE.EMPTY) {
 						let color = this.table[y][x];
-						this.table[y][x] = PUYO_TYPE.EMPTY;
+						this.table[y][x] = BUBBLING_TYPE.EMPTY;
 
-						let puyo = new Puyo(color);
+						let bubbling = new Bubbling(color);
 
-						puyo.setPos(x, y);
-						//console.log(`new dropping puyo type ${color} at (${x},${y}) to (${x},${lowest})`)
-						puyo.setLimit(lowest--);
-						xArr.push(puyo);
+						bubbling.setPos(x, y);
+						bubbling.setLimit(lowest--);
+						xArr.push(bubbling);
 					}
 				}
 			}
-			puyos.push(xArr);
+			bubblings.push(xArr);
 		}
-		return puyos;
+		return bubblings;
 	};
 
 	addGarbage = n => {
@@ -253,24 +251,24 @@ export default class Board {
 		}
 		let garb = [];
 		
-		for(var i = 0; i<PUYO_BOARD_WIDTH; i++) {
+		for(var i = 0; i<BUBBLING_BOARD_WIDTH; i++) {
 			arr[i] += lines;
 			
 			let counter = -1;
 			let temp = [];
 			
 			let lowest = 0;
-			for (let y = PUYO_BOARD_HEIGHT - 1; y >= 0; y--) {
-				if (this.table[y][i] == PUYO_TYPE.EMPTY) {
+			for (let y = BUBBLING_BOARD_HEIGHT - 1; y >= 0; y--) {
+				if (this.table[y][i] == BUBBLING_TYPE.EMPTY) {
 					lowest = y;
 					break;
 				}
 			}
 			for(var j = 0; j<arr[i];j++) {
-				let garbPuyo = new Puyo(PUYO_TYPE.TRASH)
-				garbPuyo.setPos(i, counter--);
-				garbPuyo.setLimit(lowest--);
-				temp.push(garbPuyo);
+				let garbBubbling = new Bubbling(BUBBLING_TYPE.TRASH)
+				garbBubbling.setPos(i, counter--);
+				garbBubbling.setLimit(lowest--);
+				temp.push(garbBubbling);
 			}
 			garb.push(temp);
 		}
@@ -279,6 +277,6 @@ export default class Board {
 	};
 
 	blocked = () => {
-		return this.table[1][2] != PUYO_TYPE.EMPTY;
+		return this.table[1][2] != BUBBLING_TYPE.EMPTY;
 	}
 }

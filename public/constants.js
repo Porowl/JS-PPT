@@ -21,7 +21,7 @@ export const CLEAR_STRINGS = Object.freeze(
     SINGLE: "SINGLE",
     DOUBLE: "DOUBLE",
     TRIPLE: "TRIPLE",
-    TETRIS: "TETRIS",
+    TETROCKS: "TETROCKS",
     MINI: "MINI ",
     T_SPIN: "T-SPIN ",
     PERFECT: "PERFECT"
@@ -36,11 +36,11 @@ export const GAMEMODE_NAMES = Object.freeze(
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~GRAPHIC MEASUREMENTS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-export const PUYO_BOARD_WIDTH = 6;
-export const PUYO_BOARD_HEIGHT = 13;
-export const PUYO_VISIBLE_HEIGHT = 12;
+export const BUBBLING_BOARD_WIDTH = 6;
+export const BUBBLING_BOARD_HEIGHT = 13;
+export const BUBBLING_VISIBLE_HEIGHT = 12;
 
-export const PUYO_SIZE = 32;
+export const BUBBLING_SIZE = 32;
 
 export const BOARD_HEIGHT  = 40;
 export const BOARD_WIDTH   = 10;
@@ -78,7 +78,7 @@ export const GAUGE_Y_OFFSET = Y_OFFSET + VISIBLE_HEIGHT * BLOCK_SIZE_OUTLINE - N
 export const PLAYER_OFFSET = 500;
 
 export const DAS = 12;
-export const PUYO_DAS = 8;
+export const BUBBLING_DAS = 8;
 export const ARR = 2;
 export const ENTRY_DELAY = 6;
 
@@ -159,7 +159,7 @@ export const SCORE = Object.freeze(
     SINGLE: 1,
     DOUBLE: 2,
     TRIPLE: 3,
-    TETRIS: 4,
+    TETROCKS: 4,
     MTS: 5,
     MTSS: 6,
     TS: 7,
@@ -190,7 +190,7 @@ export const T_SPIN_STATE =
     MINI: 2
 }
 
-export const PUYO_TYPE = Object.freeze(
+export const BUBBLING_TYPE = Object.freeze(
     {
         EMPTY: -1,
         R: 0,
@@ -202,7 +202,7 @@ export const PUYO_TYPE = Object.freeze(
     }
 );
 
-export const PUYO_STATE = Object.freeze({
+export const BUBBLING_STATE = Object.freeze({
 	N : 0,
 	D : 1,
 	U : 2,
@@ -242,7 +242,7 @@ export const GAME_STATE = Object.freeze({
 export const GROUP_SIZE_BONUS = Object.freeze([0,0,0,0,0,2,3,4,5,6,7,10]);
 export const CHAIN_BONUS = Object.freeze([   0,   8,  16,  32,  64,  96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 480, 512]);
 export const COLOR_BONUS = Object.freeze([0,3,6,12,24]);
-export const VS_TETRIS_SCORE = Object.freeze([0,210,630,1050,1710,3500,7000,14000,28000,56000]);
+export const VS_TETROCKS_SCORE = Object.freeze([0,210,630,1050,1710,3500,7000,14000,28000,56000]);
 export const GAUGE_TO_TRASH = Object.freeze([0,4,5,6,8,10,13,16,20,24,28,33,38,43,49,55,61,68,75,83,92,102,113,125,138,152,167,183,200,218,237,257,278,300,323,347,372,398,425,453,482,512,543,575,608,642,677,713,750,788,827,867,908,950,993,1037,1082,1128,1175,1223,1272
 ]);
 
@@ -280,7 +280,7 @@ export const GHOST_COLOR_MAP = Object.freeze(
     "rgba(240,240,000,0.5)"      //O
 ]);
 
-export const PUYO_COLOR = Object.freeze({
+export const BUBBLING_COLOR = Object.freeze({
 	R:"rgba(255,050,019,1.0)",
 	G:"rgba(114,203,059,1.0)",
 	B:"rgba(003,065,174,1.0)",
@@ -366,13 +366,13 @@ export const DIRECTION = Object.freeze({
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~IMAGES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 export const SPRITE_IMAGE = new Image();
-SPRITE_IMAGE.src ='./Images/puyo.png'
+SPRITE_IMAGE.src ='./Images/bubbs.png'
 
-export const PUYO_BUTTON = new Image();
-PUYO_BUTTON.src ='./Images/p.png'
+export const BUBBLING_BUTTON = new Image();
+BUBBLING_BUTTON.src ='./Images/p.png'
 
-export const TETRIS_BUTTON = new Image();
-TETRIS_BUTTON.src ='./Images/t.jpg'
+export const TETROCKS_BUTTON = new Image();
+TETROCKS_BUTTON.src ='./Images/t.jpg'
 
 export const POP_SPRITE = Object.freeze(
 [

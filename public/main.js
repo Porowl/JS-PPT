@@ -1,8 +1,8 @@
 export let socket = io();
-import TetPlayer from './Tetris/TetPlayer.js';
-import TetView from './Tetris/TetView.js';
-import PuyoPlayer from './PuyoPuyo/PuyoPlayer.js';
-import PuyoView from './PuyoPuyo/PuyoView.js';
+import TetPlayer from './Tetrocks/TetPlayer.js';
+import TetView from './Tetrocks/TetView.js';
+import BubblingPlayer from './Bubblings/BubblingPlayer.js';
+import BubblingView from './Bubblings/BubblingView.js';
 import Randomizer from './Randomizer.js'
 import menu from './Menu.js';
 
@@ -38,12 +38,13 @@ const init = () => {
 		resetPlayer(Player);
 		
 		myType = type;
-		Player = myType==='PUYO'?new PuyoPlayer(socket.id):new TetPlayer(socket.id);
+		Player = myType==='BUBBLING'?new BubblingPlayer(socket.id):new TetPlayer(socket.id);
+		GUI.changeScreenTo('returnToMain')
 	});
 
 	socket.on('oppJoined', type =>{
 		enemyType = type;
-		EnemyView = enemyType === 'PUYO'?new PuyoView(1):new TetView(1);
+		EnemyView = enemyType === 'BUBBLING'?new BubblingView(1):new TetView(1);
 		
 		if(!document.hasFocus()) PageTitleNotification.on("Opponent has joined!", 1000);
 		playSound(SOUNDS.PLAYER_JOIN)
@@ -63,10 +64,11 @@ const init = () => {
 
 	socket.on('countdown', ()=>{
 		GUI.changeScreenTo('empty');
-		setTimeout(()=>{Player.View.countDown(3);EnemyView.countDown(3)},0);
-		setTimeout(()=>{Player.View.countDown(2);EnemyView.countDown(2)},1000);
-		setTimeout(()=>{Player.View.countDown(1);EnemyView.countDown(1)},2000);
-		setTimeout(()=>{Player.View.countDown(0);EnemyView.countDown(0);Player.gameStart();},3000);
+		Player.countDown();
+		setTimeout(()=>{EnemyView.countDown(3)},0);
+		setTimeout(()=>{EnemyView.countDown(2)},1000);
+		setTimeout(()=>{EnemyView.countDown(1)},2000);
+		setTimeout(()=>{EnemyView.countDown(0);},3000);
 	})
 	socket.on('update', dt =>{
 		Player.update(dt);
@@ -118,8 +120,8 @@ const init = () => {
 	socket.on('reset',seed=>{
 		resetPlayer(Player);
 		
-		Player = myType==='PUYO'?new PuyoPlayer(socket.id):new TetPlayer(socket.id);
-		EnemyView = enemyType === 'PUYO'?new PuyoView(1):new TetView(1);
+		Player = myType==='BUBBLING'?new BubblingPlayer(socket.id):new TetPlayer(socket.id);
+		EnemyView = enemyType === 'BUBBLING'?new BubblingView(1):new TetView(1);
 		Player.random = new Randomizer(seed);
 		EnemyView.preview = true;
 		Player.setOpponent(enemyType);

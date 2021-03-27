@@ -1,6 +1,6 @@
 import {XY_OFFSETS,DIRECTION,KICK} from '../constants.js'
 
-export default class MultPuyos{
+export default class MultBubblings{
     constructor(piece1, piece2)
     {
         this.mainPiece = piece1;

@@ -1,16 +1,16 @@
 {
   "name": "js-ppt",
   "version": "0.1.0",
-  "description": "JS Korean-ripoff of Puyo Puyo Tetris series",
+  "description": "JS Korean-ripoff of Bubbling Bubbling TETROCKS series",
   "main": "index.js",
   "type": "module",
   "dependencies": {
     "express": "^4.17.1",
+    "random-username-generator": "^1.0.4",
     "socket.io": "^3.1.2"
   },
-  "devDependencies": {},
   "scripts": {
-	"start": "node index.js",
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

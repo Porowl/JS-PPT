@@ -87,16 +87,18 @@ export default class Player {
 		{
 			this.board.addGarbage(data);
 			this.View.showGarbage(this.board.garbage);
-			if(this.stg.vsPuyo) this.updateGauge();
+			if(this.stg.vsBubbling) this.updateGauge();
 		});
 	}
 
 	setOpponent = type => {
 		this.stg.setOpponent(type);
-		if(this.stg.vsPuyo) this.updateGauge();
+		if(this.stg.vsBubbling) this.updateGauge();
 	};
 
 	countDown = () => {
+		this.updateNexts();
+		this.updateScore();
 		setTimeout(() => {
 			this.View.countDown(3);
 		}, 0);
@@ -108,13 +110,7 @@ export default class Player {
 		}, 2000);
 		setTimeout(() => {
 			this.View.countDown(0);
-			this.gameStart();
 		}, 3000);
-	};
-
-	gameStart = () => {
-		this.updateNexts();
-		this.updateScore();
 	};
 
 	update = (dt) => {
@@ -123,11 +119,6 @@ export default class Player {
 				break;
 			}
 			case PHASE.CLEAR_UPS: {
-				if(!this.board.executeGarbage(this.stg.vsPuyo)) {
-					this.phase = PHASE.GAME_OVER;
-					return;
-				};
-				this.View.showGarbage(this.board.garbage); 
 				let scoreArr = this.stg.updateLines(this.clearedLineArr, this.board.isEmpty());
 				this.View.displayScoreArr(scoreArr);
 				this.updateScore();
@@ -137,11 +128,16 @@ export default class Player {
 			}
 				
 			case PHASE.NEW_BLOCK: {
-				//if not on chain send garbage to puyo
-				if(this.stg.vsPuyo && this.stg.isComboBroken()) {
+				//if not on chain send garbage to bubbling
+				if(!this.board.executeGarbage(this.stg.vsBubbling)) {
+					this.phase = PHASE.GAME_OVER;
+					return;
+				};
+				if(this.stg.vsBubbling && this.stg.isComboBroken()) {
 					this.stg.executeGauge(this.board.resetGauge())
 					this.updateGauge();
 				}
+				this.View.showGarbage(this.board.garbage);
 				this.View.draw(this.board.field);
 				this.getNewPiece();
 				if(!this.board.canMove(this.piece,0,0)) {

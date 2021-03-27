@@ -3,9 +3,9 @@ export default class Randomizer{
 		this.engine = new Math.seedrandom(seed);
         this.bag = [];
         this.pieces = [];
-		this.puyos = [];
+		this.bubblings = [];
 		
-		this.initPuyoBag();
+		this.initBubblingBag();
 		this.initPieces();
     }
 
@@ -48,18 +48,18 @@ export default class Randomizer{
 		}
     }
 	
-	getPuyo = (index = 0) =>
+	getBubbling = (index = 0) =>
     {
-		index = index % this.puyos.length;
-        return this.puyos[index];
+		index = index % this.bubblings.length;
+        return this.bubblings[index];
     }
 	
-	getNextPuyos = index =>
+	getNextBubblings = index =>
 	{
-		this.puyos.slice(index,index+3);
+		this.bubblings.slice(index,index+3);
 	}
 	
-	initPuyoBag = () => {
+	initBubblingBag = () => {
 		let arr = [];
 		
 		for(let i = 0; i<16; i++) {	
@@ -69,7 +69,7 @@ export default class Randomizer{
 			while(arr.length>0){
 				let rand = this.engine()*arr.length|0;
 				let pulled = arr.splice(rand,1);
-				this.puyos.push(pulled);				
+				this.bubblings.push(pulled);				
 			}
 		}
 	}

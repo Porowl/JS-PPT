@@ -19,7 +19,7 @@ export default class Storage{
         this.gameMode = GAMEMODE.VERSUS;
         this.nexts = 6;
         this.initKeyMap();
-		this.vsPuyo = false;
+		this.vsBubbling = false;
 		
         /* Pieces */
         this.index = 0;
@@ -27,8 +27,8 @@ export default class Storage{
     }
 
 	setOpponent = type =>{
-		if(type==='PUYO') {
-			this.vsPuyo = true;
+		if(type==='BUBBLING') {
+			this.vsBubbling = true;
 		}
 	}
 	
@@ -75,7 +75,7 @@ export default class Storage{
                     mode = SCORE.TRIPLE;
                     break;
                 case 4:
-                    mode = SCORE.TETRIS;
+                    mode = SCORE.TETROCKS;
                     break;
             }
         }
@@ -162,10 +162,10 @@ export default class Storage{
                 text = CLEAR_STRINGS.TRIPLE;
 				playSound(SOUNDS.ERASE);
                 break;
-            case SCORE.TETRIS:
+            case SCORE.TETROCKS:
                 calc = 800;
                 this.b2b++;
-                text = CLEAR_STRINGS.TETRIS;
+                text = CLEAR_STRINGS.TETROCKS;
 				playSound(SOUNDS.ERASE4);
                 break;
             case SCORE.MTS:
@@ -240,7 +240,7 @@ export default class Storage{
             case SCORE.TRIPLE:
                 lines = 2;
                 break;
-            case SCORE.TETRIS:
+            case SCORE.TETROCKS:
                 lines = 4;
                 break;
             case SCORE.MTS:
@@ -269,31 +269,31 @@ export default class Storage{
         }	
         lines += (this.b2b>1)?1:0;
 		
-		let vsPuyo = lines;
-		if(this.vsPuyo){
+		let vsBubbling = lines;
+		if(this.vsBubbling){
 			switch(mode) {
 				case SCORE.TSD:
-					vsPuyo -= 1;
+					vsBubbling -= 1;
 					break;
 				case SCORE.TST:
-					vsPuyo -= 2;
+					vsBubbling -= 2;
 					break;
 				case SCORE.PERFECT:
-					vsPuyo -= 4;
+					vsBubbling -= 4;
 					break;
 			}
 		}	
 
-		vsPuyo += COMBO_GARB_NERF[Math.min(this.combo,COMBO_GARB_NERF.length-1)];
+		vsBubbling += COMBO_GARB_NERF[Math.min(this.combo,COMBO_GARB_NERF.length-1)];
         lines += COMBO_GARB[Math.min(this.combo,COMBO_GARB.length-1)];
 		
-		let eventName = (this.vsPuyo?'AddGauge':'garbCount');
+		let eventName = (this.vsBubbling?'AddGauge':'garbCount');
 		
         document.dispatchEvent(
             new CustomEvent(eventName,{
                 detail:{
                     n: lines,
-					m: vsPuyo
+					m: vsBubbling
                 }
             })
         );
@@ -301,7 +301,7 @@ export default class Storage{
 	
 	executeGauge = n => {
 		if(n==0) return;
-		let garbPuyo = GAUGE_TO_TRASH[n];
-		socket.emit(`attackFromP${this.user}`,garbPuyo);
+		let garbBubbling = GAUGE_TO_TRASH[n];
+		socket.emit(`attackFromP${this.user}`,garbBubbling);
 	}
 }

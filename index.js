@@ -7,6 +7,7 @@ import {fileURLToPath} from 'url';
 
 import WaitingQueue from './src/WaitingQueue.js';
 import RoomManager from './src/RoomManager.js';
+import rug from 'random-username-generator';
 
 let app = new express();
 let http = __http.Server(app);
@@ -19,7 +20,7 @@ let numUser = 0;
 let Rmgr = new RoomManager();
 let lobby = new WaitingQueue(Rmgr);
 let __dirname = path.dirname(fileURLToPath(import.meta.url));
-
+	
 app.use(express.static(path.join(__dirname, 'public')));
 
 let port = process.env.PORT || 3000;

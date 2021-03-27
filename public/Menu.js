@@ -1,5 +1,5 @@
 import {socket} from './main.js';
-import {canvas3,ctx0,ctx1,ctx2,ctx3,TETRIS_BUTTON,PUYO_BUTTON,X_OFFSET,Y_OFFSET,BOARD_CENTER_X,BOARD_CENTER_Y,SOUNDS} from './constants.js';
+import {canvas3,ctx0,ctx1,ctx2,ctx3,TETROCKS_BUTTON,BUBBLING_BUTTON,X_OFFSET,Y_OFFSET,BOARD_CENTER_X,BOARD_CENTER_Y,SOUNDS,COLOR_GREY} from './constants.js';
 
 /***************Classes****************/
 class Menu {
@@ -182,35 +182,56 @@ titleScreen.addEvent(()=>{
 	});
 });
 
-
-
 titleScreen.addObject(title);
 
 let ButtonImages = {
 	x : 1024/2-150,
 	y : 768/2,
 	draw : () =>{
- 		ctx3.drawImage(TETRIS_BUTTON,ButtonImages.x,ButtonImages.y-50);
- 		ctx3.drawImage(PUYO_BUTTON,ButtonImages.x,ButtonImages.y+55);
+ 		ctx3.drawImage(TETROCKS_BUTTON,ButtonImages.x,ButtonImages.y-50);
+ 		ctx3.drawImage(BUBBLING_BUTTON,ButtonImages.x,ButtonImages.y+55);
 	}
 }
 titleScreen.addObject(ButtonImages);
 
-let SelectTetris = new MenuButton(1024/2-150,768/2-50,300,100,'Play As TETRIS');
-titleScreen.addButton(SelectTetris);
+let SelectTETROCKS = new MenuButton(1024/2-150,768/2-50,300,100,'Play As TETROCKS');
+titleScreen.addButton(SelectTETROCKS);
 
-SelectTetris.setEvent(()=>{
-	socket.emit('waiting','TETRIS');
-	SelectTetris.context.changeScreenTo('empty');
+SelectTETROCKS.setEvent(()=>{
+	socket.emit('waiting','TETROCKS');
+	SelectTETROCKS.context.changeScreenTo('empty');
 });
 
-let SelectPuyo = new MenuButton(1024/2-150,768/2+55,300,100,'Play As PUYO');
-titleScreen.addButton(SelectPuyo);
+let SelectBubbling = new MenuButton(1024/2-150,768/2+55,300,100,'Play As BUBBLINGS');
+titleScreen.addButton(SelectBubbling);
 
-SelectPuyo.setEvent(()=>{
-	socket.emit('waiting','PUYO');
-	SelectTetris.context.changeScreenTo('empty');
+SelectBubbling.setEvent(()=>{
+	socket.emit('waiting','BUBBLING');
+	SelectTETROCKS.context.changeScreenTo('empty');
 });
+
+let input = new CanvasInput({
+	canvas: canvas3,
+	width: 285,
+	height: 25,
+	x: 1024/2-150,
+	y: 768/2+165,
+	borderRadius: 1,
+	padding: 5,
+	fontWeight: 'bold',
+	backgroundColor: COLOR_GREY
+});
+titleScreen.addEvent(()=>{
+	input.render();
+});
+
+let UsernameLocator = new MenuButton(1024/2-150,768/2+155,300,100,'');
+titleScreen.addButton(UsernameLocator);
+UsernameLocator.draw = ()=>{};
+UsernameLocator.setEvent(()=>{
+	input.focus();	
+})
+
 
 /***************READY SCREEN****************/
 let readyScreen = new MenuScreen('ready');

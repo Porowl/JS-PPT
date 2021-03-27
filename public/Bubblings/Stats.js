@@ -1,4 +1,4 @@
-import {CHAIN_BONUS,COLOR_BONUS,GROUP_SIZE_BONUS,VS_TETRIS_SCORE,playSound,VOICES,SOUNDS,KEY,KEYSTATES} from '../constants.js';
+import {CHAIN_BONUS,COLOR_BONUS,GROUP_SIZE_BONUS,VS_TETROCKS_SCORE,playSound,VOICES,SOUNDS,KEY,KEYSTATES} from '../constants.js';
 
 import {socket} from '../main.js';
 
@@ -11,11 +11,11 @@ export default class Stats{
         this.chain = 0;
 		this.last = 0;
 		this.leftOver = 0;
-		this.leftOverVsTetris = 0;
+		this.leftOverVsTETROCKS = 0;
 		
 		this.remaining = 0;
 		
-		this.vsTetris = false;
+		this.vsTETROCKS = false;
 		
 		this.gameStartedAt = Date.now();
 		
@@ -27,8 +27,8 @@ export default class Stats{
 	}
 	
 	setOpponent = type =>{
-		if(type==='TETRIS') {
-			this.vsTetris = true;
+		if(type==='TETROCKS') {
+			this.vsTETROCKS = true;
 		}
 	}
 	
@@ -106,33 +106,33 @@ export default class Stats{
 		let ds = this.score-this.last;
 		this.last = this.score;
 		let multiplier = this.getMargin();
-		let vsTetris = 0;
+		let vsTETROCKS = 0;
 		let sc = ds;
 		let threshold = 0;
 		let nextThreshold;
 		let index = 0;
 		
-		// vs PUYO calculation
+		// vs BUBBLING calculation
 		garbs = ds / (60/multiplier|0) + this.leftOver;
 		this.leftOver = garbs % 1;		
 		garbs = garbs | 0;
 		
 		// vs TET calculation
-		while(index < VS_TETRIS_SCORE.length){
-			nextThreshold = ( VS_TETRIS_SCORE[index] /multiplier | 0);
+		while(index < VS_TETROCKS_SCORE.length){
+			nextThreshold = ( VS_TETROCKS_SCORE[index] /multiplier | 0);
 			if(sc<nextThreshold) break;
 			threshold = nextThreshold;
 			index++;
 		}
 		
-		vsTetris = Math.min(index,VS_TETRIS_SCORE.length);
+		vsTETROCKS = Math.min(index,VS_TETROCKS_SCORE.length);
 
-		this.leftOverVsTetris += (sc-threshold)/nextThreshold;
+		this.leftOverVsTETROCKS += (sc-threshold)/nextThreshold;
 
 		if(this.chain>=8 && (this.chain-8%3 == 0)){
-			if(this.leftOverVsTetris>1){
-				vsTetris++;
-				this.leftOverVsTetris -= 1;
+			if(this.leftOverVsTETROCKS>1){
+				vsTETROCKS++;
+				this.leftOverVsTETROCKS -= 1;
 			}
 		}
 		
@@ -140,7 +140,7 @@ export default class Stats{
             new CustomEvent('garbCount',{
                 detail:{
                     n:garbs,
-					m:vsTetris
+					m:vsTETROCKS
                 }
             })
         );

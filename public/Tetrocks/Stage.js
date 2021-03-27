@@ -158,11 +158,11 @@ export default class Stage {
 		return counter;
 	};
 
-	executeGarbage = (vsPuyo) => {
+	executeGarbage = (vsBubbling) => {
 		if(this.garbage>=40) return false;
 		let n = Math.min(this.garbage, BOARD_HEIGHT - 1);
 		
-		if(vsPuyo && n > 7) n = 7;
+		if(vsBubbling && n > 7) n = 7;
 		
 		for (let y = 0; y < BOARD_HEIGHT - n; y++) {
 			for (let x = 0; x < BOARD_WIDTH; x++) this.field[y][x] = this.field[y + n][x];
@@ -174,18 +174,21 @@ export default class Stage {
 			for (let x = 0; x < BOARD_WIDTH; x++) this.field[y][x] = x == empty ? -1 : 7;
 		}
 		this.remaining += this.garbage*9;
-		vsPuyo?this.garbage -= n:this.garbage = 0;
+		
+		this.garbage -= n;
+
 		return true;
 	};
 
 	addGarbage = (n) => {
 		let temp = n;
 		if(this.gauge>0){
-			temp -= this.gauge;
-			if(temp<0){
-				this.gauge = temp;
+			if(this.gauge > temp){
+				this.gauge -= temp;
 			} else {
-				this.garbage -= temp;
+				temp -= his.gauge;
+				this.gauge = 0;
+				this.garbage += temp;
 			}
 		} else { 
 			this.garbage += n;		

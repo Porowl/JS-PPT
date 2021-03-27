@@ -1,7 +1,7 @@
 import {ctx0, ctx1, ctx2, ctx3} from "./constants.js";
 import {socket} from "./main.js"
 
-import {PLAYER_OFFSET, HOLD, HOLD_X_OFFSET, HOLD_Y_OFFSET, NEXT, NEXT_X_OFFSET, NEXT_Y_OFFSET, NEXT_BLOCK_SIZE_OUTLINE, COLOR_WHITE, HOLD_BLOCK_SIZE_OUTLINE, X_OFFSET, Y_OFFSET, BOARD_WIDTH, BLOCK_SIZE_OUTLINE, COLOR_BLACK, COLOR_MAP,VISIBLE_HEIGHT,P2_COLORS,P1_COLORS,DIST_BTW_NEXTS,BOARD_END_Y,COLOR_GREY,BOARD_CENTER_X,BOARD_CENTER_Y,GAME_STATE,NUISANCE_QUEUE,SPRITE_IMAGE,PUYO_SIZE} from './constants.js';
+import {PLAYER_OFFSET, HOLD, HOLD_X_OFFSET, HOLD_Y_OFFSET, NEXT, NEXT_X_OFFSET, NEXT_Y_OFFSET, NEXT_BLOCK_SIZE_OUTLINE, COLOR_WHITE, HOLD_BLOCK_SIZE_OUTLINE, X_OFFSET, Y_OFFSET, BOARD_WIDTH, BLOCK_SIZE_OUTLINE, COLOR_BLACK, COLOR_MAP,VISIBLE_HEIGHT,P2_COLORS,P1_COLORS,DIST_BTW_NEXTS,BOARD_END_Y,COLOR_GREY,BOARD_CENTER_X,BOARD_CENTER_Y,GAME_STATE,NUISANCE_QUEUE,SPRITE_IMAGE,BUBBLING_SIZE} from './constants.js';
 
 export default class view {
 	constructor(player = 0) {
@@ -134,18 +134,18 @@ export default class view {
 			
 			while(remaining >= div){
 				remaining -= div;
-				let x = X_OFFSET + this.offset + index * (PUYO_SIZE+3); 
-				let y = Y_OFFSET - PUYO_SIZE;
+				let x = X_OFFSET + this.offset + index * (BUBBLING_SIZE+3); 
+				let y = Y_OFFSET - BUBBLING_SIZE;
 				ctx.drawImage(
 					SPRITE_IMAGE, //Source
-					NUISANCE_QUEUE.SPRITES[value][0] * PUYO_SIZE, //sX
-					NUISANCE_QUEUE.SPRITES[value][1] * PUYO_SIZE, //sY
-					PUYO_SIZE, //s Width
-					PUYO_SIZE, //s Height
+					NUISANCE_QUEUE.SPRITES[value][0] * BUBBLING_SIZE, //sX
+					NUISANCE_QUEUE.SPRITES[value][1] * BUBBLING_SIZE, //sY
+					BUBBLING_SIZE, //s Width
+					BUBBLING_SIZE, //s Height
 					x, //dX
 					y, //dY
-					PUYO_SIZE, //dW
-					PUYO_SIZE //dH
+					BUBBLING_SIZE, //dW
+					BUBBLING_SIZE //dH
 				);
 				index++;
 			}
