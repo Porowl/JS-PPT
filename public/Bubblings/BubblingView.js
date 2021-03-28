@@ -28,7 +28,6 @@ export default class BubblingView extends view {
 		super();
 		this.player = player;
 		this.offset = PLAYER_OFFSET * this.player;
-		this.bubblingArr = [];
 		this.popFrame = 0;
 		this.initGraphics();
 		this.preview = false;
@@ -115,24 +114,6 @@ export default class BubblingView extends view {
 		ctx.closePath();
 		ctx.stroke();
 	}
-
-
-	addBubbling = bubbling => {
-		this.bubblingArr.push(bubbling);
-	};
-
-	fallingBubblings = arr => {
-		this.bubblingArr = arr;
-	};
-
-	addMultBubbling = multBubbling => {
-		this.bubblingArr = multBubbling;
-	};
-
-	emptyArray = () => (this.bubblingArr.length = 0);
-
-	getBubblingArr = () => this.bubblingArr;
-
 	drawBoard = board => {
 		this.boardCtx.clearRect(X_OFFSET+this.offset+1, Y_OFFSET+1, BUBBLING_BOARD_WIDTH * BUBBLING_SIZE, BUBBLING_VISIBLE_HEIGHT * BUBBLING_SIZE);
 
@@ -160,31 +141,22 @@ export default class BubblingView extends view {
 		}
 	};
 
-	moveCycle = () => {
+	moveCycle = (multBubbling) => {
 		this.refreshPiece();
 
-		let main = this.bubblingArr.mainPiece;
-		let sub = this.bubblingArr.subPiece;
-
-		main.move();
-		sub.moveRotate(main.gX, main.gY);
-
-		this.drawBubbling(main, CTX_NUM.PIECE);
-		this.drawBubbling(sub, CTX_NUM.PIECE);
+		this.drawBubbling(multBubbling.mainPiece, CTX_NUM.PIECE);
+		this.drawBubbling(multBubbling.subPiece, CTX_NUM.PIECE);
 	};
 
-	fallCycle = () => {
-		let counter = 0;
+	fallCycle = (arr) => {
 		this.refreshPiece();
 		for (let x = 0; x < BUBBLING_BOARD_WIDTH; x++) {
-			for (let bubbling of this.bubblingArr[x]) {
+			for (let bubbling of arr[x]) {
 				if (bubbling) {
-					if (!bubbling.fall()) counter++;
 					this.drawBubbling(bubbling, CTX_NUM.PIECE);
 				}
 			}
 		}
-		return counter > 0;
 	};
 
 	popCycle = arr => {

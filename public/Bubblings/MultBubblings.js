@@ -66,4 +66,9 @@ export default class MultBubblings{
     {
         this.tempRotation = this.tempRotation ^ 1
     }
+	
+	update = () => {
+		this.mainPiece.move();
+		this.subPiece.moveRotate(this.mainPiece.gX, this.mainPiece.gY);
+	}
 }

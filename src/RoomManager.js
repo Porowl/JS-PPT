@@ -171,6 +171,8 @@ class Room {
 	};
 
 	turnOff = () =>{
+		let p0 = this.player0;
+		let p1 = this.player1;
 		p0.off('ready');
 		p0.off('cancel');
 		p0.off('attackFromP'+this.player0.id);

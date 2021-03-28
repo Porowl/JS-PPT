@@ -12,9 +12,10 @@ export default class BubblingPlayer{
 		this.user = user;
 		this.Board = new Board();
 		this.Stats = new Stats(user);
+		this.View = new BubblingView(0);
 		this.bubbling = {};
 		this.popArr = {arr:[]};
-		this.View = new BubblingView(0);
+		this.fallingBubblings = [];
 		this.random = {};
 		
 		this.phase = PHASE.NEW_BUBBLING;
@@ -34,7 +35,7 @@ export default class BubblingPlayer{
 			'keyup',
 			'garbCount'
 		];
-		this.events =[
+		this.events = [
 			//0
 			(event) => {
 				this.Stats.keyMap[event.keyCode] = true;
@@ -77,11 +78,14 @@ export default class BubblingPlayer{
 	}
 	
 	countDown = () => {
+		
 		let i = this.Stats.getIndex()
 		let p1 = this.random.getBubbling(i);
 		let p2 = this.random.getBubbling(i+1);
 		this.View.drawNexts(p1,p2);
+		
 		this.View.displayScore(this.Stats.scoreToText());
+		
 		setTimeout(() => {
 			this.View.countDown(3);
 		}, 0);
@@ -103,18 +107,22 @@ export default class BubblingPlayer{
 				break;
 			}
             case PHASE.DROP: {
-                this.View.moveCycle();
+                //this.View.moveCycle();
+				
+				this.bubbling.update();
+				this.View.moveCycle(this.bubbling);
+				
 				this.moveDownCycle(dt);
 				this.inputCycle(); 
 
-				if(!this.Board.valid(this.bubbling.getPos(DIRECTION.DOWN))){
+				if(this.Board.valid(this.bubbling.getPos(DIRECTION.DOWN))){
+					this.lockDlay = 0;
+				} else {
 					if(this.Stats.keyMap[KEY.DOWN]){
 						this.phase++;
 					} else {
 						this.lockDelay += dt;
 					}
-				} else {
-					this.lockDlay = 0;
 				}
 				
 				if(this.lockDelay >= 0.533 && !this.Board.valid(this.bubbling.getPos(DIRECTION.DOWN))) {
@@ -130,26 +138,32 @@ export default class BubblingPlayer{
                 break;
             }
             case PHASE.FALL: {
-                let array = this.Board.fall();
+                this.fallingBubblings = this.Board.fall();
                 this.View.drawBoard(this.Board);
-                this.View.fallingBubblings(array);
                 this.phase++;
                 break;
             }
 			case PHASE.FALL_ANIMATION:{
-                if(!this.View.fallCycle()) this.phase++;
+				let counter = 0;
+				for (let x = 0; x < BUBBLING_BOARD_WIDTH; x++) {
+					for (let bubbling of this.fallingBubblings[x]) {
+						if (bubbling) {
+							if (!bubbling.fall()) counter++;
+						}
+					}
+				}
+				this.View.fallCycle(this.fallingBubblings);
+                if(!counter > 0) this.phase++;
                 break;
             }
-
             case PHASE.FALL_ANIMATION_END: {
-                let arr = this.View.getBubblingArr();
-
                 for(let x = 0; x<BUBBLING_BOARD_WIDTH;x++) {
-                    for(let Bubbling of arr[x]) {
+                    for(let Bubbling of this.fallingBubblings[x]) {
                         this.Board.lockSingle(Bubbling);
                     }
                 }
-                this.View.emptyArray();
+                //this.View.emptyArray();
+				this.fallingBubblings.length = 0;
                 this.View.drawBoard(this.Board);
                 this.phase++;
                 break;
