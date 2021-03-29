@@ -68,7 +68,7 @@ export default class Player {
 			(event) => {
 				let lines = this.board.deductGarbage(event.detail.n)
 				if(lines>0) {
-					socket.emit(`attackFromP${this.user}`,lines);	
+					socket.emit('sendAttack',lines);	
 				}
 			},
 			//3
@@ -82,8 +82,8 @@ export default class Player {
 			document.addEventListener(this.eventTriggerNames[i],this.events[i]);
 		}
 		
-		socket.off(`attackOnP${this.user}`);
-		socket.on(`attackOnP${this.user}`,data=>
+		socket.off('receiveAttack');
+		socket.on('receiveAttack',data=>
 		{
 			this.board.addGarbage(data);
 			this.View.showGarbage(this.board.garbage);
@@ -182,9 +182,10 @@ export default class Player {
 				
 			case PHASE.CLEAR_ANI: {
 				if (this.lineClearDelay >= 0) {
-					this.lineClearDelay--;
-					for (var i = 0; i < this.clearedLineArr.length(); i++)
+					for (var i = 0; i < this.clearedLineArr.length(); i++) {
 						this.View.clearAnimation(this.clearedLineArr.get(i), this.lineClearDelay);
+					}
+					this.lineClearDelay--;
 				} else {
 					this.phase = PHASE.CLEAR;
 				}

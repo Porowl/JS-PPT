@@ -268,14 +268,13 @@ export default class TetView extends view {
 
 	clearAnimation = (l, i) => {
 		let ctx = this.aniCtx;
-		var y = Y_OFFSET + (l - 20) * BLOCK_SIZE_OUTLINE + 1;
-		var w = BLOCK_SIZE * BOARD_WIDTH;
-		var h = BLOCK_SIZE;
-
-		if (i > LINE_CLEAR_FRAMES / 2) ctx.fillStyle = LINE_CLEAR_WHITE;
-		else ctx.fillStyle = LINE_CLEAR_BLACK;
-
 		var x = X_OFFSET + 1 + this.offset;
+		var y = Y_OFFSET + (l - 20) * BLOCK_SIZE_OUTLINE + 1;
+		var w = BLOCK_SIZE_OUTLINE * BOARD_WIDTH;
+		var h = BLOCK_SIZE;
+		
+		ctx.fillStyle = (i>LINE_CLEAR_FRAMES?LINE_CLEAR_WHITE:LINE_CLEAR_BLACK)
+
 		ctx.fillRect(x, y, w, h);
 		if(i==0) ctx.clearRect(x,y,w,h);
 		
@@ -351,8 +350,8 @@ export default class TetView extends view {
 
 	hardDropAnimation = (tarPiece, offset = 0) => {
 		let ctx = this.aniCtx;
-		for (let i = 0; i < 4; i++)
-			for (let j = 0; j < 4; j++)
+		for (let i = 0; i < 4; i++) {
+			for (let j = 0; j < 4; j++) {
 				if (PIECE_MAP[tarPiece.typeId][tarPiece.rotation] & (0x8000 >> (i * 4 + j))) {
 					ctx.strokeStyle = GHOST_COLOR_MAP[tarPiece.typeId];
 					ctx.lineWidth = 1;
@@ -367,6 +366,8 @@ export default class TetView extends view {
 						ctx.closePath();
 					}
 				}
+			}
+		}
 		setTimeout(
 			() =>
 				ctx.clearRect(
@@ -375,7 +376,7 @@ export default class TetView extends view {
 					BOARD_WIDTH * BLOCK_SIZE_OUTLINE,
 					VISIBLE_HEIGHT * BLOCK_SIZE_OUTLINE
 				),
-			HARDDROP_ANIMATION_FRAMES * 1000 / 60
+			(HARDDROP_ANIMATION_FRAMES+1) * 1000 / 60
 		);
 	};
 
@@ -384,34 +385,10 @@ export default class TetView extends view {
 		let height = n % 20;
 		let ctx = this.boardCtx;
 		
-		switch (level) {
-			case 0:
-				ctx.fillStyle = COLOR_GREY;
-				break;
-			case 1:
-				ctx.fillStyle = COLOR_MAP[0];
-				break;
-			case 2:
-				ctx.fillStyle = COLOR_MAP[6];
-				break;
-			case 3:
-				ctx.fillStyle = COLOR_MAP[1];
-				break;
-		}
+		ctx.fillStyle = colorArr[level];
 		ctx.fillRect(GAUGE_X_OFFSET + this.offset,GAUGE_Y_OFFSET,NEXT_BLOCK_SIZE_OUTLINE,NEXT_BLOCK_SIZE_OUTLINE*20);
 		
-		switch (level) {
-			case 0:
-				ctx.fillStyle = COLOR_MAP[0];
-				break;
-			case 1:
-				ctx.fillStyle = COLOR_MAP[6];
-				break;
-			case 2:
-				ctx.fillStyle = COLOR_MAP[1];
-				break;
-		}
-		
+		ctx.fillStyle = colorArr[level+1]
 		ctx.fillRect(GAUGE_X_OFFSET + this.offset,GAUGE_Y_OFFSET + NEXT_BLOCK_SIZE_OUTLINE * (20-height),NEXT_BLOCK_SIZE_OUTLINE,NEXT_BLOCK_SIZE_OUTLINE * height);
 		
 		ctx.strokeStyle = COLOR_BLACK;
@@ -420,11 +397,7 @@ export default class TetView extends view {
 		ctx.strokeRect(GAUGE_X_OFFSET + this.offset,GAUGE_Y_OFFSET+i*NEXT_BLOCK_SIZE_OUTLINE,NEXT_BLOCK_SIZE_OUTLINE,NEXT_BLOCK_SIZE_OUTLINE)
 		}
 		this.callDrawOutline(
-			GAUGE_X_OFFSET,
-			GAUGE_Y_OFFSET,
-			GAUGE_X_OFFSET + NEXT_BLOCK_SIZE_OUTLINE,
-			GAUGE_Y_OFFSET + NEXT_BLOCK_SIZE_OUTLINE*20
-		);		
+			GAUGE_X_OFFSET, GAUGE_Y_OFFSET, GAUGE_X_OFFSET + NEXT_BLOCK_SIZE_OUTLINE, GAUGE_Y_OFFSET + NEXT_BLOCK_SIZE_OUTLINE * 20 );	
 		if(!this.preview) {
 			socket.emit('graphics',{
 				name:'displayGauge',
@@ -433,3 +406,5 @@ export default class TetView extends view {
 		}
 	}
 }
+
+const colorArr = [COLOR_GREY, COLOR_MAP[0], COLOR_MAP[6], COLOR_MAP[1]]

@@ -298,12 +298,15 @@ export default class BubblingView extends view {
         const p3 = ( m & 0xc ) / 0x4;
         const p4 = m % 0x4;
 		let ctx = this.boardCtx;
-		ctx.clearRect(NEXT_X_OFFSET+BUBBLING_SIZE/2 + this.offset,NEXT_Y_OFFSET+BUBBLING_SIZE/2,BUBBLING_SIZE,BUBBLING_SIZE*2);
-		ctx.clearRect(NEXT_X_OFFSET+BUBBLING_SIZE/2*3 + this.offset,NEXT_Y_OFFSET+BUBBLING_SIZE/2*5,BUBBLING_SIZE,BUBBLING_SIZE*2);
-		ctx.drawImage(SPRITE_IMAGE, 0, p2 * BUBBLING_SIZE, BUBBLING_SIZE, BUBBLING_SIZE, NEXT_X_OFFSET+BUBBLING_SIZE/2 + this.offset, NEXT_Y_OFFSET + BUBBLING_SIZE/2, BUBBLING_SIZE, BUBBLING_SIZE);
-		ctx.drawImage(SPRITE_IMAGE, 0, p1 * BUBBLING_SIZE, BUBBLING_SIZE, BUBBLING_SIZE, NEXT_X_OFFSET+BUBBLING_SIZE/2 + this.offset, NEXT_Y_OFFSET + BUBBLING_SIZE*3/2, BUBBLING_SIZE, BUBBLING_SIZE);
-		ctx.drawImage(SPRITE_IMAGE, 0, p4 * BUBBLING_SIZE, BUBBLING_SIZE, BUBBLING_SIZE, NEXT_X_OFFSET+BUBBLING_SIZE/2*3 + this.offset, NEXT_Y_OFFSET + BUBBLING_SIZE / 2 * 5, BUBBLING_SIZE, BUBBLING_SIZE);
-		ctx.drawImage(SPRITE_IMAGE, 0, p3 * BUBBLING_SIZE, BUBBLING_SIZE, BUBBLING_SIZE, NEXT_X_OFFSET+BUBBLING_SIZE/2*3 + this.offset, NEXT_Y_OFFSET + BUBBLING_SIZE / 2 * 7, BUBBLING_SIZE, BUBBLING_SIZE);
+		
+		let u = BUBBLING_SIZE;
+		
+		ctx.clearRect(NEXT_X_OFFSET+u/2 + this.offset,NEXT_Y_OFFSET+u/2,u,u*2);
+		ctx.clearRect(NEXT_X_OFFSET+u/2*3 + this.offset,NEXT_Y_OFFSET+u/2*5,u,u*2);
+		ctx.drawImage(SPRITE_IMAGE, 0, p2 * u, u, u, NEXT_X_OFFSET+u/2 + this.offset, NEXT_Y_OFFSET + u/2, u, u);
+		ctx.drawImage(SPRITE_IMAGE, 0, p1 * u, u, u, NEXT_X_OFFSET+u/2 + this.offset, NEXT_Y_OFFSET + u*3/2, u, u);
+		ctx.drawImage(SPRITE_IMAGE, 0, p4 * u, u, u, NEXT_X_OFFSET+u/2*3 + this.offset, NEXT_Y_OFFSET + u / 2 * 5, u, u);
+		ctx.drawImage(SPRITE_IMAGE, 0, p3 * u, u, u, NEXT_X_OFFSET+u/2*3 + this.offset, NEXT_Y_OFFSET + u / 2 * 7, u, u);
 		if(!this.preview) {
 			socket.emit('graphics',{
 				name:'drawNexts',

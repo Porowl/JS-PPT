@@ -109,9 +109,9 @@ const init = () => {
 		GUI.changeScreenTo('returnToMain');
 	});
 	
-	socket.on('GAME_OVER',STATE=>{
-		let a = (STATE==GAME_STATE.WIN)?GAME_STATE.WIN:GAME_STATE.LOST;
-		let b = 1-a;
+	socket.on('GAME_OVER',id=>{
+		let a = (id==socket.id)?GAME_STATE.LOST:GAME_STATE.WIN;
+		let b = (id==socket.id)?GAME_STATE.WIN:GAME_STATE.LOST;
 		Player.View.display(a);
 		EnemyView.display(b);
 		GUI.changeScreenTo('replay');

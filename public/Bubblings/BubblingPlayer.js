@@ -58,10 +58,10 @@ export default class BubblingPlayer{
 				let remaining = this.Board.garbage;
 				if(this.Stats.vsTETROCKS){
 					if(garbs!=0&&remaining==0) {
-						socket.emit(`attackFromP${this.user}`,event.detail.m);
+						socket.emit('sendAttack',event.detail.m);
 					}
 				} else if(garbs>0) {
-					socket.emit(`attackFromP${this.user}`,garbs);	
+					socket.emit('sendAttack',garbs);	
 				}
 			}
 		];
@@ -70,8 +70,8 @@ export default class BubblingPlayer{
 			document.addEventListener(this.eventTriggerNames[i],this.events[i]);
 		}
 		
-		socket.off(`attackOnP${this.user}`)
-		socket.on(`attackOnP${this.user}`,data=> {
+		socket.off('receiveAttack')
+		socket.on('receiveAttack',data=> {
 			this.Board.addGarbage(data);
 			this.View.showGarbage(this.Board.garbage); 
 		});
@@ -213,7 +213,6 @@ export default class BubblingPlayer{
 						this.Board.lockSingle(Bubbling);
 					}
 				}
-				this.View.emptyArray();
 				this.View.drawBoard(this.Board);
 				this.phase++;
                 break;
@@ -234,8 +233,6 @@ export default class BubblingPlayer{
                 this.Stats.resetChain();
                 this.bubbling = this.getBubbling();
 
-                this.View.emptyArray();
-                this.View.addMultBubbling(this.bubbling);
 				
 				let i = this.Stats.getIndex()
 				let p1 = this.random.getBubbling(i);

@@ -34,7 +34,7 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname,'public','./client.html'));
 });
 
-io.on('connection', (socket) => {	
+io.on('connection', (socket) => {
 	let cycle = setInterval(()=>{
 		io.to(socket.id).emit('connected')
 	},500);
@@ -62,7 +62,41 @@ io.on('connection', (socket) => {
 		onDisconnection(socket)
 		io.to(socket.id).emit('connected')
 	})
+	
+	// GAMES
+	
+	socket.on('ready', ()=>{
+		let room = Rmgr.getRoom(socket);
+		if(room) room.playerReady(socket.id);
+	});
+	socket.on('cancel', ()=>{
+		let room = Rmgr.getRoom(socket);
+		if(room) room.playerCancel(socket.id);
+	});
+	socket.on('graphics', data=>{
+		let room = Rmgr.getRoom(socket); let other = null;
+		if(room) other = room.other(socket);
+		if(other) io.to(other.id).emit('eview',data);
+		else console.log('other not found!');
+	})
+	socket.on('playAgain',()=>{
+		let room = Rmgr.getRoom(socket);
+		if(room) room.playAgain(socket.id);
+	});
+	socket.on('sendAttack',data =>{
+		let room = Rmgr.getRoom(socket); let other = null;
+		if(room) other = room.other(socket);
+		if(other) {
+			console.log(`${data} : ${socket.id} -> ${other.id}`)
+			io.to(other.id).emit('receiveAttack',data);
+		}
+	});
+	socket.on('gameOver', () =>{
+		let room = Rmgr.getRoom(socket); let other = null;
+		if(room) room.gameOver(socket.id);
+	});
 });
+
 
 const onDisconnection = socket => {
 	lobby.leave(socket);

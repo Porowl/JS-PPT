@@ -421,7 +421,6 @@ export const SOUNDS = {
 	COMBO6: './sounds/soundEffects/combo_6.mp3',
 	COMBO7: './sounds/soundEffects/combo_7.mp3',
 	COMBO8: './sounds/soundEffects/combo_8.mp3',
-	COMBO9: './sounds/soundEffects/combo_9.mp3',
 	CHANGE: './sounds/soundEffects/lock.mp3',
 	ERASE: './sounds/soundEffects/clear1.mp3',
 	ERASE4: './sounds/soundEffects/clear4.mp3',
