@@ -302,6 +302,6 @@ export default class Storage{
 	executeGauge = n => {
 		if(n==0) return;
 		let garbBubbling = GAUGE_TO_TRASH[n];
-		socket.emit(`attackFromP${this.user}`,garbBubbling);
+		socket.emit('sendAttack',garbBubbling);
 	}
 }
