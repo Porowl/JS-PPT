@@ -186,7 +186,7 @@ export default class Stage {
 			if(this.gauge > temp){
 				this.gauge -= temp;
 			} else {
-				temp -= his.gauge;
+				temp -= this.gauge;
 				this.gauge = 0;
 				this.garbage += temp;
 			}
