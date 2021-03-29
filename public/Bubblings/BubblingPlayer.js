@@ -195,18 +195,28 @@ export default class BubblingPlayer{
             }
 			case PHASE.GARB: {
                 let arr = this.Board.executeGarbage();
+				this.fallingBubblings = arr;
 				this.garbDropped = true;
 				this.View.showGarbage(this.Board.garbage)
 				this.phase++;
 				break;
 			}
 			case PHASE.GARB_FALL: {
-                if(!this.View.fallCycle()) this.phase++;
+				let counter = 0;
+				for (let x = 0; x < BUBBLING_BOARD_WIDTH; x++) {
+					for (let bubbling of this.fallingBubblings[x]) {
+						if (bubbling) {
+							if (!bubbling.fall()) counter++;
+						}
+					}
+				}
+				this.View.fallCycle(this.fallingBubblings);
+                if(!counter > 0) this.phase++;
+                break;
 				break;
 			}
             case PHASE.GARB_FALL_ANIMATION_END: {
-				let arr = this.View.getBubblingArr();
-
+				let arr = this.fallingBubblings;
 				for(let x = 0; x<BUBBLING_BOARD_WIDTH;x++) {
 					for(let Bubbling of arr[x]) {
 						this.Board.lockSingle(Bubbling);
