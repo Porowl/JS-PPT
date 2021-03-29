@@ -114,6 +114,7 @@ export default class BubblingView extends view {
 		ctx.closePath();
 		ctx.stroke();
 	}
+	
 	drawBoard = board => {
 		this.boardCtx.clearRect(X_OFFSET+this.offset+1, Y_OFFSET+1, BUBBLING_BOARD_WIDTH * BUBBLING_SIZE, BUBBLING_VISIBLE_HEIGHT * BUBBLING_SIZE);
 
@@ -146,6 +147,12 @@ export default class BubblingView extends view {
 
 		this.drawBubbling(multBubbling.mainPiece, CTX_NUM.PIECE);
 		this.drawBubbling(multBubbling.subPiece, CTX_NUM.PIECE);
+		if(!this.preview) {
+			socket.emit('graphics',{
+				name:'moveCycle',
+				args:multBubbling
+			})			
+		}
 	};
 
 	fallCycle = (arr) => {
@@ -157,12 +164,19 @@ export default class BubblingView extends view {
 				}
 			}
 		}
+		if(!this.preview) {
+			socket.emit('graphics',{
+				name:'fallCycle',
+				args:[arr]
+			})			
+		}
 	};
 
-	popCycle = arr => {
+	popCycle = (arr, givenf) => {
+		console.log(givenf);
 		if (arr.length == 0) return true;
-		this.popFrame++;
-
+		if(!givenf) givenf = this.popFrame++;
+		
 		let frame = 6;
 		this.refreshPiece();
 		for (let pos of arr) {
@@ -174,24 +188,24 @@ export default class BubblingView extends view {
 				gX: x * BUBBLING_SIZE,
 				gY: y * BUBBLING_SIZE,
 			};
-			if (this.popFrame < frame * 1) {
+			if (givenf < frame * 1) {
 				bubbling.type = POP_SPRITE[color][0];
 				bubbling.state = POP_SPRITE[color][1];
-			} else if (this.popFrame < frame * 2) {
+			} else if (givenf < frame * 2) {
 				bubbling.type = POP_SPRITE[color][0];
 				bubbling.state = POP_SPRITE[color][1] + 1;
 				if (color == BUBBLING_TYPE.TRASH) {
 					bubbling.type = 13;
 					bubbling.state = 3;
 				}
-			} else if (this.popFrame < frame * 3) {
+			} else if (givenf < frame * 3) {
 				bubbling.type = 10;
 				bubbling.state = 6 + color * 2;
 				if (color == BUBBLING_TYPE.TRASH) {
 					bubbling.type = POP_SPRITE[color][0];
 					bubbling.state = POP_SPRITE[color][1];
 				}
-			} else if (this.popFrame < frame * 4) {
+			} else if (givenf < frame * 4) {
 				bubbling.type = 10;
 				bubbling.state = 6 + color * 2 + 1;
 				if (color == BUBBLING_TYPE.TRASH) {
@@ -202,7 +216,13 @@ export default class BubblingView extends view {
 
 			this.drawBubbling(bubbling, CTX_NUM.PIECE);
 		}
-
+		
+		if(!this.preview) {
+			socket.emit('graphics',{
+				name:'popCycle',
+				args:[arr,givenf]
+			});			
+		}
 		return this.popFrame > frame * 5;
 	};
 
@@ -228,23 +248,10 @@ export default class BubblingView extends view {
 			BUBBLING_SIZE, //dW
 			BUBBLING_SIZE //dH
 		);
-		
-		if(!this.preview) {
-			socket.emit('graphics',{
-				name:'drawBubbling',
-				args:[bubbling,on]
-			})			
-		}
 	};
 
 	refreshPiece = () => {
 		this.pieceCtx.clearRect(X_OFFSET+this.offset-BUBBLING_SIZE, 0, (BUBBLING_BOARD_WIDTH+2) * BUBBLING_SIZE, Y_OFFSET + 1 + BUBBLING_VISIBLE_HEIGHT * BUBBLING_SIZE);
-		if(!this.preview) {
-			socket.emit('graphics',{
-				name:'refreshPiece',
-				args:null
-			})			
-		}
 	}
 
 	drawBubblingByPointer = (x, y, state, color, on) => {

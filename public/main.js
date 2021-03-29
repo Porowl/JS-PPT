@@ -68,14 +68,15 @@ const init = () => {
 		setTimeout(()=>{EnemyView.countDown(3)},0);
 		setTimeout(()=>{EnemyView.countDown(2)},1000);
 		setTimeout(()=>{EnemyView.countDown(1)},2000);
-		setTimeout(()=>{EnemyView.countDown(0);},3000);
-	})
-	socket.on('update', dt =>{
-		Player.update(dt);
+		setTimeout(()=>{
+			EnemyView.countDown(0);
+			GameCycle.on();
+		},3000);
 	})
 	
 	socket.on('eview', data =>{
 		let call = data.name;
+		if(!EnemyView[call]) {console.log(`${call} is not found!`); return;}
 		Array.isArray(data.args)?EnemyView[call](...data.args):EnemyView[call](data.args);
 	})
 	
@@ -107,6 +108,7 @@ const init = () => {
 		console.log('enemy disconnected');
 		EnemyView.display(GAME_STATE.DISCONNECTED);
 		GUI.changeScreenTo('returnToMain');
+		GameCycle.off();
 	});
 	
 	socket.on('GAME_OVER',id=>{
@@ -115,6 +117,7 @@ const init = () => {
 		Player.View.display(a);
 		EnemyView.display(b);
 		GUI.changeScreenTo('replay');
+		GameCycle.off();
 	});
 	
 	socket.on('reset',seed=>{
@@ -182,6 +185,31 @@ const PageTitleNotification = {
         clearInterval(this.vars.Interval);
         document.title = this.vars.OriginalTitle;   
     }
+}
+
+const GameCycle = {
+	vars: {
+		cycle:null,
+		last:0,
+		now:0,
+	},
+	on: function() {
+		this.vars.cycle = setInterval(()=>{update();},1000/60);
+		this.vars.last = this.vars.now = Date.now();
+	},
+	off: function() {
+		clearInterval(this.vars.cycle);
+	},
+	dt: function() {
+		let now = this.vars.now = Date.now();
+		let dt = now - this.vars.last;
+		this.vars.last = now;
+		return dt/1000;
+	}
+}
+
+const update = () => {
+	if(Player) Player.update(GameCycle.dt());
 }
 
 window.init = init;

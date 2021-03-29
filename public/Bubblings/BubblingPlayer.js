@@ -188,7 +188,7 @@ export default class BubblingPlayer{
             }
             case PHASE.POP_ANIMATION: {
                 if(this.View.popCycle(this.popArr.arr)) {
-						this.phase = PHASE.NEW_BUBBLING;
+					this.phase = PHASE.NEW_BUBBLING;
 				}
 	            this.View.showGarbage(this.Board.garbage); 
                 break;

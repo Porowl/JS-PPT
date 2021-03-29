@@ -74,10 +74,8 @@ io.on('connection', (socket) => {
 		if(room) room.playerCancel(socket.id);
 	});
 	socket.on('graphics', data=>{
-		let room = Rmgr.getRoom(socket); let other = null;
-		if(room) other = room.other(socket);
-		if(other) io.to(other.id).emit('eview',data);
-		else console.log('other not found!');
+		let room = Rmgr.getRoom(socket);
+		if(room) room.sendGraphicInfo(socket, data);
 	})
 	socket.on('playAgain',()=>{
 		let room = Rmgr.getRoom(socket);
@@ -85,11 +83,7 @@ io.on('connection', (socket) => {
 	});
 	socket.on('sendAttack',data =>{
 		let room = Rmgr.getRoom(socket); let other = null;
-		if(room) other = room.other(socket);
-		if(other) {
-			console.log(`${data} : ${socket.id} -> ${other.id}`)
-			io.to(other.id).emit('receiveAttack',data);
-		}
+		if(room) room.sendAttack(socket, data);
 	});
 	socket.on('gameOver', () =>{
 		let room = Rmgr.getRoom(socket); let other = null;

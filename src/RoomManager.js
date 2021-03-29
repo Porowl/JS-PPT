@@ -7,8 +7,6 @@ export default class RoomManager {
 		
 		this.now = 0;
 		this.last = 0;
-		
-		setInterval(()=>this.update(),1000/60);
 	}
 
 	create = (player0, player1, type0, type1) => {
@@ -56,17 +54,6 @@ export default class RoomManager {
 		});
 		return roomIndex;
 	};
-
-	update = () => {
-		this.now = Date.now();
-		let dt = (this.now - this.last)/1000;
-		this.last = this.now;
-		
-		for(var roomId in this.rooms){
-			var room = this.rooms[roomId];
-			room.update(dt)
-		}
-	}
 }
 
 class Room {
@@ -102,11 +89,10 @@ class Room {
 	}
 
 	start = () =>{
-		console.log(this.id, this.count);
 		if(this.count<2) return;
 		
 		this.count = 0;
-		console.log(`starting game`);
+		console.log(`${this.id}: starting game`);
 		io.to(this.id).emit('countdown');
 		
 		setTimeout(()=>{
@@ -139,8 +125,21 @@ class Room {
 	
 	gameOver = (id) => {
 		io.to(this.id).emit('GAME_OVER',id);
-		console.log(`{$id} won`)
+		console.log(`${this.id}: ${id} won`)
 		this.status = STATUS.WAITING;
+	}
+	
+	sendAttack = (socket, data) =>{
+		let other = this.other(socket);
+		if(other){
+			console.log(`${data} : ${socket.id} -> ${other.id}`)
+			io.to(other.id).emit('receiveAttack',data);			
+		}
+	}
+	
+	sendGraphicInfo = (socket, data) =>{
+		let other = this.other(socket);
+		if(other) io.to(other.id).emit('eview',data);
 	}
 	
 }
