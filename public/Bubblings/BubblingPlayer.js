@@ -197,7 +197,6 @@ export default class BubblingPlayer{
                 let arr = this.Board.executeGarbage();
 				this.garbDropped = true;
 				this.View.showGarbage(this.Board.garbage)
-                this.View.fallingBubblings(arr);
 				this.phase++;
 				break;
 			}
