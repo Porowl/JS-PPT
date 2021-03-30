@@ -123,7 +123,7 @@ export default class Stats{
 		
 		// vs TET calculation
 		while(index < VS_TETROCKS_SCORE.length){
-			nextThreshold = Math.max(1,Math.floor( VS_TETROCKS_SCORE[index] * multiplier));
+			nextThreshold = Math.max(1,VS_TETROCKS_SCORE[index] * multiplier|0);
 			if(sc<nextThreshold) break;
 			threshold = nextThreshold;
 			index++;
@@ -136,10 +136,11 @@ export default class Stats{
 		if(this.chain>=8 && (this.chain-8%3 == 0)){
 			if(this.leftOverVsTETROCKS>1){
 				vsTETROCKS++;
-				this.leftOverVsTETROCKS -= 1;
+				this.leftOverVsTETROCKS--;
 			}
 		}
 		
+		// send event
         document.dispatchEvent(
             new CustomEvent('garbCount',{
                 detail:{
@@ -156,7 +157,7 @@ export default class Stats{
 		let multiplier = 1;
 		if(dt >= 96000) {
 			dt -= 96000;
-			let exp = Math.max((1 + dt/14000 ) | 0,14);
+			let exp = Math.min((1 + dt/14000 ) | 0, 14);
 			multiplier = Math.pow(0.75, exp);
 		}
 		return multiplier;
