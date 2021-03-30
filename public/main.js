@@ -39,6 +39,7 @@ const init = () => {
 		
 		myType = type;
 		Player = myType==='BUBBLING'?new BubblingPlayer(socket.id):new TetPlayer(socket.id);
+		window.player = Player;
 		GUI.changeScreenTo('returnToMain')
 	});
 

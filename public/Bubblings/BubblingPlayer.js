@@ -24,7 +24,7 @@ export default class BubblingPlayer{
 		this.RotateFrameCounter = 0;
 		this.dropRate = 0;
 		this.lockDelay = 0;
-		this.gravity = 16/60
+		this.gravity = 60/60
 		
 		this.View.drawBoard(this.Board);
 		
@@ -74,6 +74,10 @@ export default class BubblingPlayer{
 		socket.on('receiveAttack',data=> {
 			this.Board.addGarbage(data);
 			this.View.showGarbage(this.Board.garbage); 
+		});
+		socket.off('fireGarb');
+		socket.on('fireGarb',()=>{
+			if(this.Board.garbage>0) this.Stats.fireGarb();
 		});
 	}
 	
@@ -227,21 +231,28 @@ export default class BubblingPlayer{
                 break;
             }
             case PHASE.NEW_BUBBLING: {
-                if(this.popArr.arr.length>0){this.phase = PHASE.FALL; break;}
-                if(this.Board.garbage>0 && !this.garbDropped){this.phase = PHASE.GARB; break;}
+                if(this.popArr.arr.length>0){
+					this.phase = PHASE.FALL; 
+					break;
+				}
+				if(this.Board.garbage>0 && !this.garbDropped && this.Stats.isChainFinished()) {
+					this.phase = PHASE.GARB; 
+					break;
+				}
+				socket.emit('fireGarb');	
+				
 				this.popArr.arr.length = 0;
 				this.garbDropped = false;
 				
 				this.View.displayScore(this.Stats.scoreToText());
-
+				
 				if(this.Board.blocked()) {
 					this.phase = PHASE.GAME_OVER;
 					break;
 				}
 				
-                this.Stats.resetChain();
-                this.bubbling = this.getBubbling();
-
+				this.Stats.resetChain();
+				this.bubbling = this.getBubbling();
 				
 				let i = this.Stats.getIndex()
 				let p1 = this.random.getBubbling(i);
@@ -301,7 +312,7 @@ export default class BubblingPlayer{
 
 	moveDownCycle = (dt) => {
 		if(this.Stats.keyMap[KEY.DOWN]) {
-			if(this.DFrameCounter%ARR==0){
+			if(this.DFrameCounter%(ARR*2)==0){
 				if (this.moveDown()) {
 					this.Stats.score += 1;
 					this.View.displayScore(this.Stats.scoreToText());

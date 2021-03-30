@@ -85,6 +85,10 @@ io.on('connection', (socket) => {
 		let room = Rmgr.getRoom(socket); let other = null;
 		if(room) room.sendAttack(socket, data);
 	});
+	socket.on('fireGarb',()=>{
+		let room = Rmgr.getRoom(socket); let other = null;
+		if(room) room.fireGarb(socket);
+	});
 	socket.on('gameOver', () =>{
 		let room = Rmgr.getRoom(socket); let other = null;
 		if(room) room.gameOver(socket.id);

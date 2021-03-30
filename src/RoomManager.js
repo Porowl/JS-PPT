@@ -40,7 +40,7 @@ export default class RoomManager {
 		if(roomIndex!=-1){
 			room = this.rooms[roomIndex];
 		} else {
-			console.log('room not found!');
+			console.log(`${socket.id}: room not found!`);
 		}
 		return room;
 	}
@@ -132,7 +132,7 @@ class Room {
 	sendAttack = (socket, data) =>{
 		let other = this.other(socket);
 		if(other){
-			console.log(`${data} : ${socket.id} -> ${other.id}`)
+			console.log(`${socket.id} -> ${other.id} : ${data}`)
 			io.to(other.id).emit('receiveAttack',data);			
 		}
 	}
@@ -140,6 +140,11 @@ class Room {
 	sendGraphicInfo = (socket, data) =>{
 		let other = this.other(socket);
 		if(other) io.to(other.id).emit('eview',data);
+	}
+	
+	fireGarb = (socket) =>{
+		let other = this.other(socket);
+		if(other) io.to(other.id).emit('fireGarb');
 	}
 	
 }

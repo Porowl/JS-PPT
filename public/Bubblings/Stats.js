@@ -16,6 +16,7 @@ export default class Stats{
 		this.remaining = 0;
 		
 		this.vsTETROCKS = false;
+		this.enemyChainFinished = false;
 		
 		this.gameStartedAt = Date.now();
 		
@@ -94,6 +95,9 @@ export default class Stats{
         return temp + mult;
     }
 
+	isOnChain = () => {
+		return this.chain >0;
+	}
     resetChain = () => {
         this.chain = 0;
     }
@@ -113,13 +117,13 @@ export default class Stats{
 		let index = 0;
 		
 		// vs BUBBLING calculation
-		garbs = ds / (60/multiplier|0) + this.leftOver;
+		garbs = ds / (60 * multiplier|0) + this.leftOver;
 		this.leftOver = garbs % 1;		
 		garbs = garbs | 0;
 		
 		// vs TET calculation
 		while(index < VS_TETROCKS_SCORE.length){
-			nextThreshold = ( VS_TETROCKS_SCORE[index] /multiplier | 0);
+			nextThreshold = Math.max(1,Math.floor( VS_TETROCKS_SCORE[index] * multiplier));
 			if(sc<nextThreshold) break;
 			threshold = nextThreshold;
 			index++;
@@ -166,4 +170,16 @@ export default class Stats{
         }
         return temp;
     }
+	
+	fireGarb = () => {
+		this.enemyChainFinished = true;	
+	}
+	
+	isChainFinished = () =>{
+		if(this.enemyChainFinished) {
+			this.enemyChainFinished = false;
+			return true;		
+		}
+		return false;
+	}
 }

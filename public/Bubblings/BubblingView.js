@@ -173,7 +173,6 @@ export default class BubblingView extends view {
 	};
 
 	popCycle = (arr, givenf) => {
-		console.log(givenf);
 		if (arr.length == 0) return true;
 		if(!givenf) givenf = this.popFrame++;
 		

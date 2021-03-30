@@ -89,6 +89,10 @@ export default class Player {
 			this.View.showGarbage(this.board.garbage);
 			if(this.stg.vsBubbling) this.updateGauge();
 		});
+		socket.off('fireGarb');
+		socket.on('fireGarb',()=>{
+			if(this.board.garbage>0) this.stg.fireGarb();
+		});
 	}
 
 	setOpponent = type => {
@@ -129,10 +133,12 @@ export default class Player {
 				
 			case PHASE.NEW_BLOCK: {
 				//if not on chain send garbage to bubbling
-				if(!this.board.executeGarbage(this.stg.vsBubbling)) {
-					this.phase = PHASE.GAME_OVER;
-					return;
-				};
+				if(this.stg.isChainFinished()){
+					if(!this.board.executeGarbage(this.stg.vsBubbling)) {
+						this.phase = PHASE.GAME_OVER;
+						return;
+					};					
+				}
 				if(this.stg.vsBubbling && this.stg.isComboBroken()) {
 					this.stg.executeGauge(this.board.resetGauge())
 					this.updateGauge();

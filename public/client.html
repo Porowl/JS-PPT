@@ -6,11 +6,23 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com">
 </head>
 <body onload="init()">
-    <canvas id="board" width="1024" height="768" z-index="0"></canvas>
-    <canvas id="mino" width="1024" height="768" z-index="1"></canvas>
-    <canvas id="animation" width="1024" height="768" z-index="2"></canvas>
-    <canvas id="infos" width="1024" height="768" z-index="3"></canvas>
-	<p id="curr"></p>
+	<div id='navgiationBar'>
+		
+	</div>
+	<div id='gameField'>
+		<canvas id="board" width="1024" height="768" z-index="0"></canvas>
+		<canvas id="mino" width="1024" height="768" z-index="1"></canvas>
+		<canvas id="animation" width="1024" height="768" z-index="2"></canvas>
+		<canvas id="infos" width="1024" height="768" z-index="3"></canvas>		
+	</div>
+	<div id='userChatWarpper'>
+		<div id='ScrollableUserChat'>
+			
+		</div>
+		<div id='inputBoxWrapper'>
+			
+		</div>
+	</div>
 </body>
 
 <script src="./CanvasInput.min.js"></script>
