@@ -24,7 +24,7 @@ export default class BubblingPlayer{
 		this.RotateFrameCounter = 0;
 		this.dropRate = 0;
 		this.lockDelay = 0;
-		this.gravity = 60/60
+		this.gravity = 16/60
 		
 		this.View.drawBoard(this.Board);
 		
@@ -312,7 +312,7 @@ export default class BubblingPlayer{
 
 	moveDownCycle = (dt) => {
 		if(this.Stats.keyMap[KEY.DOWN]) {
-			if(this.DFrameCounter%(ARR*2)==0){
+			if(this.DFrameCounter%ARR==0){
 				if (this.moveDown()) {
 					this.Stats.score += 1;
 					this.View.displayScore(this.Stats.scoreToText());

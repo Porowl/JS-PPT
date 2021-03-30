@@ -46,7 +46,7 @@ export default class Puyo{
      */
     fall = () =>
     {
-        this.velocity += 0.25;
+        this.velocity += 0.20;
         this.gY += this.velocity;
 
         if(this.gY>this.limit*BUBBLING_SIZE)

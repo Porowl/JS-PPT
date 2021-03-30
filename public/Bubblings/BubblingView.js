@@ -176,7 +176,7 @@ export default class BubblingView extends view {
 		if (arr.length == 0) return true;
 		if(!givenf) givenf = this.popFrame++;
 		
-		let frame = 6;
+		let frame = 4;
 		this.refreshPiece();
 		for (let pos of arr) {
 			const x = pos.x;
