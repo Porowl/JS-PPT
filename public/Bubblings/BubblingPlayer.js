@@ -24,7 +24,7 @@ export default class BubblingPlayer{
 		this.RotateFrameCounter = 0;
 		this.dropRate = 0;
 		this.lockDelay = 0;
-		this.gravity = 16/60
+		this.gravity = 60/60;
 		
 		this.View.drawBoard(this.Board);
 		
@@ -73,11 +73,11 @@ export default class BubblingPlayer{
 		socket.off('receiveAttack')
 		socket.on('receiveAttack',data=> {
 			this.Board.addGarbage(data);
-			this.View.showGarbage(this.Board.garbage); 
+			this.View.showGarbage(this.Board.getTotalGarb()); 
 		});
 		socket.off('fireGarb');
 		socket.on('fireGarb',()=>{
-			if(this.Board.garbage>0) this.Stats.fireGarb();
+			this.Board.queueGarbage();
 		});
 	}
 	
@@ -194,14 +194,14 @@ export default class BubblingPlayer{
                 if(this.View.popCycle(this.popArr.arr)) {
 					this.phase = PHASE.NEW_BUBBLING;
 				}
-	            this.View.showGarbage(this.Board.garbage); 
+	            this.View.showGarbage(this.Board.getTotalGarb());
                 break;
             }
 			case PHASE.GARB: {
                 let arr = this.Board.executeGarbage();
 				this.fallingBubblings = arr;
 				this.garbDropped = true;
-				this.View.showGarbage(this.Board.garbage)
+				this.View.showGarbage(this.Board.getTotalGarb())
 				this.phase++;
 				break;
 			}
@@ -235,11 +235,11 @@ export default class BubblingPlayer{
 					this.phase = PHASE.FALL; 
 					break;
 				}
-				if(this.Board.garbage>0 && !this.garbDropped && this.Stats.isChainFinished()) {
+				if(this.Board.garbage>0 && !this.garbDropped) {
 					this.phase = PHASE.GARB; 
 					break;
 				}
-				socket.emit('fireGarb');	
+				socket.emit('fireGarb');
 				
 				this.popArr.arr.length = 0;
 				this.garbDropped = false;

@@ -11,7 +11,6 @@ import {DRAWMODE,MOVES,KEYSTATES,LAST_MOVE,KEY,ENTRY_DELAY,DAS,ARR,OFFSETS,I_OFF
 export default class Player {
 	constructor(myid) {
 		this.user = myid;
-		this.enemy;
 		this.board = new Stage();
 		this.View = new TetView(0);
 		this.stg = new Storage(myid);
@@ -87,12 +86,14 @@ export default class Player {
 		socket.on('receiveAttack',data=>
 		{
 			this.board.addGarbage(data);
-			this.View.showGarbage(this.board.garbage);
+			if(this.stg.vsBubbling) this.deductGauge();
+			this.View.showGarbage(this.board.getTotalGarb());
 			if(this.stg.vsBubbling) this.updateGauge();
 		});
 		socket.off('fireGarb');
 		socket.on('fireGarb',()=>{
-			if(this.board.garbage>0) this.stg.fireGarb();
+			this.board.queueGarbage();
+			this.View.showGarbage(this.board.getTotalGarb());
 		});
 	}
 
@@ -134,17 +135,15 @@ export default class Player {
 				
 			case PHASE.NEW_BLOCK: {
 				//if not on chain send garbage to bubbling
-				if(this.stg.isChainFinished()){
-					if(!this.board.executeGarbage(this.stg.vsBubbling)) {
-						this.phase = PHASE.GAME_OVER;
-						return;
-					};					
-				}
+				if(!this.board.executeGarbage(this.stg.vsBubbling)) {
+					this.phase = PHASE.GAME_OVER;
+					return;
+				};					
 				if(this.stg.vsBubbling && this.stg.isComboBroken()) {
 					this.stg.executeGauge(this.board.resetGauge())
 					this.updateGauge();
 				}
-				this.View.showGarbage(this.board.garbage);
+				this.View.showGarbage(this.board.getTotalGarb());
 				this.View.draw(this.board.field);
 				this.getNewPiece();
 				if(!this.board.canMove(this.piece,0,0)) {

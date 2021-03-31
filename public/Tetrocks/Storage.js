@@ -20,7 +20,6 @@ export default class Storage{
         this.nexts = 6;
         this.initKeyMap();
 		this.vsBubbling = false;
-		this.enemyChainFinished = false;
 		
         /* Pieces */
         this.index = 0;
@@ -305,18 +304,5 @@ export default class Storage{
 		let garbBubbling = GAUGE_TO_TRASH[n];
 		socket.emit('sendAttack', garbBubbling);
 		socket.emit('fireGarb');
-	}
-	
-		
-	fireGarb = () => {
-		this.enemyChainFinished = true;	
-	}
-	
-	isChainFinished = () =>{
-		if(this.enemyChainFinished) {
-			this.enemyChainFinished = false;
-			return true;		
-		}
-		return false;
 	}
 }

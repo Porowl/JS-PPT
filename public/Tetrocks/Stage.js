@@ -13,9 +13,9 @@ export default class Stage {
 
 		this.remaining = 0;
 		this.garbage = 0;
+		this.inqueue = 0;
 		this.gauge = 0;
 	}
-
 	
 	isEmpty = () => this.remaining == 0;
 
@@ -158,6 +158,11 @@ export default class Stage {
 		return counter;
 	};
 
+	queueGarbage = () => {
+		this.garbage += this.inqueue;
+		this.inqueue = 0;
+	}
+	
 	executeGarbage = (vsBubbling) => {
 		if(this.garbage>=40) return false;
 		let n = Math.min(this.garbage, BOARD_HEIGHT - 1);
@@ -181,44 +186,49 @@ export default class Stage {
 	};
 
 	addGarbage = (n) => {
-		let temp = n;
-		if(this.gauge>0){
-			if(this.gauge > temp){
-				this.gauge -= temp;
-			} else {
-				temp -= this.gauge;
-				this.gauge = 0;
-				this.garbage += temp;
-			}
-		} else { 
-			this.garbage += n;		
-		}
+		this.inqueue += n;
 	};
 
 	deductGarbage = (n) => {
-		this.garbage -= n;
-		if (this.garbage < 0) {
-			let a = 0 - this.garbage;
-			this.garbage = 0;
-			return a;
+		if(n == 0) return 0;
+		let d = this.garbage - n;
+			if(d>0) {
+				n = 0;
+				this.garbage = d;
+			} else {
+				n = d;
+				this.garbage = 0;
+			}
+		if(n > 0) {
+			let d = this.inqueue - n;
+			if(d>0) {
+				n = 0;
+				this.inqueue = d;
+			} else {
+				n = d;
+				this.inqueue = 0;
+			}
 		}
-		return 0;
+		return n;
 	};
 
+	getTotalGarb = () => {
+		return this.garbage + this.inqueue;
+	}
+
 	addGauge = (n, m) => {
-		if(this.garbage > 0) {
-			this.garbage -= n;
-			if(this.garbage<0) {
-				let a = 0 - this.garbage;
-				this.garbage = 0;
-				this.gauge += a;
-			}
+		if(this.getTotalGarb()>0) {
+			this.gauge += this.deductGarbage(n);
 		} else {
 			this.gauge += m;
 		}
 		if(this.gauge>60) this.gauge = 60;
 	}
 	
+	deductGauge = () => {
+		this.gauge = this.deductGarbage(this.gauge);
+	}
+
 	resetGauge = () => {
 		let temp = this.gauge;
 		this.gauge = 0;

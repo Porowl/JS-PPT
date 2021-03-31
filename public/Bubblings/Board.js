@@ -221,17 +221,35 @@ export default class Board {
 	};
 
 	addGarbage = n => {
-		this.garbage += n;
+		this.inqueue += n;
 	};
 
 	deductGarbage = n => {
-		this.garbage -= n;
-		if (this.garbage < 0) {
-			let a = 0 - this.garbage;
-			this.garbage = 0;
-			return a;
-		} else return 0;
+		let d = this.garbage - n;
+			if(d>0) {
+				n = 0;
+				this.garbage = d;
+			} else {
+				n = d;
+				this.garbage = 0;
+			}
+		if(n > 0) {
+			let d = this.inqueue - n;
+			if(d>0) {
+				n = 0;
+				this.inqueue = d;
+			} else {
+				n = d;
+				this.inqueue = 0;
+			}
+		}
+		return n;
 	};
+
+	queueGarbage = () => {
+		this.garbage += this.inqueue;
+		this.inqueue = 0;
+	}
 
 	executeGarbage = () => {
 		let attack = Math.min(this.garbage,30);
@@ -276,6 +294,10 @@ export default class Board {
 		
 		return garb;
 	};
+
+	getTotalGarb = () => {
+		return this.garbage + this.inqueue;
+	}
 
 	blocked = () => {
 		return this.table[1][2] != BUBBLING_TYPE.EMPTY;

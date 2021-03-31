@@ -16,7 +16,6 @@ export default class Stats{
 		this.remaining = 0;
 		
 		this.vsTETROCKS = false;
-		this.enemyChainFinished = false;
 		
 		this.gameStartedAt = Date.now();
 		
@@ -172,16 +171,4 @@ export default class Stats{
         }
         return temp;
     }
-	
-	fireGarb = () => {
-		this.enemyChainFinished = true;	
-	}
-	
-	isChainFinished = () =>{
-		if(this.enemyChainFinished) {
-			this.enemyChainFinished = false;
-			return true;		
-		}
-		return false;
-	}
 }
