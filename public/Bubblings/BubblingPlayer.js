@@ -24,7 +24,7 @@ export default class BubblingPlayer{
 		this.RotateFrameCounter = 0;
 		this.dropRate = 0;
 		this.lockDelay = 0;
-		this.gravity = 60/60;
+		this.gravity = 16/60;
 		
 		this.View.drawBoard(this.Board);
 		
