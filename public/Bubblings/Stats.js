@@ -98,6 +98,7 @@ export default class Stats{
 	isOnChain = () => {
 		return this.chain >0;
 	}
+	
     resetChain = () => {
         this.chain = 0;
     }

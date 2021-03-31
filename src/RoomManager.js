@@ -125,7 +125,7 @@ class Room {
 	
 	gameOver = (id) => {
 		io.to(this.id).emit('GAME_OVER',id);
-		console.log(`${this.id}: ${id} won`)
+		console.log(`${this.id}: ${id} lost`)
 		this.status = STATUS.WAITING;
 	}
 	

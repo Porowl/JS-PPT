@@ -23,8 +23,9 @@ export default class Board {
 				temp[y].push(BUBBLING_TYPE.EMPTY);
 			}
 		}
-		temp[-1] = [BUBBLING_TYPE.EMPTY,BUBBLING_TYPE.EMPTY,BUBBLING_TYPE.EMPTY,BUBBLING_TYPE.EMPTY,BUBBLING_TYPE.EMPTY,BUBBLING_TYPE.EMPTY];
-		temp[-2] = [BUBBLING_TYPE.EMPTY,BUBBLING_TYPE.EMPTY,BUBBLING_TYPE.EMPTY,BUBBLING_TYPE.EMPTY,BUBBLING_TYPE.EMPTY,BUBBLING_TYPE.EMPTY];
+		let e = BUBBLING_TYPE.EMPTY;
+		temp[-1] = [e,e,e,e,e,e];
+		temp[-2] = [e,e,e,e,e,e];
 		return temp;
 	};
 
@@ -200,7 +201,7 @@ export default class Board {
 				}
 			}
 
-			for (let y = BUBBLING_BOARD_HEIGHT - 2; y > 0; y--) {
+			for (let y = BUBBLING_BOARD_HEIGHT - 2; y >= 0; y--) {
 				if (this.table[y][x] != BUBBLING_TYPE.EMPTY) {
 					if (this.table[y + 1][x] == BUBBLING_TYPE.EMPTY) {
 						let color = this.table[y][x];

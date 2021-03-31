@@ -304,7 +304,7 @@ export default class Storage{
 		if(n==0) return;
 		let garbBubbling = GAUGE_TO_TRASH[n];
 		socket.emit('sendAttack', garbBubbling);
-		socket.emit('fireGarb');	
+		socket.emit('fireGarb');
 	}
 	
 		

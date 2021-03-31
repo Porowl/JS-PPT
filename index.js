@@ -42,7 +42,8 @@ io.on('connection', (socket) => {
 		clearInterval(cycle);
 	});
 	
-	console.log('user connected: ', socket.id);
+	console.log('user connected\t: ', socket.id);
+	console.log('Curr. # of users\t: ', io.engine.clientsCount);
 
 	socket.on('askCurrPlayers',()=>{
 		socket.emit('currPlayers',io.engine.clientsCount);	
@@ -56,6 +57,7 @@ io.on('connection', (socket) => {
 	socket.on('disconnect', () => {
 		onDisconnection(socket);
 		console.log('user disconnected: ', socket.id);
+		console.log('Curr. # of users\t: ', io.engine.clientsCount);
 	});
 	
 	socket.on('leaveRoom', () =>{

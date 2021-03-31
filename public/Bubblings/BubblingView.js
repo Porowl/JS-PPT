@@ -25,12 +25,8 @@ import {
 
 export default class BubblingView extends view {
 	constructor(player) {
-		super();
-		this.player = player;
-		this.offset = PLAYER_OFFSET * this.player;
 		this.popFrame = 0;
 		this.initGraphics();
-		this.preview = false;
 	}
 	/**
 	 * 무대를 그립니다.

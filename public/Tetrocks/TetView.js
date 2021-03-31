@@ -5,11 +5,7 @@ import {socket} from '../main.js';
 
 export default class TetView extends view {
 	constructor(player) {
-		super();
-		
-		this.player = player;
-		this.offset = PLAYER_OFFSET*this.player;
-		this.preview = false;
+		super(player);
 		this.initGraphics();
 		this.refreshHold();
 		this.refreshNexts();
