@@ -25,6 +25,7 @@ import {
 
 export default class BubblingView extends view {
 	constructor(player) {
+		super(player);
 		this.popFrame = 0;
 		this.initGraphics();
 	}
