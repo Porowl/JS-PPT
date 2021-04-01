@@ -152,6 +152,33 @@ export default class BubblingView extends view {
 		}
 	};
 
+	bounceAnimation = (multBubbling, givenf) => {
+		// if(!givenf) givenf = this.popFrame++;
+		
+		// let main = multBubbling.mainPiece;
+		// let sub = multBubbling.subPiece;
+		
+		// let frame = 4;
+		// 	if (givenf < frame * 1) {
+		// 		sub.type = POP_SPRITE[sub.type][0];
+		// 		sub.state = POP_SPRITE[sub.type][1];
+		// 	} else if (givenf < frame * 2) {
+		// 		main.type = POP_SPRITE[sub.type][0];
+		// 		sub.state = POP_SPRITE[sub.type][1] + 1;
+		// 	} else if (givenf < frame * 3) {
+		// 	} else if (givenf < frame * 4) {
+		// 	}
+		// 	this.drawBubbling(bubbling, CTX_NUM.PIECE);
+		
+		// if(!this.preview) {
+		// 	socket.emit('graphics',{
+		// 		name:'bounceAnimation',
+		// 		args:[multBubbling,givenf]
+		// 	});			
+		// }
+		// return this.popFrame > frame * 5;
+	};
+
 	fallCycle = (arr) => {
 		this.refreshPiece();
 		for (let x = 0; x < BUBBLING_BOARD_WIDTH; x++) {
@@ -173,7 +200,7 @@ export default class BubblingView extends view {
 		if (arr.length == 0) return true;
 		if(!givenf) givenf = this.popFrame++;
 		
-		let frame = 4;
+		let frame = 6;
 		this.refreshPiece();
 		for (let pos of arr) {
 			const x = pos.x;
@@ -184,15 +211,13 @@ export default class BubblingView extends view {
 				gX: x * BUBBLING_SIZE,
 				gY: y * BUBBLING_SIZE,
 			};
-			if (givenf < frame * 1) {
-				bubbling.type = POP_SPRITE[color][0];
-				bubbling.state = POP_SPRITE[color][1];
-			} else if (givenf < frame * 2) {
-				bubbling.type = POP_SPRITE[color][0];
-				bubbling.state = POP_SPRITE[color][1] + 1;
-				if (color == BUBBLING_TYPE.TRASH) {
+			if (givenf < frame * 2) {
+				if((givenf/3|0) % 3 == 0){
 					bubbling.type = 13;
-					bubbling.state = 3;
+					bubbling.state = 3;			
+				} else {
+					bubbling.type = color;
+					bubbling.state = 0;			
 				}
 			} else if (givenf < frame * 3) {
 				bubbling.type = 10;

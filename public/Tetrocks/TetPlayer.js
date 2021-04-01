@@ -86,7 +86,7 @@ export default class Player {
 		socket.on('receiveAttack',data=>
 		{
 			this.board.addGarbage(data);
-			if(this.stg.vsBubbling) this.deductGauge();
+			if(this.stg.vsBubbling) this.board.deductGauge();
 			this.View.showGarbage(this.board.getTotalGarb());
 			if(this.stg.vsBubbling) this.updateGauge();
 		});

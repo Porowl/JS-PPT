@@ -12,6 +12,7 @@ import Bubbling from './Bubbling.js';
 export default class Board {
 	constructor() {
 		this.table = this.initTable();
+		this.inqueue = 0;
 		this.garbage = 0;
 	}
 

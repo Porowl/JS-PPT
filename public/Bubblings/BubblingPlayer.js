@@ -14,7 +14,7 @@ export default class BubblingPlayer{
 		this.Stats = new Stats(user);
 		this.View = new BubblingView(0);
 		this.bubbling = {};
-		this.popArr = {arr:[]};
+		this.calcData = {arr:[]};
 		this.fallingBubblings = [];
 		this.random = {};
 		
@@ -72,8 +72,10 @@ export default class BubblingPlayer{
 		
 		socket.off('receiveAttack')
 		socket.on('receiveAttack',data=> {
+			console.log(this.Board.getTotalGarb());
 			this.Board.addGarbage(data);
-			this.View.showGarbage(this.Board.getTotalGarb()); 
+			console.log(this.Board.getTotalGarb());
+			this.View.showGarbage(this.Board.getTotalGarb());
 		});
 		socket.off('fireGarb');
 		socket.on('fireGarb',()=>{
@@ -82,7 +84,6 @@ export default class BubblingPlayer{
 	}
 	
 	countDown = () => {
-		
 		let i = this.Stats.getIndex()
 		let p1 = this.random.getBubbling(i);
 		let p2 = this.random.getBubbling(i+1);
@@ -134,6 +135,13 @@ export default class BubblingPlayer{
 				}
                 break;
             }
+			case PHASE.BOUNCE: {
+				// if(!this.View.bounceAnimation(this.bubbling)){
+					
+				// } else {
+					this.phase++;
+				// }
+			}
             case PHASE.LOCK: {
 				this.lockDelay = 0;
                 this.Board.lockMult(this.bubbling)
@@ -174,15 +182,15 @@ export default class BubblingPlayer{
             }
             case PHASE.CALC: {
                 this.phase++;
-                this.popArr = this.Board.calc();
+                this.calcData = this.Board.calc();
                 break;
             }
             case PHASE.POP: {
                 this.View.popFrame = 0;
-                if(this.popArr.arr.length>0) {
-					let data = this.Stats.calcScore(this.popArr);
+                if(this.calcData.arr.length>0) {
+					let data = this.Stats.calcScore(this.calcData);
 					this.View.displayScore(data)
-                    this.Board.pop(this.popArr.arr);
+                    this.Board.pop(this.calcData.arr);
                     this.View.drawBoard(this.Board);
                     this.phase++;
 				} else {
@@ -191,7 +199,7 @@ export default class BubblingPlayer{
                 break;
             }
             case PHASE.POP_ANIMATION: {
-                if(this.View.popCycle(this.popArr.arr)) {
+                if(this.View.popCycle(this.calcData.arr)) {
 					this.phase = PHASE.NEW_BUBBLING;
 				}
 	            this.View.showGarbage(this.Board.getTotalGarb());
@@ -231,7 +239,7 @@ export default class BubblingPlayer{
                 break;
             }
             case PHASE.NEW_BUBBLING: {
-                if(this.popArr.arr.length>0){
+                if(this.calcData.arr.length>0){
 					this.phase = PHASE.FALL; 
 					break;
 				}
@@ -241,7 +249,7 @@ export default class BubblingPlayer{
 				}
 				socket.emit('fireGarb');
 				
-				this.popArr.arr.length = 0;
+				this.calcData.arr.length = 0;
 				this.garbDropped = false;
 				
 				this.View.displayScore(this.Stats.scoreToText());
@@ -276,7 +284,7 @@ export default class BubblingPlayer{
 		this.rotate();
 	};
 
-	moveLR = () =>{
+	moveLR = () => {
 		let state = this.Stats.checkLR();
 		if (state == KEYSTATES.LR || state == -1) {
 			this.LRFrameCounter = 0;
@@ -336,8 +344,7 @@ export default class BubblingPlayer{
 		return false;
 	}
 
-    getBubbling = () =>
-    {
+    getBubbling = () => {
         const ranNum = this.random.getBubbling(this.Stats.getIndexInc());
         const p1 = ( ranNum & 0xc ) / 0x4;
         const p2 = ranNum % 0x4;
@@ -352,17 +359,18 @@ export default class BubblingPlayer{
 const PHASE = 
 {
     DROP: 0,
-    LOCK: 1,
-    FALL: 2,
-    FALL_ANIMATION: 3,
-    FALL_ANIMATION_END: 4,
-    CALC: 5,
-    POP:6,
-    POP_ANIMATION:7,
-	GARB:8,
-	GARB_FALL:9,
-	GARB_FALL_ANIMATION_END:10,
-    NEW_BUBBLING:11,
+	BOUNCE: 1,
+    LOCK: 2,
+    FALL: 3,
+    FALL_ANIMATION: 4,
+    FALL_ANIMATION_END: 5,
+    CALC: 6,
+    POP:7,
+    POP_ANIMATION:8,
+	GARB:9,
+	GARB_FALL:10,
+	GARB_FALL_ANIMATION_END:11,
+    NEW_BUBBLING:12,
 
     GAME_OVER:99
 }

@@ -403,4 +403,4 @@ export default class TetView extends view {
 	}
 }
 
-const colorArr = [COLOR_GREY, COLOR_MAP[0], COLOR_MAP[6], COLOR_MAP[1]]
+const colorArr = Object.freeze([COLOR_GREY, COLOR_MAP[0], COLOR_MAP[6], COLOR_MAP[1]]);
