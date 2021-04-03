@@ -231,7 +231,7 @@ export default class Board {
 				n = 0;
 				this.garbage = d;
 			} else {
-				n = d;
+				n = 0 - d;
 				this.garbage = 0;
 			}
 		if(n > 0) {
@@ -240,7 +240,7 @@ export default class Board {
 				n = 0;
 				this.inqueue = d;
 			} else {
-				n = d;
+				n = 0 -d;
 				this.inqueue = 0;
 			}
 		}
