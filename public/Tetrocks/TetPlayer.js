@@ -66,7 +66,6 @@ export default class Player {
 			//2
 			(event) => {
 				let lines = this.board.deductGarbage(event.detail.n)
-				console.log(lines);
 				if(lines>0) {
 					socket.emit('sendAttack',lines);
 					socket.emit('fireGarb');
