@@ -430,7 +430,9 @@ export const SOUNDS = {
 	TSPIN: './sounds/soundEffects/lock.mp3',
 	TSPINC: './sounds/soundEffects/lock.mp3',
 	PLAYER_JOIN: './sounds/soundEffects/player_join.mp3',
-	GAMEOVER: './sounds/soundEffects/gameover.mp3'
+	GAMEOVER: './sounds/soundEffects/gameover.mp3',
+	BUB_DROP: './sounds/soundEffects/bub_drop.mp3',
+	POP: './sounds/soundEffects/bub_pop.mp3',
 }
 
 export const VOICES = {

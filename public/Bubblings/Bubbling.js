@@ -78,7 +78,7 @@ export default class Bubbling{
             this.angle = (this.angle+Math.PI*2) % (Math.PI*2)
             this.gX = x + Math.sin(this.angle)*BUBBLING_SIZE
             this.gY = y - Math.cos(this.angle)*BUBBLING_SIZE 
-            if(this.frame++>8) this.frame = 0;
+            if(++this.frame>8) this.frame = 0;
         } else {
             this.moveLR();
         }

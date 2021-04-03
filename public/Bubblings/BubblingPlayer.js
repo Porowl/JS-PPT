@@ -4,7 +4,7 @@ import BubblingView from './BubblingView.js';
 import Bubbling from './Bubbling.js';
 import MultBubblings from './MultBubblings.js';
 
-import {BUBBLING_SIZE, DIRECTION,KICK,BUBBLING_BOARD_WIDTH,KEY,BUBBLING_DAS,ARR,KEYSTATES,BUBBLING_STATE,POP_SPRITE} from '../constants.js';
+import {BUBBLING_SIZE, DIRECTION,KICK,BUBBLING_BOARD_WIDTH,KEY,BUBBLING_DAS,ARR,KEYSTATES,BUBBLING_STATE,POP_SPRITE,playSound,SOUNDS} from '../constants.js';
 import {socket} from '../main.js';
 
 export default class BubblingPlayer{
@@ -121,11 +121,16 @@ export default class BubblingPlayer{
             case PHASE.DROP: {
 				this.inputCycle(); 
 				
+				let keyDown = this.Stats.keyMap[KEY.DOWN];
 				if(this.Board.valid(this.bubbling.getPos(DIRECTION.DOWN))){
-					this.bubbling.moveDown(this.Stats.keyMap[KEY.DOWN]);
+					this.bubbling.moveDown(keyDown);
+					if(keyDown){
+						this.Stats.score += 1;
+						this.View.displayScore(this.Stats.scoreToText());
+					}
 					this.lockDlay = 0;
 				} else {
-					if(this.Stats.keyMap[KEY.DOWN]){
+					if(keyDown){
 						this.phase++;
 					} else {
 						this.lockDelay += dt;
@@ -378,11 +383,16 @@ class BouncingBubblingManager {
 	}
 	
 	update = () => {
+		let p = false;
 		for(let i = 0; i< this.arr.length; i++){
 			let bubbling = this.arr[i];
 			if(!bubbling) continue
-			if(bubbling.update()) delete this.arr[i];
+			if(bubbling.update()) {
+				delete this.arr[i]
+				if(!p) p = true;
+			};
 		}
+		if(p) playSound(SOUNDS.BUB_DROP);
 	}
 	
 	cleanUp = () => {

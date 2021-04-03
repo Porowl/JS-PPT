@@ -20,6 +20,8 @@ import {
 	NEXT_X_OFFSET,
 	P1_COLORS,
 	P2_COLORS,
+	playSound,
+	SOUNDS
 	
 } from '../constants.js';
 
@@ -157,10 +159,10 @@ export default class BubblingView extends view {
 		let counter = 0;
 		for(let b of arr) {
 			if(!b) continue;
-				let x = X_OFFSET + b.x * BUBBLING_SIZE + 1 + this.offset;
-				let y = Y_OFFSET + (b.y - 1) * BUBBLING_SIZE + 1;
-				this.boardCtx.clearRect(x, y, BUBBLING_SIZE,BUBBLING_SIZE);
-				this.drawBubblingByPointer(x, y, b.state, b.type, CTX_NUM.BOARD);
+			let x = X_OFFSET + b.x * BUBBLING_SIZE + 1 + this.offset;
+			let y = Y_OFFSET + (b.y - 1) * BUBBLING_SIZE + 1;
+			this.boardCtx.clearRect(x, y, BUBBLING_SIZE,BUBBLING_SIZE);
+			this.drawBubblingByPointer(x, y, b.state, b.type, CTX_NUM.BOARD);
 			counter++;
 		}
 		if(!this.preview) {
@@ -207,10 +209,10 @@ export default class BubblingView extends view {
 			if (givenf < frame * 2) {
 				if((givenf/3|0) % 3 == 0){
 					bubbling.type = 13;
-					bubbling.state = 3;			
+					bubbling.state = 3;
 				} else {
 					bubbling.type = color;
-					bubbling.state = 0;			
+					bubbling.state = 0;	
 				}
 			} else if (givenf < frame * 3) {
 				bubbling.type = 10;
@@ -227,9 +229,9 @@ export default class BubblingView extends view {
 					bubbling.state = 3;
 				}
 			}
-
 			this.drawBubbling(bubbling, CTX_NUM.PIECE);
 		}
+		if(givenf == frame*2) playSound(SOUNDS.POP);
 		
 		if(!this.preview) {
 			socket.emit('graphics',{
@@ -237,7 +239,7 @@ export default class BubblingView extends view {
 				args:[arr,givenf]
 			});			
 		}
-		return this.popFrame > frame * 5;
+		return givenf > frame * 5;
 	};
 
 	drawBubbling = (bubbling, on) => {
