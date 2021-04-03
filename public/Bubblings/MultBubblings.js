@@ -27,10 +27,9 @@ export default class MultBubblings{
         return data;
     }
 
-    rotate = (direction,kick) =>
-    {
-        switch(kick)
-        {
+    rotate = (direction,kick) => {
+		if(this.subPiece.onRotate()) return;
+        switch(kick) {
             case KICK.DONT_PUSH:
                 break;
             case KICK.PUSH_LEFT:
@@ -47,28 +46,31 @@ export default class MultBubblings{
         this.rotation = (this.rotation + 4 + direction + this.tempRotation)%4;
         this.tempRotation = 0;
         
-        this.subPiece.setPos(this.mainPiece.x+XY_OFFSETS[this.rotation][0],
-                            this.mainPiece.y+XY_OFFSETS[this.rotation][1]);
+        this.subPiece.setPos(this.mainPiece.x + XY_OFFSETS[this.rotation][0],
+                             this.mainPiece.y + XY_OFFSETS[this.rotation][1]);
         this.subPiece.rotation = this.rotation;
         this.subPiece.direction = direction;
-        this.subPiece.onRotate = true;
+        this.subPiece.frame = 1;
     }
 
-    move = (x = 0,y = 0) =>
-    {
-        if(x===0&&y===0)console.error(`CAUTION: x,y not passed`);
+    move = (x = 0, y = 0) => {
+        if(x===0 && y===0)console.error(`CAUTION: x,y not passed`);
 
         this.mainPiece.movePos(x,y);
         this.subPiece.movePos(x,y);
     }
 
-    toggleTempRotation = () =>
-    {
+    toggleTempRotation = () => {
         this.tempRotation = this.tempRotation ^ 1
     }
 	
-	update = () => {
-		this.mainPiece.move();
+	updateLR = () => {
+		this.mainPiece.moveLR();
 		this.subPiece.moveRotate(this.mainPiece.gX, this.mainPiece.gY);
+	}
+	
+	moveDown = (keyDown) => {
+		this.mainPiece.moveDown(keyDown);
+		this.subPiece.moveDown(keyDown);
 	}
 }

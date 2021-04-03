@@ -152,31 +152,24 @@ export default class BubblingView extends view {
 		}
 	};
 
-	bounceAnimation = (multBubbling, givenf) => {
-		// if(!givenf) givenf = this.popFrame++;
-		
-		// let main = multBubbling.mainPiece;
-		// let sub = multBubbling.subPiece;
-		
-		// let frame = 4;
-		// 	if (givenf < frame * 1) {
-		// 		sub.type = POP_SPRITE[sub.type][0];
-		// 		sub.state = POP_SPRITE[sub.type][1];
-		// 	} else if (givenf < frame * 2) {
-		// 		main.type = POP_SPRITE[sub.type][0];
-		// 		sub.state = POP_SPRITE[sub.type][1] + 1;
-		// 	} else if (givenf < frame * 3) {
-		// 	} else if (givenf < frame * 4) {
-		// 	}
-		// 	this.drawBubbling(bubbling, CTX_NUM.PIECE);
-		
-		// if(!this.preview) {
-		// 	socket.emit('graphics',{
-		// 		name:'bounceAnimation',
-		// 		args:[multBubbling,givenf]
-		// 	});			
-		// }
-		// return this.popFrame > frame * 5;
+	bounceAnimation = (arr) => {
+		this.refreshPiece();
+		let counter = 0;
+		for(let b of arr) {
+			if(!b) continue;
+				let x = X_OFFSET + b.x * BUBBLING_SIZE + 1 + this.offset;
+				let y = Y_OFFSET + (b.y - 1) * BUBBLING_SIZE + 1;
+				this.boardCtx.clearRect(x, y, BUBBLING_SIZE,BUBBLING_SIZE);
+				this.drawBubblingByPointer(x, y, b.state, b.type, CTX_NUM.BOARD);
+			counter++;
+		}
+		if(!this.preview) {
+			socket.emit('graphics',{
+				name:'bounceAnimation',
+				args:[arr]
+			})			
+		}
+		return counter == 0;
 	};
 
 	fallCycle = (arr) => {

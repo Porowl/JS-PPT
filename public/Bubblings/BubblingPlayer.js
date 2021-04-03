@@ -4,7 +4,7 @@ import BubblingView from './BubblingView.js';
 import Bubbling from './Bubbling.js';
 import MultBubblings from './MultBubblings.js';
 
-import {DIRECTION,KICK,BUBBLING_BOARD_WIDTH,KEY,BUBBLING_DAS,ARR,KEYSTATES} from '../constants.js';
+import {BUBBLING_SIZE, DIRECTION,KICK,BUBBLING_BOARD_WIDTH,KEY,BUBBLING_DAS,ARR,KEYSTATES,BUBBLING_STATE,POP_SPRITE} from '../constants.js';
 import {socket} from '../main.js';
 
 export default class BubblingPlayer{
@@ -16,6 +16,7 @@ export default class BubblingPlayer{
 		this.bubbling = {};
 		this.calcData = {arr:[]};
 		this.fallingBubblings = [];
+		this.BBM = new BouncingBubblingManager();
 		this.random = {};
 		
 		this.phase = PHASE.NEW_BUBBLING;
@@ -24,7 +25,7 @@ export default class BubblingPlayer{
 		this.RotateFrameCounter = 0;
 		this.dropRate = 0;
 		this.lockDelay = 0;
-		this.gravity = 16/60;
+		this.onBounceAnimation = false;
 		
 		this.View.drawBoard(this.Board);
 		
@@ -72,9 +73,7 @@ export default class BubblingPlayer{
 		
 		socket.off('receiveAttack')
 		socket.on('receiveAttack',data=> {
-			console.log(this.Board.getTotalGarb());
 			this.Board.addGarbage(data);
-			console.log(this.Board.getTotalGarb());
 			this.View.showGarbage(this.Board.getTotalGarb());
 		});
 		socket.off('fireGarb');
@@ -106,21 +105,24 @@ export default class BubblingPlayer{
 		}, 3000);
 	};
 	
-    update = (dt) => {
-        switch(this.phase) {
-			case PHASE.STAND_BY: {
-				break;
+    update = (dt) => {		
+		this.BBM.update();
+		let bbmArr = this.BBM.getArr();
+		if(bbmArr.length>0) {
+			this.onBounceAnimation = true;
+			if(this.View.bounceAnimation(bbmArr)) {
+				this.BBM.cleanUp();
+				this.onBounceAnimation = false;
 			}
+		};
+        switch(this.phase) {
+			case PHASE.STAND_BY:
+				break;
             case PHASE.DROP: {
-                //this.View.moveCycle();
-				
-				this.bubbling.update();
-				this.View.moveCycle(this.bubbling);
-				
-				this.moveDownCycle(dt);
 				this.inputCycle(); 
-
+				
 				if(this.Board.valid(this.bubbling.getPos(DIRECTION.DOWN))){
+					this.bubbling.moveDown(this.Stats.keyMap[KEY.DOWN]);
 					this.lockDlay = 0;
 				} else {
 					if(this.Stats.keyMap[KEY.DOWN]){
@@ -129,24 +131,22 @@ export default class BubblingPlayer{
 						this.lockDelay += dt;
 					}
 				}
+				this.bubbling.updateLR();
+				this.View.moveCycle(this.bubbling);
 				
 				if(this.lockDelay >= 0.533 && !this.Board.valid(this.bubbling.getPos(DIRECTION.DOWN))) {
 					this.phase++;
 				}
                 break;
             }
-			case PHASE.BOUNCE: {
-				// if(!this.View.bounceAnimation(this.bubbling)){
-					
-				// } else {
-					this.phase++;
-				// }
-			}
             case PHASE.LOCK: {
 				this.lockDelay = 0;
                 this.Board.lockMult(this.bubbling)
 				this.phase++;
-				this.View.drawBoard(this.Board);
+				let bub = this.bubbling.mainPiece;
+				if(!this.Board.validCell(bub.x,bub.y+1)) this.bounce(bub);
+				bub = this.bubbling.subPiece;
+				if(!this.Board.validCell(bub.x,bub.y+1)) this.bounce(bub);
                 break;
             }
             case PHASE.FALL: {
@@ -169,9 +169,11 @@ export default class BubblingPlayer{
                 break;
             }
             case PHASE.FALL_ANIMATION_END: {
+				if(this.onBounceAnimation) break;
                 for(let x = 0; x<BUBBLING_BOARD_WIDTH;x++) {
                     for(let Bubbling of this.fallingBubblings[x]) {
                         this.Board.lockSingle(Bubbling);
+						this.bounce(Bubbling); 
                     }
                 }
                 //this.View.emptyArray();
@@ -181,6 +183,8 @@ export default class BubblingPlayer{
                 break;
             }
             case PHASE.CALC: {
+				if(this.onBounceAnimation) break;
+                this.View.drawBoard(this.Board);
                 this.phase++;
                 this.calcData = this.Board.calc();
                 break;
@@ -267,6 +271,7 @@ export default class BubblingPlayer{
 				let p2 = this.random.getBubbling(i+1);
 				this.View.drawNexts(p1,p2);
 
+                this.View.popFrame = 0;
                 this.phase = PHASE.DROP;
                 break;
             }
@@ -318,32 +323,6 @@ export default class BubblingPlayer{
 		}
 	};
 
-	moveDownCycle = (dt) => {
-		if(this.Stats.keyMap[KEY.DOWN]) {
-			if(this.DFrameCounter%ARR==0){
-				if (this.moveDown()) {
-					this.Stats.score += 1;
-					this.View.displayScore(this.Stats.scoreToText());
-				}				
-			}
-			this.DFrameCounter++;
-			return;
-		}
-		this.dropRate += dt;
-		while (this.dropRate > this.gravity) {
-			this.dropRate -= this.gravity;
-			this.moveDown();
-		}
-	};
-
-	moveDown = () => {
-		if(this.Board.valid(this.bubbling.getPos(DIRECTION.DOWN))){
-			this.bubbling.move(0,1);
-			return true;
-		}
-		return false;
-	}
-
     getBubbling = () => {
         const ranNum = this.random.getBubbling(this.Stats.getIndexInc());
         const p1 = ( ranNum & 0xc ) / 0x4;
@@ -354,23 +333,87 @@ export default class BubblingPlayer{
 	setOpponent = type => {
 		this.Stats.setOpponent(type);
 	};
+
+	bounce = (bub) => {
+		this.BBM.addSingle(bub);
+	}
 }
 
-const PHASE = 
-{
+const PHASE = {
+	STAND_BY: -1,
     DROP: 0,
-	BOUNCE: 1,
-    LOCK: 2,
-    FALL: 3,
-    FALL_ANIMATION: 4,
-    FALL_ANIMATION_END: 5,
-    CALC: 6,
-    POP:7,
-    POP_ANIMATION:8,
-	GARB:9,
-	GARB_FALL:10,
-	GARB_FALL_ANIMATION_END:11,
-    NEW_BUBBLING:12,
-
+    LOCK: 1,
+    FALL: 2,
+    FALL_ANIMATION: 3,
+    FALL_ANIMATION_END: 4,
+    CALC: 5,
+    POP:6,
+    POP_ANIMATION:7,
+	GARB:8,
+	GARB_FALL:9,
+	GARB_FALL_ANIMATION_END:10,
+    NEW_BUBBLING:11,
     GAME_OVER:99
+}
+
+class BouncingBubblingManager {
+	constructor() {
+		this.arr = [];
+	}
+	
+	addSingle = (bub) => {
+		this.arr.push(new BouncingBubbling(bub.x,bub.y,bub.type));
+	}
+	
+	addByData = (x,y,c) => {
+		this.arr.push(new BouncingBubbling(x,y,c));		
+	}
+
+	addArr = arr => {
+		this.arr.concat(arr);
+	}
+	
+	getArr = () => {
+		return this.arr;
+	}
+	
+	update = () => {
+		for(let i = 0; i< this.arr.length; i++){
+			let bubbling = this.arr[i];
+			if(!bubbling) continue
+			if(bubbling.update()) delete this.arr[i];
+		}
+	}
+	
+	cleanUp = () => {
+		this.arr.length = 0;
+	}
+}
+
+class BouncingBubbling {
+	constructor(x,y,c){
+		this.x = x;
+		this.y = y;
+		this.color = c;
+		this.type = c
+		this.state = 0
+		this.frame = 0;
+	}
+	
+	update = () => {
+		let c = this.color;
+		let f = ++this.frame;
+		
+		if(f<7){
+			this.type = POP_SPRITE[c][0];
+			this.state = POP_SPRITE[c][1];
+		} else if (f<12) {
+			this.type = POP_SPRITE[c][0];
+			this.state = POP_SPRITE[c][1]+1;
+		} else {
+			this.type = c
+			this.state = BUBBLING_STATE.N;
+		}
+		return f>12;
+	}
 }

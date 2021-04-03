@@ -31,20 +31,20 @@ export default class Board {
 	};
 
 	valid = (data, color = BUBBLING_TYPE.EMPTY) => {
-		let x = data.x;
+		let x = data.x; 
 		let y = data.y;
-
-		if (x < 0 || x > BUBBLING_BOARD_WIDTH || y >= BUBBLING_BOARD_HEIGHT) return false;
-		if (this.table[y][x] != color) return false;
-
+		if(!this.validCell(x,y,color)) return false;
 		x += data.dx;
 		y += data.dy;
-
-		if (x < 0 || x > BUBBLING_BOARD_WIDTH || y >= BUBBLING_BOARD_HEIGHT) return false;
-		if (this.table[y][x] != color) return false;
-
+		if(!this.validCell(x,y,color)) return false;
 		return true;
 	};
+
+	validCell = (x, y, color = BUBBLING_TYPE.EMPTY) => {
+		if (x < 0 || x > BUBBLING_BOARD_WIDTH || y >= BUBBLING_BOARD_HEIGHT) return false;
+		if (this.table[y][x] != color) return false;
+		return true
+	}
 
 	validRotation = (data, direction = direction.CW) => {
 		let rotation = data.rotation + data.tempRotation;
@@ -254,7 +254,6 @@ export default class Board {
 
 	executeGarbage = () => {
 		let attack = Math.min(this.garbage,30);
-		console.log('executing', attack)
 		this.garbage -= attack;
 		
 		let lines = ( attack / 6 ) | 0;
