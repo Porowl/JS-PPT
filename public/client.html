@@ -1,34 +1,67 @@
 <head>
     <title>JSPPT</title>
+	<style>
+	@font-face {
+		font-family: 'Kongtext';
+		src: url('./fonts/kongtext.ttf')
+	}
+	</style>
 	<link rel="shortcut icon" href="./Images/favicon.ico" type="image/x-icon">
 	<link rel="icon" href="./Images/favicon.ico" type="image/x-icon">
-    <link href="./main.css" rel="stylesheet" type="text/css" media="all">
-	<link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="./css/main.css" rel="stylesheet" type="text/css" media="all">
+    <link href="./css/chatbox.css" rel="stylesheet" type="text/css" media="all">
 </head>
 <body onload="init()">
-	<div id='navgiationBar'>
-		
-	</div>
-	<div id='gameField'>
-		<canvas id="board" width="1024" height="768" z-index="0"></canvas>
-		<canvas id="mino" width="1024" height="768" z-index="1"></canvas>
-		<canvas id="animation" width="1024" height="768" z-index="2"></canvas>
-		<canvas id="infos" width="1024" height="768" z-index="3"></canvas>		
-	</div>
-	<div id='userChatWarpper'>
-		<div id='ScrollableUserChat'>
-			
+	<div class="wrapper">		
+		<div id='navgiationBar'></div>
+		<div id='mainWrapper'>
+			<div id='gameField'>
+				<div id='menu'>
+					<div class="logo">JSPPT</div>
+					<div id='multPlayer' class="menu_button">Play as TETROCKS<img src='./Images/t.png' width='100px'></div>
+					<div id='singlePlayer' class="menu_button">Play as BUBBLINGS<img src='./Images/p.png' width='100px'></div>
+					<div id='settings' class="menu_button">Settings</div>
+				</div>
+				<div id='ingameMenu' class='hidden'>
+					<div id='playAgain' class="small_menu_button">Play Again</div>
+					<div id='ready' class="small_menu_button">ready</div>
+					<div id='return' class="small_menu_button">return</div>
+				</div>
+				<canvas id="board" width="1024" height="768" z-index="0"></canvas>
+				<canvas id="mino" width="1024" height="768" z-index="1"></canvas>
+				<canvas id="animation" width="1024" height="768" z-index="2"></canvas>
+				<canvas id="infos" width="1024" height="768" z-index="3"></canvas>
+			</div>
+			<!-- <section class="chatbox">
+				<div class="chat-nav">
+					<button>×</button>
+				</div>
+				<div class="chat-window">
+					<article class="msg-container msg-remote" id="msg-0">
+						<div class="msg-box">
+							<img class="user-img" id="user-0" src="" />
+							<div class="flr">
+								<div class="messages">
+									<p class="msg" id="msg-0">hi</p>
+								</div>
+								<span class="timestamp"><span class="username">Name</span>&bull;<span class="posttime">3 minutes ago</span></span>
+							</div>
+						</div>
+					</article>
+				</div>
+				<form class="chat-input" onsubmit="return false;">
+					
+					<input type="text" autocomplete="on" placeholder="Type a message" />
+					<button>button</button>
+				</form>
+			</section> -->
+			<div id="playerCounter"></div>
 		</div>
-		<div id='inputBoxWrapper'>
-			
-		</div>
-	</div>
-	<div id='dev'>
-		
 	</div>
 </body>
 
-<script src="./CanvasInput.min.js"></script>
+<foot>
 <script src="./seedrandom.min.js"></script>
 <script src="./socket.io.js"></script>
 <script src="./main.js" type="module"></script>
+</foot>

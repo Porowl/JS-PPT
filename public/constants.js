@@ -372,7 +372,7 @@ export const BUBBLING_BUTTON = new Image();
 BUBBLING_BUTTON.src ='./Images/p.png'
 
 export const TETROCKS_BUTTON = new Image();
-TETROCKS_BUTTON.src ='./Images/t.jpg'
+TETROCKS_BUTTON.src ='./Images/t.png'
 
 export const POP_SPRITE = Object.freeze(
 [
@@ -438,7 +438,7 @@ export const SOUNDS = {
 export const VOICES = {
 	ARLE: {
 		COMBO: n =>{
-			return SOUNDS['COMBO'+Math.min(n,9)];
+			return SOUNDS['COMBO'+Math.min(n,8)];
 		}
 	},
 }

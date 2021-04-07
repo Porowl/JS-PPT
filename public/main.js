@@ -4,33 +4,37 @@ import TetView from './Tetrocks/TetView.js';
 import BubblingPlayer from './Bubblings/BubblingPlayer.js';
 import BubblingView from './Bubblings/BubblingView.js';
 import Randomizer from './Randomizer.js'
-import menu from './Menu.js';
+// import menu from './Menu.js';
 
-import {canvas0, canvas1, canvas2, canvas3,GAME_STATE,playSound,SOUNDS} from './constants.js';
+import {canvas0, canvas1, canvas2, canvas3, ctx0, ctx1, ctx2, ctx3, GAME_STATE,playSound,SOUNDS} from './constants.js';
 
 let established = false;
 let requestId;
 let keySettings = () => {};
 let Player;
 let EnemyView;
-let GUI;
+// let GUI;
 let myType;
 let enemyType;
+let ready;
 
 const init = () => {
-	resize();
-
-	window.addEventListener('resize', resize, false);
 	window.addEventListener('focus',()=>{
 		document.title = 'JS-PPT';
 		PageTitleNotification.off();
 	});
 	
+	initMenus();
+	
+	let counter = document.getElementById('playerCounter');
+	socket.on('currPlayers',data=>{
+		counter.innerText = data + ' player' + (data>1?'s are':' is') + ' currently online';
+	});
+
 	socket.on('connected', () => {
 		if(established) return;
 		established = true;
-		GUI = menu;
-		GUI.changeScreenTo('title');
+		// GUI = menu;
 		socket.emit('load_complete')
 	});
 	
@@ -39,8 +43,8 @@ const init = () => {
 		
 		myType = type;
 		Player = myType==='BUBBLING'?new BubblingPlayer(socket.id):new TetPlayer(socket.id);
-		window.player = Player;
-		GUI.changeScreenTo('returnToMain')
+		ready = false;
+		// GUI.changeScreenTo('returnToMain')
 	});
 
 	socket.on('oppJoined', type =>{
@@ -60,11 +64,11 @@ const init = () => {
 	
 	socket.on('seed', seed=>{
 		Player.random = new Randomizer(seed);
-		GUI.changeScreenTo('ready');
+		// GUI.changeScreenTo('ready');
 	});
 
 	socket.on('countdown', ()=>{
-		GUI.changeScreenTo('empty');
+		// GUI.changeScreenTo('empty');
 		Player.countDown();
 		setTimeout(()=>{EnemyView.countDown(3)},0);
 		setTimeout(()=>{EnemyView.countDown(2)},1000);
@@ -108,7 +112,6 @@ const init = () => {
 	socket.on('oppDisconnected',()=>{
 		console.log('enemy disconnected');
 		EnemyView.display(GAME_STATE.DISCONNECTED);
-		GUI.changeScreenTo('returnToMain');
 		GameCycle.off();
 	});
 	
@@ -117,7 +120,6 @@ const init = () => {
 		let b = (id==socket.id)?GAME_STATE.WIN:GAME_STATE.LOST;
 		Player.View.display(a);
 		EnemyView.display(b);
-		GUI.changeScreenTo('replay');
 		GameCycle.off();
 	});
 	
@@ -131,31 +133,64 @@ const init = () => {
 		Player.setOpponent(enemyType);
 		Player.View.display();
 		EnemyView.display();
-		GUI.changeScreenTo('ready');
 	})
 };
+const hide = item => item.classList.add('hidden');
+const show = item => item.classList.remove('hidden');
 
-const resize = () => {
-	var ratio = canvas0.width / canvas0.height;
-	var ch = window.innerHeight;
-	var cw = ch * ratio;
-	if (cw > window.innerWidth) {
-		cw = Math.floor(window.innerWidth);
-		ch = Math.floor(cw / ratio);
+const initMenus = () => {
+	let menus = document.getElementById('menu');
+	let igmenus = document.getElementById('ingameMenu');
+	let mult = document.getElementById('multPlayer');
+	let sing = document.getElementById('singlePlayer');
+	let sett = document.getElementById('settings');
+	let red = document.getElementById('ready');
+	let ret = document.getElementById('return');
+	let playAgain = document.getElementById('playAgain')
+
+	mult.addEventListener('click',()=>{
+		hide(menus);
+		show(igmenus)
+		hide(red);
+		hide(playAgain);
+		socket.emit('waiting','TETROCKS');
+	});
+	sing.addEventListener('click',()=>{
+		hide(menus);
+		show(igmenus)
+		hide(red);
+		hide(playAgain);
+		socket.emit('waiting','BUBBLING');
+	})
+	sett.addEventListener('click',()=>{
+		alert('WIP: 개발중입니다.');
+	})
+	red.addEventListener('click', () => {
+		ready = ready ^ true;
+		let eventName = ready ?'ready':'cancel' 
+		socket.emit(eventName);
+	})
+	ret.addEventListener('click', () => {
+		ctx0.clearRect(0,0,1024,768);
+		ctx1.clearRect(0,0,1024,768);
+		ctx2.clearRect(0,0,1024,768);
+		ctx3.clearRect(0,0,1024,768);
+		socket.emit('leaveRoom');
+		hide(igmenus);
+		show(menus);
+	})
+	socket.on('oppJoined',()=>show(red));
+	socket.on('countdown',()=>hide(igmenus));
+	socket.on('GAME_OVER',()=>{
+		hide(red);
+		show(playAgain);
+		show(igmenus);
+	});
+	socket.on('reset'),()=>{
+		show(red);
+		hide(playAgain);
 	}
-	if (window.innerWidth > 1024) {
-		cw = 1024;
-		ch = 768;
-	}
-	canvas0.style.width = cw;
-	canvas0.style.height = ch;
-	canvas1.style.width = cw;
-	canvas1.style.height = ch;
-	canvas2.style.width = cw;
-	canvas2.style.height = ch;
-	canvas3.style.width = cw;
-	canvas3.style.height = ch;
-};
+}
 
 const resetPlayer = (user) =>{
 	if(user){

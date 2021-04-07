@@ -210,21 +210,6 @@ SelectBubbling.setEvent(()=>{
 	SelectTETROCKS.context.changeScreenTo('empty');
 });
 
-let input = new CanvasInput({
-	canvas: canvas3,
-	width: 285,
-	height: 25,
-	x: 1024/2-150,
-	y: 768/2+165,
-	borderRadius: 1,
-	padding: 5,
-	fontWeight: 'bold',
-	backgroundColor: COLOR_GREY
-});
-titleScreen.addEvent(()=>{
-	input.render();
-});
-
 let UsernameLocator = new MenuButton(1024/2-150,768/2+155,300,100,'');
 titleScreen.addButton(UsernameLocator);
 UsernameLocator.draw = ()=>{};
@@ -257,7 +242,7 @@ returnButton.setEvent(()=>{
 	ctx0.clearRect(0,0,1024,768);
 	ctx1.clearRect(0,0,1024,768);
 	ctx2.clearRect(0,0,1024,768);
-	ctx3.clearRect(0,0,1024,768);
+	ctx3.clearRect(0,0,1024,768);	socket.emit('leaveRoom');
 	returnToMain.context.changeScreenTo('title')
 	socket.emit('leaveRoom');
 });
