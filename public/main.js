@@ -184,7 +184,7 @@ const initMenus = () => {
 		hide(red);
 		hide(playAgain);
 		menuWrapper.classList.remove('scrollLeft');
-		if(mode) socket.emit('waiting','TETROCKS'});
+		if(mode) socket.emit('waiting','TETROCKS');
 		else playSinglePlayer('TETROCKS');
 	});
 	PasB.addEventListener('click',()=>{
