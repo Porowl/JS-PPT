@@ -62,7 +62,7 @@ export default class view {
 				ctx.fillStyle = COLOR_MAP[0];
 				break;
 		}
-		ctx.clearRect(BOARD_CENTER_X + this.offset - 100, BOARD_CENTER_Y - 100, 300, 300);
+		ctx.clearRect(BOARD_CENTER_X + this.offset - 100, BOARD_CENTER_Y - 100, 300, 200);
 		if (i == 0) return;
 		ctx.fillText(i, BOARD_CENTER_X + this.offset, BOARD_CENTER_Y, BLOCK_SIZE_OUTLINE * 10);
 	};
@@ -196,7 +196,7 @@ export default class view {
 				break;
 		}
 		
-		ctx.clearRect(X_OFFSET+this.offset,Y_OFFSET,BLOCK_SIZE_OUTLINE*10,BLOCK_SIZE_OUTLINE*20)
+		ctx.clearRect(X_OFFSET+this.offset,Y_OFFSET,BLOCK_SIZE_OUTLINE*10,BLOCK_SIZE_OUTLINE*17)
 		ctx.fillText(string, BOARD_CENTER_X + this.offset, BOARD_CENTER_Y, BLOCK_SIZE_OUTLINE * 10);
 		ctx.strokeStyle = COLOR_BLACK;
 		ctx.lineWidth = 1;

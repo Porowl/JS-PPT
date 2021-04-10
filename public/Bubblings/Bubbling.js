@@ -54,7 +54,7 @@ export default class Bubbling{
 
     moveLR = () => {
         let dx = (this.x * BUBBLING_SIZE - this.gX) * 0.4 | 0;
-        let dy = (this.y * BUBBLING_SIZE - this.gY) * 0.4 | 0;
+        let dy = (this.y * BUBBLING_SIZE - this.gY + this.suby) * 0.4 | 0;
 
 		if(dx == 0)
             this.gX = this.x * BUBBLING_SIZE;
@@ -69,7 +69,7 @@ export default class Bubbling{
 		if(this.suby>BUBBLING_SIZE) {
 			this.suby -= BUBBLING_SIZE;
 			this.y++
-		} ;
+		};
 	}
 
     moveRotate = (x,y, keyDown) => {

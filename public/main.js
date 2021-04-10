@@ -6,16 +6,21 @@ import BubblingView from './Bubblings/BubblingView.js';
 import Randomizer from './Randomizer.js'
 // import menu from './Menu.js';
 
-import {canvas0, canvas1, canvas2, canvas3, ctx0, ctx1, ctx2, ctx3, GAME_STATE,playSound,SOUNDS} from './constants.js';
+import {canvas0, canvas1, canvas2, canvas3, ctx0, ctx1, ctx2, ctx3, GAME_STATE,playSound,SOUNDS,AudioVolumeManager} from './constants.js';
 
+//
 let established = false;
 let requestId;
 let keySettings = () => {};
+
+//
 let Player;
 let EnemyView;
-// let GUI;
 let myType;
 let enemyType;
+
+// 
+let mode;
 let ready;
 
 const init = () => {
@@ -43,6 +48,7 @@ const init = () => {
 		
 		myType = type;
 		Player = myType==='BUBBLING'?new BubblingPlayer(socket.id):new TetPlayer(socket.id);
+		Player.initMultEvents();
 		ready = false;
 		// GUI.changeScreenTo('returnToMain')
 	});
@@ -70,13 +76,11 @@ const init = () => {
 	socket.on('countdown', ()=>{
 		// GUI.changeScreenTo('empty');
 		Player.countDown();
+		GameCycle.on();
 		setTimeout(()=>{EnemyView.countDown(3)},0);
 		setTimeout(()=>{EnemyView.countDown(2)},1000);
 		setTimeout(()=>{EnemyView.countDown(1)},2000);
-		setTimeout(()=>{
-			EnemyView.countDown(0);
-			GameCycle.on();
-		},3000);
+		setTimeout(()=>{EnemyView.countDown(0)},3000);
 	})
 	
 	socket.on('eview', data =>{
@@ -84,6 +88,10 @@ const init = () => {
 		if(!EnemyView[call]) {console.log(`${call} is not found!`); return;}
 		Array.isArray(data.args)?EnemyView[call](...data.args):EnemyView[call](data.args);
 	})
+	
+	socket.on('enemyAud',data=>{
+		playSound(data,false);
+	});
 	
 	socket.on('readyStatus', data=>{
 		if(data==socket.id){
@@ -124,15 +132,19 @@ const init = () => {
 	});
 	
 	socket.on('reset',seed=>{
-		resetPlayer(Player);
-		
-		Player = myType==='BUBBLING'?new BubblingPlayer(socket.id):new TetPlayer(socket.id);
-		EnemyView = enemyType === 'BUBBLING'?new BubblingView(1):new TetView(1);
-		Player.random = new Randomizer(seed);
-		EnemyView.preview = true;
-		Player.setOpponent(enemyType);
-		Player.View.display();
-		EnemyView.display();
+		if(mode==1){
+			resetPlayer(Player);
+			Player = myType==='BUBBLING'?new BubblingPlayer(socket.id):new TetPlayer(socket.id);
+			EnemyView = enemyType === 'BUBBLING'?new BubblingView(1):new TetView(1);
+			Player.initMultEvents();
+			Player.random = new Randomizer(seed);
+			EnemyView.preview = true;
+			Player.setOpponent(enemyType);
+			Player.View.display();
+			EnemyView.display();			
+		} else if(mode==0) {
+			singlePlayerGameOver();
+		}
 	})
 };
 const hide = item => item.classList.add('hidden');
@@ -140,42 +152,69 @@ const show = item => item.classList.remove('hidden');
 
 const initMenus = () => {
 	let menus = document.getElementById('menu');
+	let menuWrapper = document.getElementById('menuWrapper');
 	let igmenus = document.getElementById('ingameMenu');
 	let mult = document.getElementById('multPlayer');
 	let sing = document.getElementById('singlePlayer');
 	let sett = document.getElementById('settings');
 	let red = document.getElementById('ready');
 	let ret = document.getElementById('return');
-	let playAgain = document.getElementById('playAgain')
+	let playAgain = document.getElementById('playAgain');
+	let selectBoardText = document.getElementById('selectBoardText');
 
+	let PasT = document.getElementById('PasT');
+	let PasB = document.getElementById('PasB');
+	
 	mult.addEventListener('click',()=>{
-		hide(menus);
-		show(igmenus)
-		hide(red);
-		hide(playAgain);
-		socket.emit('waiting','TETROCKS');
+		mode = 1;
+		selectBoardText.innerText = 'SELECT YOUR BOARD TO COMPETE WITH:';
+		menuWrapper.classList.add('scrollLeft');
 	});
 	sing.addEventListener('click',()=>{
+		mode = 0;
+		selectBoardText.innerText = 'SELECT YOUR BOARD TO PRACTICE:';
+		menuWrapper.classList.add('scrollLeft');
+	});
+	sett.addEventListener('click',()=>{
+		menuWrapper.classList.add('scrollRight');
+	});
+	PasT.addEventListener('click',()=>{
 		hide(menus);
 		show(igmenus)
 		hide(red);
 		hide(playAgain);
-		socket.emit('waiting','BUBBLING');
-	})
-	sett.addEventListener('click',()=>{
-		alert('WIP: 개발중입니다.');
+		menuWrapper.classList.remove('scrollLeft');
+		if(mode) socket.emit('waiting',{type:'TETROCKS',mode:mode});
+		else playSinglePlayer('TETROCKS');
+	});
+	PasB.addEventListener('click',()=>{
+		hide(menus);
+		show(igmenus)
+		hide(red);
+		hide(playAgain);
+		menuWrapper.classList.remove('scrollLeft');
+		if(mode) socket.emit('waiting',{type:'BUBBLING',mode:mode});
+		else playSinglePlayer('BUBBLING');
 	})
 	red.addEventListener('click', () => {
-		ready = ready ^ true;
-		let eventName = ready ?'ready':'cancel' 
-		socket.emit(eventName);
+		if(mode==1){
+			ready = ready ^ true;
+			let eventName = ready ?'ready':'cancel' 
+			socket.emit(eventName);			
+		} else if (mode==0) {
+			startSinglePlayer();
+		}
 	})
 	ret.addEventListener('click', () => {
+		if(mode==1) {
+			socket.emit('leaveRoom');
+		} else {
+			singlePlayerGameOver();	   
+		}
 		ctx0.clearRect(0,0,1024,768);
 		ctx1.clearRect(0,0,1024,768);
 		ctx2.clearRect(0,0,1024,768);
 		ctx3.clearRect(0,0,1024,768);
-		socket.emit('leaveRoom');
 		hide(igmenus);
 		show(menus);
 	})
@@ -186,22 +225,51 @@ const initMenus = () => {
 		show(playAgain);
 		show(igmenus);
 	});
+	socket.on('oppDisconnected',()=>{
+		hide(red);
+		show(playAgain);
+		show(igmenus);
+	});
 	socket.on('reset'),()=>{
 		show(red);
 		hide(playAgain);
 	}
 }
 
-const resetPlayer = (user) =>{
-	if(user){
-		let eventNames = user.eventTriggerNames;
-		let events = user.events;
+const resetPlayer = () =>{
+	if(Player){
+		let eventNames = Player.eventTriggerNames;
+		let events = Player.events;
 		
 		for(let i = 0; i<eventNames.length;i++){
 			document.removeEventListener(eventNames[i],events[i]);
 		}
-		user = null;
+		Player = null;
 	}
+}
+
+const playSinglePlayer = (mode) => {
+	resetPlayer();
+	myType = mode;
+	Player = myType ==='BUBBLING'?new BubblingPlayer(socket.id):new TetPlayer(socket.id);
+	Player.random = new Randomizer(Math.random().toString(36).substr(2,11));
+	Player.View.preview = true;
+	show(document.getElementById('ready'));
+}
+
+const startSinglePlayer = () => {
+	resetPlayer();
+	Player = myType==='BUBBLING'?new BubblingPlayer(socket.id):new TetPlayer(socket.id);
+	Player.random = new Randomizer(Math.random().toString(36).substr(2,11));
+	Player.View.preview = true;
+	hide(document.getElementById('ready'));
+	Player.countDown();
+	GameCycle.on();
+}
+
+const singlePlayerGameOver = () => {
+	GameCycle.off();
+	resetPlayer();
 }
 
 const PageTitleNotification = {
@@ -248,4 +316,10 @@ const update = () => {
 	if(Player) Player.update(GameCycle.dt());
 }
 
+const SetVolume = value => {
+	AudioVolumeManager.vars.volume = value/100;
+	playSound(SOUNDS.COMBO1, false)
+}
+
 window.init = init;
+window.SetVolume = SetVolume;

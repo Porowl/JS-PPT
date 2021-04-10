@@ -240,11 +240,7 @@ export default class Board {
 				n = 0;
 				this.inqueue = d;
 			} else {
-<<<<<<< Updated upstream
-				n = 0 -d;
-=======
 				n = 0 - d;
->>>>>>> Stashed changes
 				this.inqueue = 0;
 			}
 		}

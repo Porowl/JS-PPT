@@ -18,43 +18,71 @@
 			<div id='gameField'>
 				<div id='menu'>
 					<div class="logo">JSPPT</div>
-					<div id='multPlayer' class="menu_button">Play as TETROCKS<img src='./Images/t.png' width='100px'></div>
-					<div id='singlePlayer' class="menu_button">Play as BUBBLINGS<img src='./Images/p.png' width='100px'></div>
-					<div id='settings' class="menu_button">Settings</div>
+					<div id='menuWrapper'>
+						<div class='main'>
+							<div id='multPlayer' class="menu_button hoverButton">PLAY ONLINE</div>
+							<div id='singlePlayer' class="menu_button hoverButton">PRACTICE</div>
+							<div id='settings' class="menu_button hoverButton">SETTINGS</div>
+							<div> </div>
+						</div>
+						<div id='playerChoose' class='main right'>
+							<div id='selectBoardText'> SELECT YOUR GAME MODE </div>
+							<div id='PasT' class="mid_menu_button hoverButton">PLAY AS TETROCKS</div>
+							<div id='PasB' class="mid_menu_button hoverButton">PLAY AS BUBBLINGS</div>
+							<div class="small_menu_button hoverButton" onclick="resetToMain();">RETURN</div>
+						</div>
+						<div id='settingsMenu' class='main left'>
+							<div class='scrollable'>
+								<div class='contentWrapper'>
+									<h1 onclick='toggleCategory(0);'>KEY SETTINGS</h1>
+									<div class='keySettings Category'>
+										<h2>
+											※Option to change key settings will be added. Default keys are:
+										</h2>
+										<table>
+											<th colspan="3">TETROCKS</th>
+											<tr><td>MOVE LEFT</td><td id="p1_LEFT" class="kb">←</td><td></td></tr>
+											<tr><td>MOVE RIGHT</td><td id="p1_RIGHT" class="kb">→</td><td></td></tr>
+											<tr><td>SOFT DROP</td><td id="p1_DOWN" class="kb">↓</td><td></td></tr>
+											<tr><td>HARD DROP</td><td id="p1_SPACE" class="kb">SPACE</td><td></td></tr>
+											<tr><td>Rotate  CW</td><td id="p1_UP" class="kb">↑</td><td id="p1_X" class="kb">X</td></tr>
+											<tr><td>Rotate ACW</td><td id="p1_CTRL" class="kb">CTRL</td><td id="p1_Z" class="kb">Z</td></tr>
+											<tr><td>HOLD</td><td id="p1_SHIFT" class="kb">SHIFT</td><td id="p1_C" class="kb">C</td></tr>
+										</table>
+										<table>
+											<th colspan="3">BUBBLINGS</th>
+											<tr><td>MOVE LEFT</td><td id="p1_LEFT" class="kb">←</td><td></td></tr>
+											<tr><td>MOVE RIGHT</td><td id="p1_RIGHT" class="kb">→</td><td></td></tr>
+											<tr><td>SOFT DROP</td><td id="p1_DOWN" class="kb">↓</td><td></td></tr>
+											<tr><td>Rotate  CW</td><td id="p1_UP" class="kb">↑</td><td id="p1_X" class="kb">Z</td></tr>
+											<tr><td>Rotate ACW</td><td id="p1_CTRL" class="kb">CTRL</td><td id="p1_Z" class="kb">X</td></tr>
+										</table>									
+									</div>
+									<h1 onclick="toggleCategory(1);">VOLUME</h1>
+									<div class='volumeSettings Category'>
+										<!-- <label for="bgm">Background Music</label>
+										<input name="bgm" type="range" min="0" max="100" step="1" 
+										oninput="SetVolume(this.value)" onchange="SetVolume(this.value)"> -->
+										<label for="sfx">Sound Effects</label>
+										<input name="sfx" type="range" min="0" max="100" step="1" value="35"
+										oninput="SetVolume(this.value)" onchange="SetVolume(this.value)">
+									</div>
+								</div>
+								<div class="small_menu_button hoverButton" onclick="resetToMain();">RETURN</div>
+							</div>
+						</div>
+					</div>
 				</div>
 				<div id='ingameMenu' class='hidden'>
-					<div id='playAgain' class="small_menu_button">Play Again</div>
-					<div id='ready' class="small_menu_button">ready</div>
-					<div id='return' class="small_menu_button">return</div>
+					<div id='playAgain' class="small_menu_button hoverButton">Play Again</div>
+					<div id='ready' class="small_menu_button hoverButton">READY</div>
+					<div id='return' class="small_menu_button hoverButton">QUIT</div>
 				</div>
 				<canvas id="board" width="1024" height="768" z-index="0"></canvas>
 				<canvas id="mino" width="1024" height="768" z-index="1"></canvas>
 				<canvas id="animation" width="1024" height="768" z-index="2"></canvas>
 				<canvas id="infos" width="1024" height="768" z-index="3"></canvas>
 			</div>
-			<!-- <section class="chatbox">
-				<div class="chat-nav">
-					<button>×</button>
-				</div>
-				<div class="chat-window">
-					<article class="msg-container msg-remote" id="msg-0">
-						<div class="msg-box">
-							<img class="user-img" id="user-0" src="" />
-							<div class="flr">
-								<div class="messages">
-									<p class="msg" id="msg-0">hi</p>
-								</div>
-								<span class="timestamp"><span class="username">Name</span>&bull;<span class="posttime">3 minutes ago</span></span>
-							</div>
-						</div>
-					</article>
-				</div>
-				<form class="chat-input" onsubmit="return false;">
-					
-					<input type="text" autocomplete="on" placeholder="Type a message" />
-					<button>button</button>
-				</form>
-			</section> -->
 			<div id="playerCounter"></div>
 		</div>
 	</div>
@@ -64,4 +92,15 @@
 <script src="./seedrandom.min.js"></script>
 <script src="./socket.io.js"></script>
 <script src="./main.js" type="module"></script>
+<script>
+	const menuWrapper = document.getElementById('menuWrapper');
+	const categories = document.getElementsByClassName('Category');
+	const resetToMain = () => {
+		menuWrapper.classList.remove('scrollLeft');
+		menuWrapper.classList.remove('scrollRight');
+	}
+	const toggleCategory = (n) => {
+		categories[n].classList.toggle('show');
+	}
+</script>
 </foot>

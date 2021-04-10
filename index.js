@@ -76,6 +76,10 @@ io.on('connection', (socket) => {
 		let room = Rmgr.getRoom(socket);
 		if(room) room.sendGraphicInfo(socket, data);
 	})
+	socket.on('aud',data=>{
+		let room = Rmgr.getRoom(socket);
+		if(room) room.trigAud(socket, data);
+	});
 	socket.on('playAgain',()=>{
 		let room = Rmgr.getRoom(socket);
 		if(room) room.playAgain(socket.id);
@@ -91,6 +95,7 @@ io.on('connection', (socket) => {
 	socket.on('gameOver', () =>{
 		let room = Rmgr.getRoom(socket); let other = null;
 		if(room) room.gameOver(socket.id);
+		else io.to(socket.id).emit('reset');
 	});
 });
 

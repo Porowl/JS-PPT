@@ -39,8 +39,6 @@ export default class RoomManager {
 		let roomIndex = this.findRoomIndex(socket);
 		if(roomIndex!=-1){
 			room = this.rooms[roomIndex];
-		} else {
-			console.log(`${socket.id}: room not found!`);
 		}
 		return room;
 	}
@@ -147,6 +145,10 @@ class Room {
 		if(other) io.to(other.id).emit('fireGarb');
 	}
 	
+	trigAud = (socket,data) => {
+		let other = this.other(socket);
+		if(other) io.to(other.id).emit('enemyAud',data);
+	}
 }
 
 const STATUS = {
