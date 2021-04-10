@@ -184,7 +184,7 @@ const initMenus = () => {
 		hide(red);
 		hide(playAgain);
 		menuWrapper.classList.remove('scrollLeft');
-		if(mode) socket.emit('waiting',{type:'TETROCKS',mode:mode});
+		if(mode) socket.emit('waiting','TETROCKS'});
 		else playSinglePlayer('TETROCKS');
 	});
 	PasB.addEventListener('click',()=>{
@@ -193,7 +193,7 @@ const initMenus = () => {
 		hide(red);
 		hide(playAgain);
 		menuWrapper.classList.remove('scrollLeft');
-		if(mode) socket.emit('waiting',{type:'BUBBLING',mode:mode});
+		if(mode) socket.emit('waiting','BUBBLING');
 		else playSinglePlayer('BUBBLING');
 	})
 	red.addEventListener('click', () => {
