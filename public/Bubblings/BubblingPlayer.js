@@ -19,7 +19,7 @@ export default class BubblingPlayer{
 		this.BBM = new BouncingBubblingManager();
 		this.random = {};
 		
-		this.phase = PHASE.NEW_BUBBLING;
+		this.phase = PHASE.STAND_BY;
 		this.LRFrameCounter = 0;
 		this.DFrameCounter = 0;
 		this.RotateFrameCounter = 0;
@@ -66,11 +66,13 @@ export default class BubblingPlayer{
 				}
 			}
 		];
-				
-		for(let i = 0; i<this.eventTriggerNames.length;i++){
+		for(let i = 0; i<2;i++){
 			document.addEventListener(this.eventTriggerNames[i],this.events[i]);
 		}
-		
+	}
+	
+	initMultEvents = () => {
+		document.addEventListener(this.eventTriggerNames[2],this.events[2]);
 		socket.off('receiveAttack')
 		socket.on('receiveAttack',data=> {
 			this.Board.addGarbage(data);
@@ -87,25 +89,12 @@ export default class BubblingPlayer{
 		let p1 = this.random.getBubbling(i);
 		let p2 = this.random.getBubbling(i+1);
 		this.View.drawNexts(p1,p2);
-		
 		this.View.displayScore(this.Stats.scoreToText());
 		
-		setTimeout(() => {
-			this.View.countDown(3);
-		}, 0);
-		setTimeout(() => {
-			this.View.countDown(2);
-		}, 1000);
-		setTimeout(() => {
-			this.View.countDown(1);
-		}, 2000);
-		setTimeout(() => {
-			this.View.countDown(0);
-			this.Stats.setGameStarted();
-		}, 3000);
+		this.phase = PHASE.COUNTDOWN;
 	};
 	
-    update = (dt) => {		
+    update = (dt) => {
 		this.BBM.update();
 		let bbmArr = this.BBM.getArr();
 		if(bbmArr.length>0) {
@@ -116,6 +105,21 @@ export default class BubblingPlayer{
 			}
 		};
         switch(this.phase) {
+			case PHASE.COUNTDOWN:{
+				if(!this.temp) this.temp = 4;
+				if(!this.timeElapsed) this.timeElapsed = 1;
+				let timeElapsed = this.timeElapsed += dt;
+				if(timeElapsed>1){
+					this.timeElapsed -= 1;
+					this.View.countDown(--this.temp);
+				}
+				if(!this.temp) {
+					delete this.temp;
+					this.phase = PHASE.NEW_BUBBLING;
+					this.Stats.setGameStarted();
+				}
+				break;
+			}
 			case PHASE.STAND_BY:
 				break;
             case PHASE.DROP: {
@@ -345,6 +349,7 @@ export default class BubblingPlayer{
 }
 
 const PHASE = {
+	COUNTDOWN: -2,
 	STAND_BY: -1,
     DROP: 0,
     LOCK: 1,

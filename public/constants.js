@@ -1,3 +1,5 @@
+import {socket} from './main.js'
+
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~HTML TAGS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 export const canvas0 = document.getElementById("board");
 export const canvas1 = document.getElementById("mino");
@@ -372,7 +374,7 @@ export const BUBBLING_BUTTON = new Image();
 BUBBLING_BUTTON.src ='./Images/p.png'
 
 export const TETROCKS_BUTTON = new Image();
-TETROCKS_BUTTON.src ='./Images/t.jpg'
+TETROCKS_BUTTON.src ='./Images/t.png'
 
 export const POP_SPRITE = Object.freeze(
 [
@@ -438,14 +440,27 @@ export const SOUNDS = {
 export const VOICES = {
 	ARLE: {
 		COMBO: n =>{
-			return SOUNDS['COMBO'+Math.min(n,9)];
+			return SOUNDS['COMBO'+Math.min(n,8)];
 		}
 	},
 }
 
-export const playSound = url => {
+export const AudioVolumeManager = {
+	vars:{
+		volume: 0.35
+	},
+	setVolume: function(n){
+		this.volume = n/100;
+	}
+}
+
+export const playSound = (url, sendEnemy = true) => {
 	let aud = new Audio(url);
-	aud.volume = 0.35;
+	aud.volume = AudioVolumeManager.vars.volume;
 	aud.play();
+	if(sendEnemy) {
+		socket.emit('aud',url);
+	}
 	return;
 }
+

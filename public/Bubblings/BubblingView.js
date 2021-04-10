@@ -253,16 +253,26 @@ export default class BubblingView extends view {
 		
 		let ctx = (on==CTX_NUM.BOARD?this.boardCtx:this.pieceCtx);
 		
+		let gX = bubbling.gX;
+		let gY = bubbling.gY;
+		
+		if(gY+BUBBLING_SIZE<Y_OFFSET) return;
+		
+		let yOff = 0;
+		if(gY<Y_OFFSET) {
+			yOff = Y_OFFSET - gY;
+		}
+		
 		ctx.drawImage(
 			SPRITE_IMAGE, //Source
 			state * BUBBLING_SIZE, //sX
-			type * BUBBLING_SIZE, //sY
+			type * BUBBLING_SIZE + yOff, //sY
 			BUBBLING_SIZE, //s Width
-			BUBBLING_SIZE, //s Height
-			bubbling.gX + X_OFFSET + this.offset, //dX
-			bubbling.gY - BUBBLING_SIZE + Y_OFFSET, //dY
+			BUBBLING_SIZE - yOff, //s Height
+			gX + X_OFFSET + this.offset, //dX
+			gY - BUBBLING_SIZE + Y_OFFSET + yOff, //dY
 			BUBBLING_SIZE, //dW
-			BUBBLING_SIZE //dH
+			BUBBLING_SIZE -yOff //dH
 		);
 	};
 
@@ -278,19 +288,23 @@ export default class BubblingView extends view {
 			state = 6;
 			type = 12;
 		}
-
 		let ctx = (on==CTX_NUM.BOARD?this.boardCtx:this.pieceCtx);
 		
+		if(y+BUBBLING_SIZE<Y_OFFSET) return;
+		let yOff = 0;
+		if(y<Y_OFFSET) {
+			yOff = Y_OFFSET - y;
+		}
 		ctx.drawImage(
 			SPRITE_IMAGE, //Source
 			state * BUBBLING_SIZE, //sX
-			type * BUBBLING_SIZE, //sY
+			type * BUBBLING_SIZE + yOff, //sY
 			BUBBLING_SIZE, //s Width
-			BUBBLING_SIZE, //s Height
+			BUBBLING_SIZE - yOff, //s Height
 			x, //dX
-			y, //dY
+			y + yOff, //dY
 			BUBBLING_SIZE, //dW
-			BUBBLING_SIZE //dH
+			BUBBLING_SIZE - yOff //dH
 		);
 	};
 

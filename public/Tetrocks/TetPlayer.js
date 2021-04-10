@@ -36,7 +36,7 @@ export default class Player {
 		this.lockDelayRefreshed = 0;
 		this.lockDelayRefreshedCount = 0;
 		
-		this.phase = PHASE.NEW_BLOCK;
+		this.phase = PHASE.COUNTDOWN;
 		this.gameOver = false;
 		this.cycle = undefined;
 		
@@ -77,8 +77,13 @@ export default class Player {
 				this.updateGauge();
 			}
 		];
-		
-		for(let i = 0; i<this.eventTriggerNames.length;i++){
+		for(let i = 0; i<2;i++){
+			document.addEventListener(this.eventTriggerNames[i],this.events[i]);
+		}
+	}
+
+	initMultEvents = () => {
+		for(let i = 2; i<this.eventTriggerNames.length;i++){
 			document.addEventListener(this.eventTriggerNames[i],this.events[i]);
 		}
 		
@@ -96,7 +101,7 @@ export default class Player {
 			this.View.showGarbage(this.board.getTotalGarb());
 		});
 	}
-
+	
 	setOpponent = type => {
 		this.stg.setOpponent(type);
 		if(this.stg.vsBubbling) this.updateGauge();
@@ -105,22 +110,24 @@ export default class Player {
 	countDown = () => {
 		this.updateNexts();
 		this.updateScore();
-		setTimeout(() => {
-			this.View.countDown(3);
-		}, 0);
-		setTimeout(() => {
-			this.View.countDown(2);
-		}, 1000);
-		setTimeout(() => {
-			this.View.countDown(1);
-		}, 2000);
-		setTimeout(() => {
-			this.View.countDown(0);
-		}, 3000);
 	};
 
 	update = (dt) => {
 		switch (this.phase) {
+			case PHASE.COUNTDOWN:{
+				if(!this.temp) this.temp = 4;
+				if(!this.timeElapsed) this.timeElapsed = 1;
+				let timeElapsed = this.timeElapsed += dt;
+				if(timeElapsed>1){
+					this.timeElapsed -= 1;
+					this.View.countDown(--this.temp);
+				}
+				if(!this.temp) {
+					delete this.temp;
+					this.phase = PHASE.NEW_BLOCK;
+				}
+				break;
+			}
 			case PHASE.STANDBY:{
 				break;
 			}
@@ -209,7 +216,7 @@ export default class Player {
 				
 			case PHASE.GAME_OVER:{
 				this.phase = PHASE.STANDBY;
-				socket.emit('gameOver')
+				socket.emit('gameOver');
 				playSound(SOUNDS.GAMEOVER);
 				break;
 			}
@@ -389,6 +396,7 @@ export default class Player {
 }
 
 const PHASE = {
+	COUNTDOWN: -2,
 	STANDBY: -1,
 	CLEAR_UPS: 0,
 	NEW_BLOCK: 1,

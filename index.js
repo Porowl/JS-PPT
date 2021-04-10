@@ -40,14 +40,11 @@ io.on('connection', (socket) => {
 	},500);
 	socket.on('load_complete',()=>{
 		clearInterval(cycle);
+		socket.emit('currPlayers',io.engine.clientsCount);
 	});
 	
 	console.log('user connected\t: ', socket.id);
 	console.log('Curr. # of users\t: ', io.engine.clientsCount);
-
-	socket.on('askCurrPlayers',()=>{
-		socket.emit('currPlayers',io.engine.clientsCount);	
-	});
 	
 	socket.on('waiting',type=>{
 		lobby.enter(socket,type);
@@ -79,6 +76,10 @@ io.on('connection', (socket) => {
 		let room = Rmgr.getRoom(socket);
 		if(room) room.sendGraphicInfo(socket, data);
 	})
+	socket.on('aud',data=>{
+		let room = Rmgr.getRoom(socket);
+		if(room) room.trigAud(socket, data);
+	});
 	socket.on('playAgain',()=>{
 		let room = Rmgr.getRoom(socket);
 		if(room) room.playAgain(socket.id);
@@ -94,9 +95,9 @@ io.on('connection', (socket) => {
 	socket.on('gameOver', () =>{
 		let room = Rmgr.getRoom(socket); let other = null;
 		if(room) room.gameOver(socket.id);
+		else io.to(socket.id).emit('reset');
 	});
 });
-
 
 const onDisconnection = socket => {
 	lobby.leave(socket);
@@ -104,4 +105,10 @@ const onDisconnection = socket => {
 	if(other) io.to(other.id).emit('oppDisconnected');
 }
 
+const broadCastCurrPlayers = () => {
+	console.log(`${Date()}: updated currPlayers`);
+	io.sockets.emit('currPlayers',io.engine.clientsCount);	
+}
+
+setInterval(broadCastCurrPlayers,60000);
 //git test

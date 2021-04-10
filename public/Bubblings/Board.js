@@ -240,7 +240,7 @@ export default class Board {
 				n = 0;
 				this.inqueue = d;
 			} else {
-				n = 0 -d;
+				n = 0 - d;
 				this.inqueue = 0;
 			}
 		}

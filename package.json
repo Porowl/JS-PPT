@@ -1,7 +1,7 @@
 {
   "name": "js-ppt",
-  "version": "0.1.0",
-  "description": "JS Korean-ripoff of Bubbling Bubbling TETROCKS series",
+  "version": "0.5.0",
+  "description": "Competetive Multiplayer Puzzle Game built with JavaScript",
   "main": "index.js",
   "type": "module",
   "dependencies": {

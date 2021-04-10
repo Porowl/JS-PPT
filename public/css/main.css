@@ -1,0 +1,247 @@
+
+div{
+	position:relative;
+}
+body{
+	background-color:black;
+	width:100%;
+    font-family: 'Kongtext', cursive;
+    color:white;
+    margin:0;
+    padding:auto;
+    overflow:hidden;
+}
+canvas{
+    position:absolute;
+	width:100%;
+	height:100%;
+    top:0px;
+	left:0px;
+	bottom:0px;
+	right:0px;
+	margin:auto;
+}
+.wrapper {
+	display:block;
+	width:100%;
+	max-width: 1170px;
+	margin:auto;
+	padding:16px;
+}
+#mainWrapper {
+	width:100%;
+	max-width: 1024px;
+	margin:auto;
+	clear:both;
+	transition: all 1s linear;
+	left:0;
+}
+#gameField{
+	background-color:rgb(30,30,30);
+	position:relative;
+	height:75vw;
+	max-height:768px;
+	width: 100%;
+	max-width:1024px;
+	margin:auto;
+	top:0px;
+	left:0px;
+}
+.logo{
+	display:flex;
+	margin-top:10vmin;
+	margin-left: auto;
+	margin-right: auto;
+	align-items: center;
+	justify-content: center;
+	font-size:10vmin;
+}
+#menu {
+	overflow:hidden;
+	height:100%;
+	z-index: 1;
+}
+#ingameMenu{
+	position:absolute;
+	bottom:20vmin;
+	left:14vmin;
+	z-index: 1;
+	width:100%;
+}
+#menuWrapper {
+	left: 0;
+	transition: all 0.5s ease-in-out;
+}
+#menuWrapper.scrollLeft{
+	left:-100%;
+}
+#menuWrapper.scrollRight{
+	left:100%;
+}
+.main {
+	width:100%;
+}
+.right {
+	position:absolute;
+	top:0;
+	left:100%;
+}
+.left {
+	position:absolute;
+	top:0;
+	right:100%;
+}
+.menu_button {
+	display:flex;
+	height:10vmin;
+	width:60%;
+	margin:auto;
+	margin-top: 5vmin;
+	font-size:2.5vmin;
+	color: rgba(0,0,0,0.85);
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0 0 0 1.25vmin rgba(0,0,0,0.75) inset; 
+	transition: rotate 0.25s;
+	user-select: none
+}
+.mid_menu_button {
+	display:flex;
+	height:5vmin;
+	width:50%;
+	margin:auto;
+	margin-top: 5vmin;
+	font-size:2.5vmin;
+	color: rgba(0,0,0,0.85);
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0 0 0 1.25vmin rgba(0,0,0,0.75) inset; 
+	transition: rotate 0.25s;
+	user-select: none;
+	background-color:lightyellow;
+}
+.small_menu_button {
+	display:flex;
+	height:5vmin;
+	width:20%;
+	margin:auto;
+	margin-top: 1vmin;
+	margin-left: 2vmin;
+	font-size: 2vmin;
+	color: rgba(0,0,0,0.85);
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0 0 0 0.5vmin rgba(0,0,0,0.75) inset; 
+	transition: rotate 0.25s;
+	user-select: none;
+	background-color:lightgray;
+}
+#selectBoardText {
+	width:100%;
+	display:flex;
+	align-items: center;
+	justify-content: center;	
+	color: white;
+	font-size: 2vmin;
+}
+.hoverButton{
+	transition: all 0.25s;
+}
+.hoverButton:hover{
+	transform: rotate(2deg);
+	transition: all 0.5s;
+}
+#multPlayer{
+	background-color: cyan;
+}
+#singlePlayer{
+	background-color: yellowgreen;
+}
+#settings{
+	background-color: blueviolet;
+}
+#playerCounter{
+	text-align:right;
+	font-size: 1vw;
+}
+.hidden {
+	display:none;
+	transition: all 0.5s;
+}
+
+/* Settings */
+.scrollable {
+	display:flex;
+	flex-direction:column;
+	top:0;
+	height:48vmin;
+	align-items: center;
+	overflow-y:auto;
+	overflow-x:hidden;
+}
+.contentWrapper{
+	display:block;
+	width:90%;
+}
+.Category{
+	border: 1px white dashed;
+	display:flex;
+	width:100%;
+	max-height:0;
+	flex-direction: column;
+	align-items: center;
+	transition: all 0.5s;
+	overflow:hidden;
+}
+.show {
+	max-height:100%;
+	clear:both;
+	transition: all 0.5s;
+}
+.hide:last-child {clear: both;}
+h1{
+	font-size: 3vmin;
+	padding: 1vmin;
+	border: 1p red solid;
+}
+h2{
+	font-size: 1vmin;
+	color: darkred;
+	padding: 1vmin;
+}
+.kb{
+}
+.kb.clicked{
+    border: 1px red solid;
+}
+table{
+	margin:1vmin;
+	width:80%;
+	border-collapse: collapse;
+}
+th{
+	border: none;
+	font-size:3vmin;
+}
+td{
+	height : 1vmin;
+    color: white;
+    border: 1px white solid;
+    text-align:center;
+	font-size:1.5vmin;
+    text-transform:uppercase;
+	padding:1vmin;
+}
+td:nth-child(1){
+	text-align:left;
+	width:70%;
+}
+td:nth-child(2){
+	width:15%;
+}
+td:nth-child(3){
+	width:15%;
+}
+input{
+	width:100%;
+}
