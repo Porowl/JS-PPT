@@ -1,8 +1,7 @@
 import {XY_OFFSETS,DIRECTION,KICK} from '../constants.js'
 
 export default class MultBubblings{
-    constructor(piece1, piece2)
-    {
+    constructor(piece1, piece2) {
         this.mainPiece = piece1;
         this.subPiece = piece2;
         this.subPiece.setPos(2,-1);
@@ -10,8 +9,7 @@ export default class MultBubblings{
         this.tempRotation = 0;
     }
 
-    getPos = (direction = DIRECTION.NONE) =>
-    {
+    getPos = (direction = DIRECTION.NONE) => {
         let data = {
             color1: this.mainPiece.type,
             x: this.mainPiece.x + direction[0],

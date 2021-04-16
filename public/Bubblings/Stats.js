@@ -1,4 +1,4 @@
-import {CHAIN_BONUS,COLOR_BONUS,GROUP_SIZE_BONUS,VS_TETROCKS_SCORE,playSound,VOICES,SOUNDS,KEY,KEYSTATES} from '../constants.js';
+import {CHAIN_BONUS,COLOR_BONUS,GROUP_SIZE_BONUS,VS_TETROCKS_SCORE,playSound,VOICES,SOUNDS,P_KEY as KEY,KEYSTATES} from '../constants.js';
 
 import {socket} from '../main.js';
 
@@ -42,23 +42,25 @@ export default class Stats{
 		return arr;
     } 
 	
-	checkLR = () => {
-        if(this.keyMap[KEY.LEFT]&&this.keyMap[KEY.RIGHT])
-            return 0;
-        else if(this.keyMap[KEY.LEFT]) return KEYSTATES.L;
-        else if(this.keyMap[KEY.RIGHT]) return KEYSTATES.R;
+	isDownPressed = () => this.keyMap[KEY.DOWN1]||this.keyMap[KEY.DOWN2]
+    checkLR = () => {
+		let L = this.keyMap[KEY.LEFT1]||this.keyMap[KEY.LEFT2];
+		let R = this.keyMap[KEY.RIGHT1]||this.keyMap[KEY.RIGHT2];
+        if(L && R) return KEYSTATES.LR;
+        else if(L) return KEYSTATES.L;
+        else if(R) return KEYSTATES.R;
         return -1;
     }
-
     checkRot = () => {
-        if((this.keyMap[KEY.UP]||this.keyMap[KEY.X])
-            &&(this.keyMap[KEY.Z]||this.keyMap[KEY.CTRL]))
-            return KEYSTATES.UZ;
-        else if(this.keyMap[KEY.UP]||this.keyMap[KEY.X]) return KEYSTATES.U;
-        else if(this.keyMap[KEY.Z]||this.keyMap[KEY.CTRL]) return KEYSTATES.Z;
+		let C = this.keyMap[KEY.CW1]||this.keyMap[KEY.CW2];
+		let A = this.keyMap[KEY.ACW1]||this.keyMap[KEY.ACW2];
+		
+        if(C && A) return KEYSTATES.CA;
+        else if(C) return KEYSTATES.C;
+        else if(A) return KEYSTATES.A;
         return -1;
     }
-
+	
     calcScore = (data) =>
     {
         //Score = (10 * NumPopped) * (ChainPower + ColorBonus + GroupBonus)

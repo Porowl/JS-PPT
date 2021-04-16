@@ -1,4 +1,4 @@
-import {GRAVITY, T_SPIN_STATE, SCORE,GAMEMODE,KEYSTATES,KEY,CLEAR_STRINGS,COMBO_GARB,COMBO_GARB_NERF,SOUNDS,GAUGE_TO_TRASH,playSound
+import {GRAVITY, T_SPIN_STATE, SCORE,GAMEMODE,KEYSTATES,T_KEY as KEY,CLEAR_STRINGS,COMBO_GARB,COMBO_GARB_NERF,SOUNDS,GAUGE_TO_TRASH,playSound
 	  } from '../constants.js';
 
 import {socket} from '../main.js';
@@ -118,24 +118,28 @@ export default class Storage{
         }
     }
 
+	isDownPressed = () => this.keyMap[KEY.DOWN1]||this.keyMap[KEY.DOWN2]
     checkLR = () => {
-        if(this.keyMap[KEY.LEFT]&&this.keyMap[KEY.RIGHT])
-            return 0;
-        else if(this.keyMap[KEY.LEFT]) return KEYSTATES.L;
-        else if(this.keyMap[KEY.RIGHT]) return KEYSTATES.R;
+		let L = this.keyMap[KEY.LEFT1]||this.keyMap[KEY.LEFT2];
+		let R = this.keyMap[KEY.RIGHT1]||this.keyMap[KEY.RIGHT2];
+        if(L && R) return KEYSTATES.LR;
+        else if(L) return KEYSTATES.L;
+        else if(R) return KEYSTATES.R;
         return -1;
     }
-
     checkRot = () => {
-        if((this.keyMap[KEY.UP]||this.keyMap[KEY.X])
-            &&(this.keyMap[KEY.Z]||this.keyMap[KEY.CTRL]))
-            return KEYSTATES.UZ;
-        else if(this.keyMap[KEY.UP]||this.keyMap[KEY.X]) return KEYSTATES.U;
-        else if(this.keyMap[KEY.Z]||this.keyMap[KEY.CTRL]) return KEYSTATES.Z;
+		let C = this.keyMap[KEY.CW1]||this.keyMap[KEY.CW2];
+		let A = this.keyMap[KEY.ACW1]||this.keyMap[KEY.ACW2];
+		
+        if(C && A) return KEYSTATES.CA;
+        else if(C) return KEYSTATES.C;
+        else if(A) return KEYSTATES.A;
         return -1;
     }
-    
-    checkHold = () => this.keyMap[KEY.SHIFT]||this.keyMap[KEY.C];
+    checkHold = () => this.keyMap[KEY.HOLD1]||this.keyMap[KEY.HOLD2];
+	resetHoldPress = () => this.keyMap[KEY.HOLD1] = this.keyMap[KEY.HOLD2] = false;
+	checkHardDrop = () => this.keyMap[KEY.HDROP1]||this.keyMap[KEY.HDROP2];
+	resetHardDropPress = () => this.keyMap[KEY.HDROP1] = this.keyMap[KEY.HDROP2] = false;
 
     addScore = mode => {
         let last = this.b2b;
@@ -228,46 +232,9 @@ export default class Storage{
     getGoal = () => (this.gameMode == GAMEMODE.STATIC)?10:(this.level+1)*5;
 
     sendGarbage = (mode) => {
-        let lines = 0;
-        switch(mode)
-        {
-            case SCORE.SINGLE:
-                lines = 0;
-                break;
-            case SCORE.DOUBLE:
-                lines = 1;
-                break;
-            case SCORE.TRIPLE:
-                lines = 2;
-                break;
-            case SCORE.TETROCKS:
-                lines = 4;
-                break;
-            case SCORE.MTS:
-                lines = 0;
-                break;
-            case SCORE.MTSS:
-                lines = 2;
-                break;
-            case SCORE.TS:
-                lines = 0;
-                break;
-            case SCORE.TSS:
-                lines = 2;
-                break;
-            case SCORE.TSD:
-                lines = 4;
-                break;
-            case SCORE.TST:
-                lines = 6;
-                break;
-            case SCORE.PERFECT:
-                lines = 10;
-                break;
-            default:
-                lines = 0;
-        }	
-        lines += (this.b2b>1)?1:0;
+		let lines = LINES_ARR[mode];
+		if(!lines) lines = 0;
+		lines += (this.b2b>1)?1:0;
 		
 		let vsBubbling = lines;
 		if(this.vsBubbling){
@@ -306,3 +273,17 @@ export default class Storage{
 		socket.emit('fireGarb');
 	}
 }
+
+const LINES_ARR = {
+	[SCORE.SINGLE]: 0,
+	[SCORE.DOUBLE]: 1,
+	[SCORE.TRIPLE]: 2,
+	[SCORE.TETROCKS]: 4,
+	[SCORE.MTS]:0,
+	[SCORE.MTSS]:2,
+	[SCORE.TS]:0,
+	[SCORE.TSS]:2,
+	[SCORE.TSD]:4,
+	[SCORE.TST]:6,
+	[SCORE.PERFECT]:10,
+};

@@ -3,7 +3,8 @@ import TetPlayer from './Tetrocks/TetPlayer.js';
 import TetView from './Tetrocks/TetView.js';
 import BubblingPlayer from './Bubblings/BubblingPlayer.js';
 import BubblingView from './Bubblings/BubblingView.js';
-import Randomizer from './Randomizer.js'
+import Randomizer from './Randomizer.js';
+import {initChatbox} from './dep/chat.js';
 // import menu from './Menu.js';
 
 import {canvas0, canvas1, canvas2, canvas3, ctx0, ctx1, ctx2, ctx3, GAME_STATE,playSound,SOUNDS,AudioVolumeManager} from './constants.js';
@@ -30,6 +31,7 @@ const init = () => {
 	});
 	
 	initMenus();
+	initChatbox();
 	
 	let counter = document.getElementById('playerCounter');
 	socket.on('currPlayers',data=>{
@@ -323,3 +325,6 @@ const SetVolume = value => {
 
 window.init = init;
 window.SetVolume = SetVolume;
+
+
+/** working area **/

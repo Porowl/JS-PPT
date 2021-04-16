@@ -1,0 +1,108 @@
+/* Settings */
+.scrollable {
+	display:flex;
+	flex-direction:column;
+	top:0;
+	height:48vmin;
+	align-items: center;
+	overflow-y:auto;
+	overflow-x:hidden;
+}
+.contentWrapper{
+	display:block;
+	width:90%;
+}
+.Category{
+	border: 1px white dashed;
+	display:flex;
+	width:100%;
+	max-height:0;
+	flex-direction: column;
+	align-items: center;
+	transition: all 0.5s;
+	overflow:hidden;
+}
+.show {
+	max-height:100%;
+	clear:both;
+	transition: all 0.5s;
+}
+.hide:last-child {clear: both;}
+h1{
+	font-size: 3vmin;
+	padding: 1vmin;
+}
+h2{
+	font-size: 1vmin;
+	color: darkred;
+	padding: 1vmin;
+}
+.kb{
+}
+.kb.clicked{
+    border: 1px red solid;
+}
+table{
+	margin:1vmin;
+	width:80%;
+}
+th{
+	border: none;
+	font-size:3vmin;
+}
+td{
+	height : 1vmin;
+    color: white;
+    border: 1px white solid;
+    text-align:center;
+	font-size:1.5vmin;
+    text-transform:uppercase;
+	padding:1vmin;
+}
+td:nth-child(1){
+	text-align:left;
+	width:70%;
+}
+td:nth-child(2){
+	width:15%;
+}
+td:nth-child(3){
+	width:15%;
+}
+
+#keyChangeWindow {
+	display:flex;
+	flex-direction:column;
+	align-items:center;
+	justify-content:center;
+	position:fixed;
+    left: 50%;
+    top: 50%;
+	width:100%;
+	height:100%;
+	background-color: rgba(0,0,0,0.5);
+    transform: translate(-50%, -50%);
+	z-index:99;
+	color:black;
+}
+
+.keyChangeContainer {
+	display:flex;
+	flex-direction:column;
+	align-items:center;
+	justify-content:center;
+	background-color:white;
+	padding:1em;
+}
+.keyChangeContainer p:nth-child(2){
+	font-size:4vmin;
+}
+.keyChangeContainer p:nth-child(3){
+	font-size:4vmin;
+}
+.H_buttonWrapper {
+	display:flex;
+	flex-direction:row;
+	width:100%;
+	justify-content:center;
+}

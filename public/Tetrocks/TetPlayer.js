@@ -4,7 +4,7 @@ import Storage from './Storage.js';
 import Mino from './Mino.js';
 import {socket} from '../main.js';
 
-import {DRAWMODE,MOVES,KEYSTATES,LAST_MOVE,KEY,ENTRY_DELAY,DAS,ARR,OFFSETS,I_OFFSETS,PIECE_MAP,
+import {DRAWMODE,KEYSTATES,LAST_MOVE, ENTRY_DELAY,DAS,ARR,OFFSETS,I_OFFSETS,PIECE_MAP,
 	   LINE_CLEAR_FRAMES,CLEAR_STRINGS,SOUNDS,playSound,ACTION_LOCKDELAY_REFRESH_MAX
 	  } from '../constants.js';
 
@@ -242,7 +242,7 @@ export default class Player {
 	};
 
 	moveDownCycle = (dt) => {
-		if (this.stg.keyMap[KEY.DOWN] && this.gravity > 2 / 60) {
+		if (this.stg.isDownPressed() && this.gravity > 2 / 60) {
 			if (this.moveDown()) {
 				this.stg.addDropScore(1);
 				this.updateScore();
@@ -290,11 +290,11 @@ export default class Player {
 
 	rotate = () => {
 		let state = this.stg.checkRot();
-		if (state == KEYSTATES.UZ || state == -1) {
+		if (state == KEYSTATES.CA || state == -1) {
 			this.RotateFrameCounter = 0;
 		} else {
 			if (this.RotateFrameCounter == 0) {
-				state == KEYSTATES.U ? this.rotateAc(1) : this.rotateAc(3);
+				state == KEYSTATES.C ? this.rotateAc(1) : this.rotateAc(3);
 			}
 			this.RotateFrameCounter++;
 		}
@@ -347,19 +347,19 @@ export default class Player {
 			this.holdUsed = true;
 			playSound(SOUNDS.HOLD.play);
 		}
-		this.stg.keyMap[KEY.SHIFT] = false;
-		this.stg.keyMap[KEY.C] = false;
+		this.stg.resetHoldPress();
+		this.stg.resetHardDropPress();
 	};
 
 	hardDrop = () => {
-		if (this.stg.keyMap[KEY.SPACE]) {			
+		if (this.stg.checkHardDrop()) {			
 			var result = this.board.hardDrop(this.piece);
 			this.updatePiece();
 			this.View.hardDropAnimation(this.piece, this.board.garbage);
 			this.stg.addDropScore(result * 2);
 			this.piece.hardDropped = true;
-			this.stg.keyMap[KEY.SPACE] = false;
-			this.stg.keyMap[KEY.H] = false;
+			this.stg.resetHoldPress();
+			this.stg.resetHardDropPress();
 			playSound(SOUNDS.HARDDROP);
 		}
 	};

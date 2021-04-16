@@ -10,8 +10,9 @@
 	<link rel="icon" href="./Images/favicon.ico" type="image/x-icon">
     <link href="./css/main.css" rel="stylesheet" type="text/css" media="all">
     <link href="./css/chatbox.css" rel="stylesheet" type="text/css" media="all">
+    <link href="./css/settings.css" rel="stylesheet" type="text/css" media="all">
 </head>
-<body onload="init()">
+<body onload="init();keySettingEvent();">
 	<div class="wrapper">		
 		<div id='navgiationBar'></div>
 		<div id='mainWrapper'>
@@ -29,34 +30,13 @@
 							<div id='selectBoardText'> SELECT YOUR GAME MODE </div>
 							<div id='PasT' class="mid_menu_button hoverButton">PLAY AS TETROCKS</div>
 							<div id='PasB' class="mid_menu_button hoverButton">PLAY AS BUBBLINGS</div>
-							<div class="small_menu_button hoverButton" onclick="resetToMain();">RETURN</div>
+							<div class="small_menu_button hoverButton" onclick="resetToMain();" style='width:20%;'>RETURN</div>
 						</div>
 						<div id='settingsMenu' class='main left'>
 							<div class='scrollable'>
 								<div class='contentWrapper'>
 									<h1 onclick='toggleCategory(0);'>KEY SETTINGS</h1>
 									<div class='keySettings Category'>
-										<h2>
-											※Option to change key settings will be added. Default keys are:
-										</h2>
-										<table>
-											<th colspan="3">TETROCKS</th>
-											<tr><td>MOVE LEFT</td><td id="p1_LEFT" class="kb">←</td><td></td></tr>
-											<tr><td>MOVE RIGHT</td><td id="p1_RIGHT" class="kb">→</td><td></td></tr>
-											<tr><td>SOFT DROP</td><td id="p1_DOWN" class="kb">↓</td><td></td></tr>
-											<tr><td>HARD DROP</td><td id="p1_SPACE" class="kb">SPACE</td><td></td></tr>
-											<tr><td>Rotate  CW</td><td id="p1_UP" class="kb">↑</td><td id="p1_X" class="kb">X</td></tr>
-											<tr><td>Rotate ACW</td><td id="p1_CTRL" class="kb">CTRL</td><td id="p1_Z" class="kb">Z</td></tr>
-											<tr><td>HOLD</td><td id="p1_SHIFT" class="kb">SHIFT</td><td id="p1_C" class="kb">C</td></tr>
-										</table>
-										<table>
-											<th colspan="3">BUBBLINGS</th>
-											<tr><td>MOVE LEFT</td><td id="p1_LEFT" class="kb">←</td><td></td></tr>
-											<tr><td>MOVE RIGHT</td><td id="p1_RIGHT" class="kb">→</td><td></td></tr>
-											<tr><td>SOFT DROP</td><td id="p1_DOWN" class="kb">↓</td><td></td></tr>
-											<tr><td>Rotate  CW</td><td id="p1_UP" class="kb">↑</td><td id="p1_X" class="kb">Z</td></tr>
-											<tr><td>Rotate ACW</td><td id="p1_CTRL" class="kb">CTRL</td><td id="p1_Z" class="kb">X</td></tr>
-										</table>									
 									</div>
 									<h1 onclick="toggleCategory(1);">VOLUME</h1>
 									<div class='volumeSettings Category'>
@@ -68,7 +48,7 @@
 										oninput="SetVolume(this.value)" onchange="SetVolume(this.value)">
 									</div>
 								</div>
-								<div class="small_menu_button hoverButton" onclick="resetToMain();">RETURN</div>
+								<div class="small_menu_button hoverButton" onclick="resetToMain();" style='width:20%;'>RETURN</div>
 							</div>
 						</div>
 					</div>
@@ -85,17 +65,41 @@
 			</div>
 			<div id="playerCounter"></div>
 		</div>
+		<div id='chatbox' class='resizeable'>
+			<div id='chatTitleBar'>CHAT <div class='MinimizeButton'>-</div></div>
+			<div id='chatContents'></div>
+			<div class="inputBox">
+				<input id='userName'>
+				<input id='text'>
+				<button id='send'>Send</button>	
+			</div>
+		</div>
+		<div id='keyChangeWrapper' class='hidden'>
+			<div id='keyChangeWindow'>
+				<div class='keyChangeContainer'>
+					<p>Press the key you want to bind for:</p>
+					<p id='bindKeyTo'></p><p id='keyPressed'></p>
+					<p>*Press ESC to unbind <br> *Press the same key to exit </p>
+					<div id='keySettingButtons' class='H_buttonWrapper'>
+						<div id='r' class="small_menu_button hoverButton">RESTORE</div>
+						<div id='c' class="small_menu_button hoverButton">RETURN</div>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 </body>
 
 <foot>
-<script src="./seedrandom.min.js"></script>
-<script src="./socket.io.js"></script>
+<script src="./dep/seedrandom.min.js"></script>
+<script src="./dep/socket.io.js"></script>
 <script src="./main.js" type="module"></script>
+<script src="./dep/keySettings.js" type="module"></script>
 <script>
 	const menuWrapper = document.getElementById('menuWrapper');
 	const categories = document.getElementsByClassName('Category');
 	const resetToMain = () => {
+		for(let cat of categories) cat.classList.remove('show');
 		menuWrapper.classList.remove('scrollLeft');
 		menuWrapper.classList.remove('scrollRight');
 	}

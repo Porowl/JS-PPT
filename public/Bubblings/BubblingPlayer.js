@@ -4,7 +4,7 @@ import BubblingView from './BubblingView.js';
 import Bubbling from './Bubbling.js';
 import MultBubblings from './MultBubblings.js';
 
-import {BUBBLING_SIZE, DIRECTION,KICK,BUBBLING_BOARD_WIDTH,KEY,BUBBLING_DAS,ARR,KEYSTATES,BUBBLING_STATE,POP_SPRITE,playSound,SOUNDS} from '../constants.js';
+import {BUBBLING_SIZE, DIRECTION,KICK,BUBBLING_BOARD_WIDTH,BUBBLING_DAS,ARR,KEYSTATES,BUBBLING_STATE,POP_SPRITE,playSound,SOUNDS} from '../constants.js';
 import {socket} from '../main.js';
 
 export default class BubblingPlayer{
@@ -125,7 +125,7 @@ export default class BubblingPlayer{
             case PHASE.DROP: {
 				this.inputCycle(); 
 				
-				let keyDown = this.Stats.keyMap[KEY.DOWN];
+				let keyDown = this.Stats.isDownPressed();
 				if(this.Board.valid(this.bubbling.getPos(DIRECTION.DOWN))){
 					this.bubbling.moveDown(keyDown);
 					if(keyDown){
@@ -303,8 +303,8 @@ export default class BubblingPlayer{
 		if (state == KEYSTATES.LR || state == -1) {
 			this.LRFrameCounter = 0;
 		} else {
-			let dir = state==KEYSTATES.L?DIRECTION.LEFT:DIRECTION.RIGHT;
-			let offset = state==KEYSTATES.L?-1:1
+			let dir = (state==KEYSTATES.L)?DIRECTION.LEFT:DIRECTION.RIGHT;
+			let offset = (state==KEYSTATES.L)?-1:1
 			let fc = this.LRFrameCounter;
 			if (fc == 0 || (fc >= BUBBLING_DAS && (fc - BUBBLING_DAS) % ARR == 0)) {
 				if(this.Board.valid(this.bubbling.getPos(dir))){
@@ -317,11 +317,11 @@ export default class BubblingPlayer{
 	
 	rotate = () => {
 		let state = this.Stats.checkRot();
-		if (state == KEYSTATES.UZ || state == -1) {
+		if (state == KEYSTATES.CA || state == -1) {
 			this.RotateFrameCounter = 0;
 		} else {
 			if (this.RotateFrameCounter == 0) {
-				let dir = state == KEYSTATES.U ? DIRECTION.CW : DIRECTION.ACW;
+				let dir = (state == KEYSTATES.C) ? DIRECTION.CW : DIRECTION.ACW;
 				let result = this.Board.validRotation(this.bubbling.getPos(),dir)
 				if(result==KICK.NO_ROTATION) {
 					if(this.bubbling.rotation%2==0) this.bubbling.tempRotation = 1;

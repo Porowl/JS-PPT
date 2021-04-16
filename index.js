@@ -62,6 +62,22 @@ io.on('connection', (socket) => {
 		io.to(socket.id).emit('connected')
 	})
 	
+	// CHATS 
+	socket.on('chatMessage', data => {
+		let room = Rmgr.getRoom(socket);
+		if(room) io.to(room.id).emit('chatMessage',data);
+		else {
+			io.to(socket.id).emit('chatmessage',data);
+			io.to(socket.id).emit('notification',{code:'roomNotFound'});
+		}
+	})
+	
+	socket.on('changedUsername',data=>{
+		let room = Rmgr.getRoom(socket);
+		let dest = room?room.id:socket.id;
+		io.to(dest).emit('notification',{code:'changedUsername',data});
+	})
+	
 	// GAMES
 	
 	socket.on('ready', ()=>{
