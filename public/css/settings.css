@@ -106,3 +106,21 @@ td:nth-child(3){
 	width:100%;
 	justify-content:center;
 }
+.credits {
+	display:flex;
+	flex-direction:column;
+	font-size:1.5vmin;
+}
+.credits div {
+	padding: 1vmin;
+}
+.attribution-block {
+	border: 1px dotted white;
+	margin:0.5vmin;
+	background : rgba(0,0,0,0.5);
+}
+.credit_title{
+	font-size:2vmin;
+	color:yellow;
+	text-decoration: underline;
+}

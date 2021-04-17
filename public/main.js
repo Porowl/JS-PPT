@@ -5,26 +5,30 @@ import BubblingPlayer from './Bubblings/BubblingPlayer.js';
 import BubblingView from './Bubblings/BubblingView.js';
 import Randomizer from './Randomizer.js';
 import {initChatbox} from './dep/chat.js';
-// import menu from './Menu.js';
+import {AudioManager} from './dep/AudioManager.js';
+import {canvas0, canvas1, canvas2, canvas3, ctx0, ctx1, ctx2, ctx3, GAME_STATE,playSound,SOUNDS,AudioVolumeManager,BGM} from './constants.js';
 
-import {canvas0, canvas1, canvas2, canvas3, ctx0, ctx1, ctx2, ctx3, GAME_STATE,playSound,SOUNDS,AudioVolumeManager} from './constants.js';
-
-//
 let established = false;
 let requestId;
 let keySettings = () => {};
 
-//
 let Player;
 let EnemyView;
 let myType;
 let enemyType;
 
-// 
 let mode;
 let ready;
 
 const init = () => {
+	let menu = document.getElementById('menu'); 
+	let startBgm = () => {
+		console.log('bgm playing!');
+		AudioManager.playBgm(BGM);
+		menu.removeEventListener('click',startBgm);
+	}
+	
+	menu.addEventListener('click',startBgm);
 	window.addEventListener('focus',()=>{
 		document.title = 'JS-PPT';
 		PageTitleNotification.off();
@@ -92,31 +96,19 @@ const init = () => {
 	})
 	
 	socket.on('enemyAud',data=>{
-		playSound(data,false);
+		AudioManager.playSound(data.setting,data.url,false);
 	});
 	
 	socket.on('readyStatus', data=>{
-		if(data==socket.id){
-			Player.View.display(GAME_STATE.READY);
-		} else {
-			EnemyView.display(GAME_STATE.READY);
-		}
+		(data==socket.id)?Player.View.display(GAME_STATE.READY):EnemyView.display(GAME_STATE.READY);
 	});
 	
 	socket.on('cancelStatus', data=>{
-		if(data==socket.id){
-			Player.View.display();
-		} else {
-			EnemyView.display();
-		}
+		(data==socket.id)?Player.View.display():EnemyView.display()
 	});
 	
 	socket.on('playAgainStatus', data=>{
-		if(data==socket.id){
-			Player.View.display(GAME_STATE.PLAY_AGAIN);
-		} else {
-			EnemyView.display(GAME_STATE.PLAY_AGAIN);
-		}
+		(data==socket.id)?Player.View.display(GAME_STATE.PLAY_AGAIN):EnemyView.display(GAME_STATE.PLAY_AGAIN)
 	});
 	
 	socket.on('oppDisconnected',()=>{
@@ -318,9 +310,9 @@ const update = () => {
 	if(Player) Player.update(GameCycle.dt());
 }
 
-const SetVolume = value => {
-	AudioVolumeManager.vars.volume = value/100;
-	playSound(SOUNDS.COMBO1, false)
+const SetVolume = (setting,value) => {
+	AudioManager.setVolume(setting,value);
+	if(setting!='bgmVolume') AudioManager.playSound(setting, SOUNDS.COMBO1, false);
 }
 
 window.init = init;

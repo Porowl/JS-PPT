@@ -4,9 +4,8 @@ import Storage from './Storage.js';
 import Mino from './Mino.js';
 import {socket} from '../main.js';
 
-import {DRAWMODE,KEYSTATES,LAST_MOVE, ENTRY_DELAY,DAS,ARR,OFFSETS,I_OFFSETS,PIECE_MAP,
-	   LINE_CLEAR_FRAMES,CLEAR_STRINGS,SOUNDS,playSound,ACTION_LOCKDELAY_REFRESH_MAX
-	  } from '../constants.js';
+import {DRAWMODE,KEYSTATES,LAST_MOVE, ENTRY_DELAY,DAS,ARR,OFFSETS,I_OFFSETS,PIECE_MAP,LINE_CLEAR_FRAMES,CLEAR_STRINGS,SOUNDS,ACTION_LOCKDELAY_REFRESH_MAX} from '../constants.js';
+import {AudioManager} from '../dep/AudioManager.js';
 
 export default class Player {
 	constructor(myid) {
@@ -217,7 +216,7 @@ export default class Player {
 			case PHASE.GAME_OVER:{
 				this.phase = PHASE.STANDBY;
 				socket.emit('gameOver');
-				playSound(SOUNDS.GAMEOVER);
+				AudioManager.playSfx(SOUNDS.GAMEOVER);
 				break;
 			}
 		}
@@ -259,7 +258,7 @@ export default class Player {
 	moveDown = () => {
 		if (this.board.canMove(this.piece,0,1)) {
 			this.piece.move(0,1);
-			playSound(SOUNDS.MOVE);
+			AudioManager.playSfx(SOUNDS.MOVE);
 			this.updatePiece();
 			return true;
 		}
@@ -280,7 +279,7 @@ export default class Player {
 				if(this.board.canMove(this.piece,dir,0)) {
 					this.piece.move(dir,0);
 					this.lockDelayRefreshed = 1;
-					playSound(SOUNDS.MOVE);
+					AudioManager.playSfx(SOUNDS.MOVE);
 					this.updatePiece();
 				}
 			}
@@ -324,7 +323,7 @@ export default class Player {
 			this.updatePiece();
 			piece.lastMove = LAST_MOVE.SPIN;
 			this.lockDelayRefreshed = 1;
-			playSound(SOUNDS.CHANGE);
+			AudioManager.playSfx(SOUNDS.CHANGE);
 		}
 	};
 
@@ -345,7 +344,7 @@ export default class Player {
 			}
 			this.updatePiece();
 			this.holdUsed = true;
-			playSound(SOUNDS.HOLD.play);
+			AudioManager.playSfx(SOUNDS.HOLD.play);
 		}
 		this.stg.resetHoldPress();
 		this.stg.resetHardDropPress();
@@ -360,7 +359,7 @@ export default class Player {
 			this.piece.hardDropped = true;
 			this.stg.resetHoldPress();
 			this.stg.resetHardDropPress();
-			playSound(SOUNDS.HARDDROP);
+			AudioManager.playSfx(SOUNDS.HARDDROP);
 		}
 	};
 

@@ -24,7 +24,6 @@
 							<div id='multPlayer' class="menu_button hoverButton">PLAY ONLINE</div>
 							<div id='singlePlayer' class="menu_button hoverButton">PRACTICE</div>
 							<div id='settings' class="menu_button hoverButton">SETTINGS</div>
-							<div> </div>
 						</div>
 						<div id='playerChoose' class='main right'>
 							<div id='selectBoardText'> SELECT YOUR GAME MODE </div>
@@ -36,16 +35,28 @@
 							<div class='scrollable'>
 								<div class='contentWrapper'>
 									<h1 onclick='toggleCategory(0);'>KEY SETTINGS</h1>
-									<div class='keySettings Category'>
-									</div>
-									<h1 onclick="toggleCategory(1);">VOLUME</h1>
+									<div class='keySettings Category'></div>
+									<h1 onclick="toggleCategory(1);">AUDIO</h1>
 									<div class='volumeSettings Category'>
-										<!-- <label for="bgm">Background Music</label>
-										<input name="bgm" type="range" min="0" max="100" step="1" 
-										oninput="SetVolume(this.value)" onchange="SetVolume(this.value)"> -->
-										<label for="sfx">Sound Effects</label>
-										<input name="sfx" type="range" min="0" max="100" step="1" value="35"
-										oninput="SetVolume(this.value)" onchange="SetVolume(this.value)">
+										<label for="sfx">BACKGROUND MUSIC</label>
+										<input name="sfx" type="range" min="0" max="1" step="0.01" value="0.35"
+										oninput="SetVolume('bgmVolume',this.value)" onchange="SetVolume('bgmVolume',this.value)">
+										<label for="sfx">SOUND EFFECTS</label>
+										<input name="sfx" type="range" min="0" max="1" step="0.01" value="0.35"
+										oninput="SetVolume('sfxVolume',this.value)" onchange="SetVolume('sfxVolume',this.value)">
+										<label for="sfx">VOICES</label>
+										<input name="sfx" type="range" min="0" max="1" step="0.01" value="0.35"
+										oninput="SetVolume('voiceVolume',this.value)" onchange="SetVolume('voiceVolume',this.value)">
+									</div>
+									<h1 onclick="toggleCategory(2);">CREDITS</h1>
+									<div class='credits Category'>
+										<div class='credit_title'>DIRECTIOR</div>
+										<div class="attribution-block">Chanporo</div>
+										<div class='credit_title hidden'>VOICES</div>
+										<div class='credit_title'>MUSIC</div>
+										<div class="attribution-block"><a href="http://dig.ccmixter.org/files/djlang59/37792">Drops of H2O ( The Filtered Water Treatment )</a> by J.Lang (c) copyright 2012 Licensed under a Creative Commons <a href="http://creativecommons.org/licenses/by/3.0/">Attribution (3.0)</a> license. Ft: Airtone</div>
+										<div class='credit_title'>SFX</div>
+										<div class="attribution-block">Chanporo</div>
 									</div>
 								</div>
 								<div class="small_menu_button hoverButton" onclick="resetToMain();" style='width:20%;'>RETURN</div>

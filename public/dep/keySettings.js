@@ -33,7 +33,6 @@ export const storageAvailable = () => {
     }
 }
 
-
 export const keySettingEvent = () => {
 	initHtml();
 	loadKeySettings();

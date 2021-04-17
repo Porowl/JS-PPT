@@ -1,5 +1,5 @@
-import {GRAVITY, T_SPIN_STATE, SCORE,GAMEMODE,KEYSTATES,T_KEY as KEY,CLEAR_STRINGS,COMBO_GARB,COMBO_GARB_NERF,SOUNDS,GAUGE_TO_TRASH,playSound
-	  } from '../constants.js';
+import {GRAVITY, T_SPIN_STATE, SCORE,GAMEMODE,KEYSTATES,T_KEY as KEY,CLEAR_STRINGS,COMBO_GARB,COMBO_GARB_NERF,SOUNDS,GAUGE_TO_TRASH} from '../constants.js';
+import {AudioManager} from '../dep/AudioManager.js';
 
 import {socket} from '../main.js';
 
@@ -105,7 +105,7 @@ export default class Storage{
 		//resetCombo;
         (lines>0)?this.combo++:this.combo=0;
 		if(this.combo!=0){
-			playSound(playSound(SOUNDS['COMBO'+Math.min(this.combo,8)]));
+			AudioManager.playVoice(SOUNDS['COMBO'+Math.min(this.combo,8)]);
 		}
     
         return scoreArr;
@@ -152,65 +152,65 @@ export default class Storage{
                 calc = 100;
                 this.b2b = 0;
                 text = CLEAR_STRINGS.SINGLE;
-				playSound(SOUNDS.ERASE);
+				AudioManager.playSfx(SOUNDS.ERASE);
                 break;
             case SCORE.DOUBLE:
                 calc = 300;
                 this.b2b = 0;
                 text = CLEAR_STRINGS.DOUBLE;
-				playSound(SOUNDS.ERASE);
+				AudioManager.playSfx(SOUNDS.ERASE);
                 break;
             case SCORE.TRIPLE:
                 calc = 500;
                 this.b2b = 0;
                 text = CLEAR_STRINGS.TRIPLE;
-				playSound(SOUNDS.ERASE);
+				AudioManager.playSfx(SOUNDS.ERASE);
                 break;
             case SCORE.TETROCKS:
                 calc = 800;
                 this.b2b++;
                 text = CLEAR_STRINGS.TETROCKS;
-				playSound(SOUNDS.ERASE4);
+				AudioManager.playSfx(SOUNDS.ERASE4);
                 break;
             case SCORE.MTS:
                 calc = 100;
                 text = CLEAR_STRINGS.T_SPIN + CLEAR_STRINGS.MINI;
-				playSound(SOUNDS.TSPIN);
+				AudioManager.playSfx(SOUNDS.TSPIN);
                 break;
             case SCORE.MTSS:
                 calc = 200;
                 this.b2b++;
                 text = CLEAR_STRINGS.T_SPIN + CLEAR_STRINGS.MINI + CLEAR_STRINGS.SINGLE;
-				playSound(SOUNDS.TSPINC);
+				AudioManager.playSfx(SOUNDS.TSPINC);
                 break;
             case SCORE.TS:
                 calc = 400;
                 text = CLEAR_STRINGS.T_SPIN;
-				playSound(SOUNDS.TSPIN);
+				AudioManager.playSfx(SOUNDS.TSPIN);
                 break;
             case SCORE.TSS:
                 calc = 800;
                 this.b2b++;
                 text = CLEAR_STRINGS.T_SPIN + CLEAR_STRINGS.SINGLE;
-				playSound(SOUNDS.TSPINC);
+				AudioManager.playSfx(SOUNDS.TSPINC);
                 break;
             case SCORE.TSD:
                 calc = 1200;
                 this.b2b++;
                 text = CLEAR_STRINGS.T_SPIN + CLEAR_STRINGS.DOUBLE;
-				playSound(SOUNDS.TSPINC);
+				AudioManager.playSfx(SOUNDS.TSPINC);
                 break;
             case SCORE.TST:
                 calc = 1600;
                 this.b2b++;
                 text = CLEAR_STRINGS.T_SPIN + CLEAR_STRINGS.TRIPLE;
-				playSound(SOUNDS.TSPINC);
+				AudioManager.playSfx(SOUNDS.TSPINC);
                 break;
             case SCORE.PERFECT:
                 this.score += 30000;
                 text = CLEAR_STRINGS.PERFECT;
                 return [text, 30000];
-				playSound(SOUNDS.ERASE4);
+				AudioManager.playSfx(SOUNDS.ERASE4);
         }
         if(last&&this.b2b) calc = calc*1.5
         calc = calc*mult;

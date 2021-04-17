@@ -4,7 +4,8 @@ import BubblingView from './BubblingView.js';
 import Bubbling from './Bubbling.js';
 import MultBubblings from './MultBubblings.js';
 
-import {BUBBLING_SIZE, DIRECTION,KICK,BUBBLING_BOARD_WIDTH,BUBBLING_DAS,ARR,KEYSTATES,BUBBLING_STATE,POP_SPRITE,playSound,SOUNDS} from '../constants.js';
+import {BUBBLING_SIZE, DIRECTION,KICK,BUBBLING_BOARD_WIDTH,BUBBLING_DAS,ARR,KEYSTATES,BUBBLING_STATE,POP_SPRITE,SOUNDS} from '../constants.js';
+import {AudioManager} from '../dep/AudioManager.js';
 import {socket} from '../main.js';
 
 export default class BubblingPlayer{
@@ -397,7 +398,7 @@ class BouncingBubblingManager {
 				if(!p) p = true;
 			};
 		}
-		if(p) playSound(SOUNDS.BUB_DROP);
+		if(p) AudioManager.playSfx(SOUNDS.BUB_DROP);
 	}
 	
 	cleanUp = () => {

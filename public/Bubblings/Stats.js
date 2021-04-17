@@ -80,7 +80,7 @@ export default class Stats{
         this.score += score;
 		this.chain++;
 
-		playSound(playSound(VOICES.ARLE.COMBO(this.chain)));
+		AudioManager.playVoice(VOICES.ARLE.COMBO(this.chain));
 
 		this.sendAttack();
 		

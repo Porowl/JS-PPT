@@ -432,6 +432,7 @@ export const SOUNDS = {
 	BUB_DROP: './sounds/soundEffects/bub_drop.mp3',
 	POP: './sounds/soundEffects/bub_pop.mp3',
 }
+export const BGM = './sounds/bgms/THE_ONE_AND_ONLY.mp3';
 
 export const VOICES = {
 	ARLE: {
