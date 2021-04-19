@@ -40,9 +40,9 @@ canvas{
 	background-color:rgb(30,30,30);
 	position:relative;
 	height:75vw;
-	max-height:768px;
-	width: 100%;
-	max-width:1024px;
+	max-height:min(90vh,768px);
+	width: 125vh;
+	max-width:min(1024px,125vh);
 	margin:auto;
 	top:0px;
 	left:0px;

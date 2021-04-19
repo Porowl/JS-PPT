@@ -39,12 +39,9 @@ export default class Randomizer{
 		this.refillBag();
     }
 
-    refillBag = () =>
-    {
+    refillBag = () => {
         if(this.bag.length == 0) {
-			for(var i = 0; i<7; i++){
-				this.bag.push(i);
-			}
+			this.bag.concat([0,1,2,3,4,5,6]);
 		}
     }
 	

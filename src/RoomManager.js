@@ -80,28 +80,19 @@ class Room {
 	contains = socket => this.player0.id == socket.id || this.player1.id == socket.id;
 	
 	reset = () =>{
-		if(this.count!=2) return;
+		if(this.count<2) return;
+		console.log(`${this.id}: resetting room`);
+		this.count = 0;
 		this.randomseed = Math.random().toString(36).substr(2,11);
 		io.to(this.id).emit('reset',this.randomseed);
-		this.count = 0;
 	}
 
 	start = () =>{
 		if(this.count<2) return;
-		
 		this.count = 0;
 		console.log(`${this.id}: starting game`);
 		io.to(this.id).emit('countdown');
-		
-		setTimeout(()=>{
-			this.status = STATUS.PLAYING;
-		},3000);
-	};
-	
-	update = (dt) => {
-		if (this.status == STATUS.PLAYING) {
-			io.to(this.id).emit('update',dt);
-		}
+		this.status = STATUS.PLAYING;
 	};
 
 	playerReady = (id) => {

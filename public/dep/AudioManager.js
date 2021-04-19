@@ -17,7 +17,7 @@ export const AudioManager = {
 		aud.volume = this.vars[setting];
 		aud.play();
 		if(sendEnemy) {
-			socket.emit('aud',{setting,url});
+			socket.emit('aud',{setting:setting,url:url});
 		}
 	},
 	playBgm: function(url){

@@ -23,7 +23,6 @@ let ready;
 const init = () => {
 	let menu = document.getElementById('menu'); 
 	let startBgm = () => {
-		console.log('bgm playing!');
 		AudioManager.playBgm(BGM);
 		menu.removeEventListener('click',startBgm);
 	}
@@ -64,7 +63,7 @@ const init = () => {
 		EnemyView = enemyType === 'BUBBLING'?new BubblingView(1):new TetView(1);
 		
 		if(!document.hasFocus()) PageTitleNotification.on("Opponent has joined!", 1000);
-		playSound(SOUNDS.PLAYER_JOIN)
+		AudioManager.playSfx(SOUNDS.PLAYER_JOIN,false);
 		
 		EnemyView.preview = true;
 		Player.setOpponent(enemyType);
@@ -112,7 +111,6 @@ const init = () => {
 	});
 	
 	socket.on('oppDisconnected',()=>{
-		console.log('enemy disconnected');
 		EnemyView.display(GAME_STATE.DISCONNECTED);
 		GameCycle.off();
 	});
@@ -127,6 +125,7 @@ const init = () => {
 	
 	socket.on('reset',seed=>{
 		if(mode==1){
+			ready = false;
 			resetPlayer(Player);
 			Player = myType==='BUBBLING'?new BubblingPlayer(socket.id):new TetPlayer(socket.id);
 			EnemyView = enemyType === 'BUBBLING'?new BubblingView(1):new TetView(1);
@@ -212,6 +211,10 @@ const initMenus = () => {
 		hide(igmenus);
 		show(menus);
 	})
+	playAgain.addEventListener('click',()=>{
+		socket.emit('playAgain');
+		hide(playAgain);
+	});
 	socket.on('oppJoined',()=>show(red));
 	socket.on('countdown',()=>hide(igmenus));
 	socket.on('GAME_OVER',()=>{
@@ -221,13 +224,11 @@ const initMenus = () => {
 	});
 	socket.on('oppDisconnected',()=>{
 		hide(red);
-		show(playAgain);
 		show(igmenus);
 	});
-	socket.on('reset'),()=>{
+	socket.on('reset',()=>{
 		show(red);
-		hide(playAgain);
-	}
+	});
 }
 
 const resetPlayer = () =>{
