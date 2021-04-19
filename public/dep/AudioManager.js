@@ -25,6 +25,7 @@ export const AudioManager = {
 		delete this.bgm;
 		let bgm = new Audio(url);
 		bgm.volume = this.vars.bgmVolume;
+		bgm.loop = true;
 		bgm.play();
 		this.bgm = bgm;
 	},
