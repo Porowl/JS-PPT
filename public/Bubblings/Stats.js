@@ -1,5 +1,5 @@
 import {CHAIN_BONUS,COLOR_BONUS,GROUP_SIZE_BONUS,VS_TETROCKS_SCORE,playSound,VOICES,SOUNDS,P_KEY as KEY,KEYSTATES} from '../constants.js';
-
+import {AudioManager} from '../dep/AudioManager.js';
 import {socket} from '../main.js';
 
 export default class Stats{
