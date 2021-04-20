@@ -41,8 +41,8 @@ canvas{
 	position:relative;
 	height:75vw;
 	max-height:min(90vh,768px);
-	width: 125vh;
-	max-width:min(1024px,125vh);
+	width: 100%;
+	max-width:min(1024px,133vh);
 	margin:auto;
 	top:0px;
 	left:0px;
