@@ -39,11 +39,7 @@ export default class Randomizer{
 		this.refillBag();
     }
 
-    refillBag = () => {
-        if(this.bag.length == 0) {
-			this.bag.concat([0,1,2,3,4,5,6]);
-		}
-    }
+    refillBag = () => {if(!this.bag.length) for(let i = 0; i<7; i++)this.bag.push(i);}
 	
 	getBubbling = (index = 0) =>
     {
