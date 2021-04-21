@@ -42,7 +42,7 @@ canvas{
 	height:75vw;
 	max-height:min(90vh,768px);
 	width: 100%;
-	max-width:min(1024px,133vh);
+	max-width:min(1024px,calc(90vh * 4 / 3));
 	margin:auto;
 	top:0px;
 	left:0px;
